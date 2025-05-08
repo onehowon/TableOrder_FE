@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://134.185.112.154', // 실제 배포 IP
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 export default api; 
