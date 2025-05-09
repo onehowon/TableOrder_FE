@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState} from 'react'
-import type { ReactNode } from 'react'
+import { createContext, useContext, useState } from 'react'
 
 interface TableContextType {
   tableId: string | null
@@ -11,10 +10,9 @@ const TableContext = createContext<TableContextType>({
   setTableId: () => {},
 })
 
-export const TableProvider = ({ children }: { children: ReactNode }) => {
-  // localStorage에 저장된 tableId를 초기값으로 가져오기
-  const [tableId, _setTableId] = useState<string | null>(
-    () => localStorage.getItem('tableId')
+export const TableProvider = ({ children }: { children: React.ReactNode }) => {
+  const [tableId, _setTableId] = useState<string | null>(() =>
+    localStorage.getItem('tableId')
   )
 
   const setTableId = (id: string) => {
