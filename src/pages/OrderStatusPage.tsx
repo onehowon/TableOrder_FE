@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 
 interface OrderItem {
-  menuName: string
+  name: string
   quantity: number
 }
 
@@ -15,11 +15,16 @@ interface OrderStatus {
 
 export default function OrderStatusPage() {
   const { orderId } = useParams<{ orderId: string }>()
+  const navigate = useNavigate()
   const [order, setOrder] = useState<OrderStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!orderId) {
+      navigate('/', { replace: true })
+      return
+    }
     let timer: ReturnType<typeof setInterval>
     const fetchStatus = () => {
       setLoading(true)
@@ -29,13 +34,17 @@ export default function OrderStatusPage() {
           setOrder(res.data.data)
           setError(null)
         })
-        .catch(() => setError('주문 상태를 불러오지 못했습니다.'))
-        .finally(() => setLoading(false))
+        .catch(() => {
+          setError('주문 상태를 불러오지 못했습니다.')
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     }
     fetchStatus()
     timer = setInterval(fetchStatus, 5000)
     return () => clearInterval(timer)
-  }, [orderId])
+  }, [orderId, navigate])
 
   if (loading) return <p className="text-center text-gray-500">로딩 중…</p>
   if (error) return <p className="text-center text-red-500">{error}</p>
@@ -54,7 +63,7 @@ export default function OrderStatusPage() {
               key={idx}
               className="flex justify-between items-center border-b last:border-b-0 pb-1"
             >
-              <span>{item.menuName}</span>
+              <span>{item.name}</span>
               <span className="font-semibold">x {item.quantity}</span>
             </li>
           ))}
