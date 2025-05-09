@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:match*",
+        "destination": "https://api.ebiztable.shop/:match*"
+      },
+      {
+        "source": "/:match*",
+        "destination": "/index.html"
+      }
+    ]
+  }
+  
