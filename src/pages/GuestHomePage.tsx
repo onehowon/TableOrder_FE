@@ -1,16 +1,39 @@
-import { useNavigate } from 'react-router-dom';
+// src/pages/GuestHomePage.tsx
+import { useEffect } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useTable } from '../contexts/TableContext'
 
 export default function GuestHomePage() {
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const { setTableId } = useTable()
+
+  useEffect(() => {
+    const id = searchParams.get('tableId')
+    if (id) {
+      setTableId(id)
+      navigate('/menu', { replace: true })
+    }
+  }, [searchParams, setTableId, navigate])
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
-      <h1 style={{ fontSize: 32, marginBottom: 40 }}>손님 홈</h1>
-      <button onClick={() => navigate('/menu')} style={{ fontSize: 20, padding: '20px 40px', marginBottom: 24, borderRadius: 8, border: '1px solid #2563eb', background: '#2563eb', color: 'white', cursor: 'pointer' }}>
-        메뉴 주문하기
-      </button>
-      <button onClick={() => navigate('/table-order')} style={{ fontSize: 20, padding: '20px 40px', borderRadius: 8, border: '1px solid #22c55e', background: '#22c55e', color: 'white', cursor: 'pointer' }}>
-        테이블 주문 내역 조회
-      </button>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        padding: 16,
+        textAlign: 'center',
+      }}
+    >
+      <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>
+        잘못된 접근입니다
+      </h1>
+      <p style={{ fontSize: 16, color: '#666' }}>
+        테이블 위 QR 코드를 다시 스캔해 주세요.
+      </p>
     </div>
-  );
-} 
+  )
+}

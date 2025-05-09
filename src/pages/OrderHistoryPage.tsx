@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import api from '../api';
 
 interface OrderItem {
@@ -25,12 +26,12 @@ export default function OrderHistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<OrderDetail | null>(null);
 
-  // 임시로 tableId=1 사용 (실제 구현시 Context/쿼리에서 받아야 함)
-  const tableId = 1;
+  const { tableId } = useParams<{ tableId: string }>();
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+    if (!tableId) return;
     api.get(`/customer/orders/table/${tableId}`)
       .then(res => setHistory(res.data.data))
       .catch(() => setError('주문 이력을 불러오지 못했습니다.'))
@@ -39,7 +40,8 @@ export default function OrderHistoryPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
-      <h2 style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 24 }}>주문 이력</h2>
+      <h2 style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 24 }}>
+        테이블 {tableId} 주문 이력</h2>
       {loading && <p>로딩 중...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {history && history.orders.length === 0 && <p>주문 이력이 없습니다.</p>}
