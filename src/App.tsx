@@ -1,5 +1,5 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import GuestHomePage         from './pages/GuestHomePage'
 import WelcomePage           from './pages/WelcomePage'
 import MenuPage              from './pages/MenuPage'
@@ -25,6 +25,7 @@ export default function App() {
   return (
     <>
       {isAdmin && <AdminHeader title="관리자 대시보드" />}
+
       <Routes>
         {/* QR 스캔 → Context 저장 → Welcome으로 */}
         <Route path="/:tableId" element={<TableOrderPage />} />
