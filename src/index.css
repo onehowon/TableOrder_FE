@@ -1,3 +1,38 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 사이드바 배경 / 너비 고정 */
+.sidebar {
+  @apply bg-sidebarBg w-sidebarW h-full flex flex-col p-6 space-y-4;
+}
+
+/* 선택된 메뉴 */
+.sidebar .menu-item-selected {
+  @apply bg-primary text-white;
+}
+
+/* 메뉴 아이콘+텍스트 */
+.menu-item {
+  @apply flex items-center space-x-3 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-100;
+}
+
+/* 메인 컨텐트 배경 */
+.content {
+  @apply flex-1 bg-contentBg p-8 overflow-auto;
+}
+
+/* 알림 카드 */
+.alert-card {
+  @apply flex items-start space-x-4;
+}
+.alert-card-avatar {
+  @apply w-10 h-10 rounded-full bg-gray-200;
+}
+.alert-card-body {
+  @apply relative bg-cardBg p-4 rounded-xl2 flex-1;
+}
+.alert-card-time {
+  @apply absolute bottom-2 right-3 text-xs text-gray-500;
+}
