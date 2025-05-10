@@ -1,61 +1,49 @@
-import { useEffect, useState } from 'react';
-import api from '../api';
+// src/pages/TableAdminSummaryPage.tsx
+import { useEffect, useState } from 'react'
+import { getAdminTableSummary } from '../api'
 
-interface ItemSummary {
-  name: string;
-  quantity: number;
-  totalPrice: number;
+interface Item {
+  menuName: string
+  quantity: number
 }
-interface TableSummary {
-  tableNumber: number;
-  totalOrders: number;
-  totalAmount: number;
-  items: ItemSummary[];
+
+interface Summary {
+  tableNumber: number
+  totalAmount: number
+  items: Item[]
 }
 
 export default function TableAdminSummaryPage() {
-  const [list, setList]         = useState<TableSummary[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
+  const [summaries, setSummaries] = useState<Summary[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError]       = useState<string|null>(null)
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const res = await api.get<{ data: TableSummary[] }>('/admin/tables/summary-all');
-        setList(res.data.data);
-        setError(null);
-      } catch {
-        setError('불러오지 못했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, []);
+    getAdminTableSummary(0)  // all-summary API 가 있다면 그것을 호출하세요.
+      .then(r => setSummaries(r.data.data))
+      .catch(() => setError('테이블 요약을 불러오지 못했습니다.'))
+      .finally(() => setLoading(false))
+  }, [])
 
-  if (loading) return <p className="text-center">로딩 중…</p>;
-  if (error)   return <p className="text-center text-red-500">{error}</p>;
+  if (loading) return <p className="text-center">로딩 중…</p>
+  if (error)   return <p className="text-center text-red-400">{error}</p>
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        전체 테이블 요약
-      </h2>
-      {list.map(tbl => (
-        <div key={tbl.tableNumber} className="bg-white rounded-lg shadow p-4 mb-4">
-          <h3 className="text-xl font-semibold mb-2">
-            테이블 {tbl.tableNumber} — 주문 {tbl.totalOrders}건, 금액 {tbl.totalAmount.toLocaleString()}원
-          </h3>
-          <ul className="text-sm">
-            {tbl.items.map(i => (
-              <li key={i.name} className="flex justify-between">
-                <span>{i.name} ({i.totalPrice.toLocaleString()}원)</span>
-                <span>×{i.quantity}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <h2 className="text-3xl font-bold text-center mb-6">테이블별 요약</h2>
+      <ul className="space-y-4">
+        {summaries.map(s => (
+          <li key={s.tableNumber} className="bg-zinc-800 p-4 rounded">
+            <p className="font-semibold">테이블 {s.tableNumber}</p>
+            <p>총 금액: {s.totalAmount.toLocaleString()}원</p>
+            <ul className="mt-2">
+              {s.items.map((it, i) => (
+                <li key={i}>{it.menuName} × {it.quantity}</li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
     </div>
-  );
+  )
 }

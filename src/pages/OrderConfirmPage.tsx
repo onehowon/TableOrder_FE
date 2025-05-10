@@ -1,106 +1,63 @@
 // src/pages/OrderConfirmPage.tsx
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
-import { createOrder } from '../api'
 import { useTable } from '../contexts/TableContext'
-
-interface CartItem {
-  menuId: number
-  name: string
-  price: number
-  quantity: number
-}
+import { createOrder } from '../api'
 
 export default function OrderConfirmPage() {
-  const { tableId } = useTable()
-  const { cart, clearCart } = useCart()       // ← items 대신 cart 로 받음
-  const navigate = useNavigate()
+  const { cart, clearCart } = useCart()
+  const { tableId }         = useTable()
+  const nav                  = useNavigate()
 
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!tableId) {
-      navigate('/welcome')
-    }
-  }, [tableId, navigate])
+  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0)
 
-  const items: CartItem[] = cart             // ← cart 를 items 로 재할당
-  const totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const handleOrder = async () => {
+    if (!tableId) { setError('테이블 정보가 없습니다.'); return }
+    if (cart.length === 0) { setError('장바구니가 비어 있습니다.'); return }
+    setLoading(true); setError(null)
 
-  const onSubmit = async () => {
-    setSubmitting(true)
-    setError(null)
     try {
-      await createOrder({
+      const res = await createOrder({
         tableNumber: Number(tableId),
-        items: items.map(i => ({
-          menuId: i.menuId,
-          quantity: i.quantity
-        }))
+        items: cart.map(i => ({ menuId: i.menuId, quantity: i.quantity }))
       })
+      const orderId = res.data.data.orderId
+      if (!orderId) throw new Error('orderId 없음')
       clearCart()
-      navigate('/welcome')
-    } catch {
-      setError('주문 처리 중 오류가 발생했습니다.')
-      setSubmitting(false)
+      alert('주문이 정상 접수되었습니다!')
+      setTimeout(() => nav(`/order/status/${orderId}`), 1500)
+    } catch (e: any) {
+      setError(e.response?.data?.message || '주문 실패. 다시 시도해주세요.')
+    } finally {
+      setLoading(false)
     }
-  }
-
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <p>장바구니가 비어 있습니다.</p>
-        <button
-          onClick={() => navigate('/menu')}
-          className="mt-4 btn-secondary w-32 mx-auto"
-        >
-          메뉴로
-        </button>
-      </div>
-    )
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-10">
-      <h2 className="text-2xl font-bold text-center mb-6">주문 확인</h2>
-
-      <ul className="space-y-4 mb-6">
-        {items.map((i: CartItem) => (
-          <li
-            key={i.menuId}
-            className="flex justify-between bg-zinc-800 p-4 rounded-xl"
-          >
-            <div>
-              <p className="font-semibold">{i.name}</p>
-              <p className="text-sm text-gray-400">
-                {i.quantity} × {i.price.toLocaleString()}원
-              </p>
+    <div className="px-2 py-4 max-w-lg mx-auto">
+      <h2 className="text-2xl font-bold text-center mb-4">주문 확인</h2>
+      {cart.length === 0
+        ? <p className="text-center">장바구니가 비어 있습니다.</p>
+        : cart.map(item => (
+            <div key={item.menuId} className="flex justify-between mb-2">
+              <span>{item.name} × {item.quantity}</span>
+              <span>{(item.price * item.quantity).toLocaleString()}원</span>
             </div>
-            <p className="font-bold">
-              {(i.quantity * i.price).toLocaleString()}원
-            </p>
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex justify-between items-center mb-6">
-        <span className="font-semibold">총 합계</span>
-        <span className="text-xl font-bold">
-          {totalAmount.toLocaleString()}원
-        </span>
-      </div>
-
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
+          ))
+      }
+      <div className="font-bold text-right mb-4">합계: {total.toLocaleString()}원</div>
       <button
-        onClick={onSubmit}
-        disabled={submitting}
-        className="btn-primary w-full"
+        onClick={handleOrder}
+        disabled={loading || cart.length === 0}
+        className="btn-primary"
       >
-        {submitting ? '주문 중…' : '주문 완료'}
+        {loading ? '주문 접수 중…' : '주문하기'}
       </button>
+      {error && <p className="text-red-400 mt-2 text-center">{error}</p>}
     </div>
   )
 }
