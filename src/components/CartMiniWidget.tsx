@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -5,7 +6,7 @@ export default function CartMiniWidget() {
   const { cart } = useCart();
   const navigate = useNavigate();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total     = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   if (itemCount === 0) return null;
 
@@ -29,8 +30,12 @@ export default function CartMiniWidget() {
         gap: 16,
       }}
     >
-      <span role="img" aria-label="cart" style={{ fontSize: 22 }}>🛒</span>
-      <span> {itemCount}개 | {total.toLocaleString()}원 </span>
+      <span role="img" aria-label="cart" style={{ fontSize: 22 }}>
+        🛒
+      </span>
+      <span>
+        {itemCount}개 | {total.toLocaleString()}원
+      </span>
     </div>
   );
-} 
+}

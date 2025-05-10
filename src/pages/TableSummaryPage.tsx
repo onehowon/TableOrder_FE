@@ -1,44 +1,50 @@
-// src/pages/TableSummaryPage.tsx
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import api from '../api'
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate }      from 'react-router-dom';
+import api                              from '../api';
 
 interface ItemSummary {
-  name: string
-  quantity: number
-  totalPrice: number
+  name: string;
+  quantity: number;
+  totalPrice: number;
 }
 
 interface TableSummaryResponse {
-  tableNumber: number
-  totalOrders: number
-  totalAmount: number
-  items: ItemSummary[]
+  tableNumber: number;
+  totalOrders: number;
+  totalAmount: number;
+  items: ItemSummary[];
 }
 
 export default function TableSummaryPage() {
-  const { tableId } = useParams<{ tableId: string }>()
-  const [summary, setSummary] = useState<TableSummaryResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
+  const { tableId } = useParams<{ tableId: string }>();
+  const navigate    = useNavigate();
+
+  const [summary, setSummary] = useState<TableSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
-    if (!tableId) {
-      setError('테이블 정보가 없습니다.')
-      setLoading(false)
-      return
-    }
-    setLoading(true)
-    api.get(`/customer/tables/${tableId}/summary`)
-      .then(res => setSummary(res.data.data))
-      .catch(() => setError('요약 정보를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false))
-  }, [tableId])
+    const fetchSummary = async () => {
+      if (!tableId) {
+        setError('테이블 정보가 없습니다.');
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await api.get(`/customer/tables/${tableId}/summary`);
+        setSummary(res.data.data);
+      } catch {
+        setError('요약 정보를 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
+  }, [tableId]);
 
-  if (loading) return <p className="text-center text-gray-500">로딩 중...</p>
-  if (error)   return <p className="text-center text-red-500">{error}</p>
-  if (!summary) return null
+  if (loading) return <p className="text-center text-gray-500">로딩 중...</p>;
+  if (error)   return <p className="text-center text-red-500">{error}</p>;
+  if (!summary) return null;
 
   return (
     <div className="px-2 py-4 max-w-lg mx-auto sm:px-4">
@@ -47,9 +53,9 @@ export default function TableSummaryPage() {
       </h2>
       <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
         <div className="space-y-1">
-          <p><b>총 주문 건수:</b> {summary.totalOrders}회</p>
+          <p>총 주문 건수: {summary.totalOrders}회</p>
           <p>
-            <b>총 주문 금액:</b>{' '}
+            총 주문 금액:{' '}
             <span className="text-blue-700 font-semibold">
               {summary.totalAmount.toLocaleString()}원
             </span>
@@ -63,13 +69,15 @@ export default function TableSummaryPage() {
               className="flex justify-between border-b last:border-b-0 pb-1"
             >
               <div>
-                <span>{item.name}</span>
-                <span className="text-gray-500 text-sm ml-2">
+                <span>{item.name}</span>{' '}
+                <span className="text-gray-500 text-sm">
                   ({item.totalPrice.toLocaleString()}원)
                 </span>
               </div>
               <div>
-                <span className="font-semibold">× {item.quantity}개</span>
+                <span className="font-semibold">
+                  × {item.quantity}개
+                </span>
               </div>
             </li>
           ))}
@@ -82,5 +90,5 @@ export default function TableSummaryPage() {
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -31,10 +31,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart(prev => {
       const exists = prev.find(i => i.menuId === item.menuId);
       if (exists) {
-        return prev.map(i => i.menuId === item.menuId ? { ...i, quantity: i.quantity + quantity } : i);
-      } else {
-        return [...prev, { ...item, quantity }];
+        return prev.map(i =>
+          i.menuId === item.menuId
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
+        );
       }
+      return [...prev, { ...item, quantity }];
     });
   };
 
@@ -43,7 +46,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateQuantity = (menuId: number, quantity: number) => {
-    setCart(prev => prev.map(i => i.menuId === menuId ? { ...i, quantity } : i));
+    setCart(prev =>
+      prev.map(i =>
+        i.menuId === menuId ? { ...i, quantity } : i
+      )
+    );
   };
 
   const clearCart = () => setCart([]);
@@ -59,4 +66,4 @@ export function useCart() {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within a CartProvider');
   return ctx;
-} 
+}

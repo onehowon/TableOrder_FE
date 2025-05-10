@@ -1,78 +1,75 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import api from '../api'
+import React, { useEffect, useState } from 'react';
+import { useParams }                  from 'react-router-dom';
+import api                            from '../api';
 
 interface Item {
-  name: string
-  quantity: number
+  menuName: string;
+  quantity: number;
 }
 
 interface Status {
-  status: string
-  estimatedTime?: number
-  items: Item[]
+  status: string;
+  estimatedTime?: number;
+  items: Item[];
 }
 
 export default function OrderStatusPage() {
-  const { orderId } = useParams<{ orderId: string }>()
-  const [data, setData] = useState<Status | null>(null)
-  const [remain, setRemain] = useState<number | null>(null)
+  const { orderId } = useParams<{ orderId: string }>();
+  const [data, setData]     = useState<Status | null>(null);
+  const [remain, setRemain] = useState<number | null>(null);
 
-  // 5초마다 상태 폴링
+  // 상태 폴링
   useEffect(() => {
-    let iv: ReturnType<typeof setInterval>
+    let iv: ReturnType<typeof setInterval>;
 
-    const fetchStatus = () =>
-      api
-        .get(`/customer/orders/${orderId}`)
-        .then(r => {
-          const d = r.data.data as Status
-          setData(d)
-          setRemain(d.estimatedTime ?? null)
-        })
-        .catch(console.error)
+    const fetchStatus = async () => {
+      try {
+        const res = await api.get(`/customer/orders/${orderId}`);
+        const d: Status = res.data.data;
+        setData(d);
+        setRemain(d.estimatedTime ?? null);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     if (orderId) {
-      fetchStatus()
-      iv = setInterval(fetchStatus, 5000)
+      fetchStatus();
+      iv = setInterval(fetchStatus, 5000);
     }
-
     return () => {
-      if (iv) clearInterval(iv)
-    }
-  }, [orderId])
+      if (iv) clearInterval(iv);
+    };
+  }, [orderId]);
 
-  // 남은 분(minutes) 카운트다운
+  // 남은 시간 카운트다운
   useEffect(() => {
     if (remain !== null && remain > 0) {
-      const to = setTimeout(() => setRemain(r => (r !== null ? r - 1 : null)), 60000)
-      return () => clearTimeout(to)
+      const to = setTimeout(() => setRemain(r => (r !== null ? r - 1 : null)), 60000);
+      return () => clearTimeout(to);
     }
-  }, [remain])
+  }, [remain]);
 
-  if (!data) return <p style={{ textAlign: 'center', marginTop: 40 }}>로딩 중…</p>
+  if (!data) return <p className="text-center mt-10">로딩 중…</p>;
 
   return (
-    <div className='p-4 max-w-md mx-auto'>
-      <h2 className='text-2xl font-bold mb-4'>주문 상태</h2>
-
-      <p className='mb-2'>
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">주문 상태</h2>
+      <p className="mb-2">
         상태: <strong>{data.status}</strong>
       </p>
-
       {remain !== null && (
-        <p className='mb-4'>
+        <p className="mb-4">
           남은 시간: <strong>{remain}분</strong>
         </p>
       )}
-
-      <ul className='list-disc pl-5'>
+      <ul className="list-disc pl-5">
         {data.items.map((i, idx) => (
           <li key={idx}>
-            {i.name} x {i.quantity}
+            {i.menuName} x {i.quantity}
           </li>
         ))}
       </ul>
     </div>
-  )
+  );
 }

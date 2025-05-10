@@ -1,52 +1,48 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import GuestHomePage from './pages/GuestHomePage'
-import MenuPage from './pages/MenuPage'
-import AdminHomePage from './pages/AdminHomePage'
-import AdminPage from './pages/AdminPage'
-import OrderAdminPage from './pages/OrderAdminPage'
-import TableOrderPage from './pages/TableOrderPage'
-import OrderConfirmPage from './pages/OrderConfirmPage'
-import OrderStatusPage from './pages/OrderStatusPage'
-import TableSummaryPage from './pages/TableSummaryPage'
-import OrderHistoryPage from './pages/OrderHistoryPage'
-import CartMiniWidget from './components/CartMiniWidget'
-import './App.css'
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-function App() {
+import TableOrderPage           from './pages/TableOrderPage';
+import GuestHomePage            from './pages/GuestHomePage';
+import MenuPage                 from './pages/MenuPage';
+import OrderConfirmPage         from './pages/OrderConfirmPage';
+import OrderStatusPage          from './pages/OrderStatusPage';
+import OrderHistoryPage         from './pages/OrderHistoryPage';
+import TableSummaryPage         from './pages/TableSummaryPage';
+
+import AdminHomePage            from './pages/AdminHomePage';
+import AdminPage                from './pages/AdminPage';
+import OrderAdminPage           from './pages/OrderAdminPage';
+import TableAdminSummaryPage    from './pages/TableAdminSummaryPage';
+
+import CartMiniWidget           from './components/CartMiniWidget';
+import './App.css';
+
+export default function App() {
   return (
     <>
       <Routes>
-        {/* QR 경로 (/1, /2 …)  */}
-        <Route path='/:tableId' element={<TableOrderPage />} />
+        {/* QR 코드로 들어오는 /:tableId → Context에 저장 후 /menu로 */}
+        <Route path="/:tableId" element={<TableOrderPage />} />
 
-        {/* 손님 */}
-        <Route path='/' element={<GuestHomePage />} />
-        <Route path='/menu' element={<MenuPage />} />
-        <Route path='/order/confirm' element={<OrderConfirmPage />} />
-        <Route path='/order/status/:orderId' element={<OrderStatusPage />} />
-        <Route path='/orders/history/:tableId' element={<OrderHistoryPage />} />
-        <Route path='/table/:tableId/summary' element={<TableSummaryPage />} />
+        {/* 손님용 */}
+        <Route path="/"                         element={<GuestHomePage />} />
+        <Route path="/menu"                     element={<MenuPage />} />
+        <Route path="/order/confirm"            element={<OrderConfirmPage />} />
+        <Route path="/order/status/:orderId"    element={<OrderStatusPage />} />
+        <Route path="/orders/history/:tableId"  element={<OrderHistoryPage />} />
+        <Route path="/table/:tableId/summary"   element={<TableSummaryPage />} />
 
-        {/* 관리자 */}
-        <Route path='/admin' element={<AdminHomePage />} />
-        <Route path='/admin/menus' element={<AdminPage />} />
-        <Route path='/admin/orders' element={<OrderAdminPage />} />
-        <Route
-          path='/admin/tables'
-          element={
-            <div style={{ padding: 32, textAlign: 'center' }}>
-              <h2>테이블 요약 페이지 (목업)</h2>
-            </div>
-          }
-        />
+        {/* 관리자용 */}
+        <Route path="/admin"                   element={<AdminHomePage />} />
+        <Route path="/admin/menus"             element={<AdminPage />} />
+        <Route path="/admin/orders"            element={<OrderAdminPage />} />
+        <Route path="/admin/tables"            element={<TableAdminSummaryPage />} />
 
-        {/* 잘못된 경로 */}
-        <Route path='*' element={<Navigate to='/' replace />} />
+        {/* 기타 잘못된 경로는 홈으로 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <CartMiniWidget />
     </>
-  )
+  );
 }
-
-export default App

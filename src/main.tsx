@@ -1,19 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import App from './App.tsx'
-import { TableProvider } from './contexts/TableContext'
-import { CartProvider } from './contexts/CartContext'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+
+import App from './App';
+import { TableProvider } from './contexts/TableContext';
+import { CartProvider }  from './contexts/CartContext';
+
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <TableProvider>
-        <CartProvider>
+    <TableProvider>
+      <CartProvider>
+        <BrowserRouter>
           <App />
-        </CartProvider>
-      </TableProvider>
-    </BrowserRouter>
+        </BrowserRouter>
+      </CartProvider>
+    </TableProvider>
   </React.StrictMode>
-)
+);

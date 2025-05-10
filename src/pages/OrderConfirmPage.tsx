@@ -1,54 +1,51 @@
-// src/pages/OrderConfirmPage.tsx
-import { useState } from 'react'
-import { useCart } from '../contexts/CartContext'
-import { useTable } from '../contexts/TableContext'
-import api from '../api'
-import { useNavigate } from 'react-router-dom'
+import React, { useState }           from 'react';
+import { useCart }                   from '../contexts/CartContext';
+import { useTable }                  from '../contexts/TableContext';
+import { useNavigate }               from 'react-router-dom';
+import api                           from '../api';
 
 export default function OrderConfirmPage() {
-  const { cart, clearCart } = useCart()
-  const { tableId } = useTable()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
+  const { cart, clearCart } = useCart();
+  const { tableId }         = useTable();
+  const navigate            = useNavigate();
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState<string | null>(null);
+
+  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const handleOrder = async () => {
-    setError(null)
+    setError(null);
     if (!tableId) {
-      setError('테이블 정보가 없습니다.')
-      return
+      setError('테이블 정보가 없습니다.');
+      return;
     }
     if (cart.length === 0) {
-      setError('장바구니가 비어 있습니다.')
-      return
+      setError('장바구니가 비어 있습니다.');
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await api.post('/customer/orders', {
         tableNumber: Number(tableId),
-        items: cart.map(item => ({
-          menuId: item.menuId,
-          quantity: item.quantity
-        }))
-      })
-      const { orderId } = res.data.data
+        items: cart.map(i => ({ menuId: i.menuId, quantity: i.quantity }))
+      });
+      const orderId = res.data.data.orderId;
       if (!orderId) {
-        setError('주문 아이디를 받지 못했습니다.')
-        return
+        setError('주문 아이디를 받지 못했습니다.');
+        return;
       }
-      clearCart()
-      navigate(`/order/status/${orderId}`)
+      clearCart();
+      navigate(`/order/status/${orderId}`);
     } catch (e: any) {
       setError(
         e.response?.data?.message ||
         '주문에 실패했습니다. 잠시 후 다시 시도해주세요.'
-      )
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="px-2 py-4 max-w-lg mx-auto sm:px-4">
@@ -87,5 +84,5 @@ export default function OrderConfirmPage() {
       </button>
       {error && <p className="text-center text-red-500 mt-4">{error}</p>}
     </div>
-  )
+  );
 }
