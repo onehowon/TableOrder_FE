@@ -1,6 +1,6 @@
+// src/pages/OrderAdminPage.tsx
 import { useEffect, useState } from 'react'
 import api from '../api'
-import { useNavigate } from 'react-router-dom'
 
 interface OrderRow {
   tableNumber: string
@@ -16,7 +16,6 @@ const statusColors: Record<string,string> = {
 
 export default function OrderAdminPage() {
   const [rows, setRows] = useState<OrderRow[]>([])
-  const nav = useNavigate()
 
   useEffect(() => {
     api.get<{ data: OrderRow[] }>('/admin/orders')
