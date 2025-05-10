@@ -1,7 +1,8 @@
-// postcss.config.cjs
+// 프로젝트 루트/postcss.config.cjs
 module.exports = {
   plugins: {
-    tailwindcss: {},
+    // ⬇️ 기존 tailwindcss 대신에 @tailwindcss/postcss
+    '@tailwindcss/postcss': {},
     autoprefixer: {},
   },
 }
