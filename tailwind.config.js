@@ -4,16 +4,16 @@ module.exports = {
     theme: {
       extend: {
         colors: {
-          primary: "#4F6DFF",       // 디자인 상 쓰인 블루
-          sidebarBg: "#FFFFFF",     // 사이드바 배경
-          contentBg: "#F5F7FF",     // 콘텐츠 배경
-          cardBg: "#FFFFFF",        // 카드 배경
+          "primary": "#4F6DFF",
+          "sidebar-bg": "#ffffff",
+          "content-bg": "#F5F7FF",
+          "card-bg": "#ffffff",
         },
         spacing: {
-          sidebarW: "240px",        // 사진처럼 고정된 너비
+          "sidebar-w": "240px",
         },
         borderRadius: {
-          xl2: "1.5rem",            // 라운드 정도
+          "xl2": "1.5rem",
         }
       },
     },
