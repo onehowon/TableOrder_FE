@@ -1,5 +1,5 @@
 // src/pages/OrderAlertPage.tsx
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../api'
 import type { OrderAlertDTO } from '../types'
 
