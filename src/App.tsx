@@ -7,6 +7,8 @@ import OrderConfirmPage         from './pages/OrderConfirmPage';
 import OrderStatusPage          from './pages/OrderStatusPage';
 import OrderHistoryPage         from './pages/OrderHistoryPage';
 import TableSummaryPage         from './pages/TableSummaryPage';
+import WelcomePage from './pages/WelcomePage' 
+
 
 import AdminHomePage            from './pages/AdminHomePage';
 import AdminPage                from './pages/AdminPage';
@@ -22,6 +24,7 @@ export default function App() {
       <Routes>
         {/* QR 코드로 들어오는 /:tableId → Context에 저장 후 /menu로 */}
         <Route path="/:tableId" element={<TableOrderPage />} />
+        <Route path="/welcome"  element={<WelcomePage   />} />
 
         {/* 손님용 */}
         <Route path="/"                         element={<GuestHomePage />} />

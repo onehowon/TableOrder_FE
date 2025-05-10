@@ -1,20 +1,21 @@
-import { useEffect }       from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useTable }               from '../contexts/TableContext';
+// src/pages/TableOrderPage.tsx
+import { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useTable } from '../contexts/TableContext'
 
 export default function TableOrderPage() {
-  const { tableId }   = useParams<{ tableId: string }>();
-  const { setTableId }= useTable();
-  const navigate      = useNavigate();
+  const { tableId: paramId } = useParams<{ tableId: string }>()
+  const { setTableId }       = useTable()
+  const nav                  = useNavigate()
 
   useEffect(() => {
-    if (!tableId || isNaN(Number(tableId))) {
-      navigate('/', { replace: true });
-      return;
+    if (paramId) {
+      setTableId(paramId)
+      nav('/welcome', { replace: true })   // ✅ 메뉴 대신 Welcome
+    } else {
+      nav('/', { replace: true })
     }
-    setTableId(tableId);            // Context + localStorage
-    navigate('/menu', { replace: true });
-  }, [tableId, setTableId, navigate]);
+  }, [paramId, setTableId, nav])
 
-  return null;
+  return null
 }
