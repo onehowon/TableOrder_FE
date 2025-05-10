@@ -1,31 +1,50 @@
 import type { ReactNode } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useTable } from '../contexts/TableContext';
-import CartMiniWidget from './CartMiniWidget'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useTable } from '../contexts/TableContext'
 
-interface Props { children: ReactNode; isAdmin?: boolean }
+interface Props {
+  children: ReactNode
+  isAdmin?: boolean
+}
 
 export default function PageLayout({ children, isAdmin = false }: Props) {
   const nav = useNavigate()
   const { tableId } = useTable()
   const { pathname } = useLocation()
 
+  // 돌아갈 기준 경로
+  const adminHome   = '/admin'
+  const customerHome = '/welcome'
+
+  const showBack = pathname !== (isAdmin ? adminHome : customerHome)
+  const showHome = true
+
   const goHome = () => {
-    if (isAdmin) return nav('/admin')
-    return tableId ? nav('/welcome') : nav('/')
+    if (isAdmin)   nav(adminHome)
+    else            nav(customerHome)
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+    <div className="min-h-screen bg-zinc-900 text-white">
       <header className="flex items-center gap-2 p-4 bg-zinc-800">
-        {pathname !== '/' && <button onClick={() => nav(-1)} className="px-3 py-1 bg-zinc-700 rounded hover:bg-zinc-600">← 뒤로</button>}
-        <button onClick={goHome} className="px-3 py-1 bg-zinc-700 rounded hover:bg-zinc-600">홈</button>
+        {showBack && (
+          <button
+            onClick={() => nav(-1)}
+            className="px-3 py-1 bg-zinc-700 rounded hover:bg-zinc-600"
+          >
+            ← 뒤로
+          </button>
+        )}
+        {showHome && (
+          <button
+            onClick={goHome}
+            className="px-3 py-1 bg-zinc-700 rounded hover:bg-zinc-600"
+          >
+            {isAdmin ? '관리자 홈' : '고객 홈'}
+          </button>
+        )}
       </header>
-
-      <main className="flex-1 p-4">{children}</main>
-
-      {/* 고객용 화면일 때만 항상 장바구니 보이도록 */}
-      {!isAdmin && <CartMiniWidget />}
+      <main className="p-4">{children}</main>
     </div>
   )
 }
