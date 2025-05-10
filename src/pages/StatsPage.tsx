@@ -6,19 +6,19 @@ import api from '../api'
 interface StatData { time: string; amount: number }
 
 export default function StatsPage() {
-  const [totalCustomers, setCustomers] = useState(0)
-  const [totalOrders,    setOrders]    = useState(0)
-  const [totalSales,     setSales]     = useState(0)
-  const [chartData,      setChartData] = useState<StatData[]>([])
+  const [totalCust, setTotalCust] = useState(0)
+  const [totalOrd,  setTotalOrd]  = useState(0)
+  const [totalSale, setTotalSale] = useState(0)
+  const [chartData, setChartData] = useState<StatData[]>([])
 
   useEffect(() => {
-    api.get('/admin/orders/today-summary').then(r => {
+    api.get('/admin/orders/today-summary').then(r=>{
       const d = r.data.data
-      setCustomers(d.totalCustomers)
-      setOrders(d.totalOrders)
-      setSales(d.totalSales)
+      setTotalCust(d.totalCustomers)
+      setTotalOrd(d.totalOrders)
+      setTotalSale(d.totalSales)
     })
-    api.get('/admin/stats/chart').then(r => setChartData(r.data.data))
+    api.get('/admin/stats/chart').then(r=>setChartData(r.data.data))
   }, [])
 
   const InfoCard = ({ title, value, icon: Icon }: any) => (
@@ -35,9 +35,9 @@ export default function StatsPage() {
     <div>
       <h2 className="text-2xl font-bold mb-6">수익</h2>
       <div className="flex gap-6 mb-8">
-        <InfoCard title="총 고객수"   value={`${totalCustomers}명`} icon={User} />
-        <InfoCard title="총 주문수"   value={`${totalOrders}건`}   icon={Box}  />
-        <InfoCard title="총 판매 금액" value={`${totalSales.toLocaleString()}원`} icon={TrendingUp} />
+        <InfoCard title="총 고객수"   value={`${totalCust}명`} icon={User} />
+        <InfoCard title="총 주문수"   value={`${totalOrd}건`}  icon={Box}  />
+        <InfoCard title="총 판매 금액" value={`${totalSale.toLocaleString()}원`} icon={TrendingUp} />
       </div>
       <div className="bg-white rounded-2xl shadow p-6">
         <div className="mb-4 flex justify-between items-center">
@@ -56,5 +56,5 @@ export default function StatsPage() {
         </ResponsiveContainer>
       </div>
     </div>
-  )
+)
 }
