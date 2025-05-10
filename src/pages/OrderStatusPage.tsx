@@ -1,10 +1,9 @@
 // src/pages/OrderStatusPage.tsx
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useTable } from '../contexts/TableContext'
-import api from '../api'
+import { getOrderStatus } from '../api'
 
-interface StatusItem {
+interface OrderItem {
   menuName: string
   quantity: number
 }
@@ -12,15 +11,14 @@ interface StatusItem {
 interface OrderStatus {
   id: number
   status: string
-  items: StatusItem[]
+  items: OrderItem[]
 }
 
 export default function OrderStatusPage() {
-  const { orderId: paramOrderId } = useParams<{ orderId: string }>()
-  const [orderId] = useState(paramOrderId)
-  const [order, setOrder] = useState<OrderStatus | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { orderId } = useParams<{ orderId: string }>()
+  const [order, setOrder]       = useState<OrderStatus | null>(null)
+  const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState<string | null>(null)
 
   useEffect(() => {
     if (!orderId) {
@@ -28,11 +26,12 @@ export default function OrderStatusPage() {
       setLoading(false)
       return
     }
+
     const fetchStatus = async () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await api.get(`/customer/orders/${orderId}`)
+        const res = await getOrderStatus(orderId)
         setOrder(res.data.data)
       } catch {
         setError('주문 상태를 불러오지 못했습니다.')
@@ -40,35 +39,31 @@ export default function OrderStatusPage() {
         setLoading(false)
       }
     }
+
     fetchStatus()
     const timer = setInterval(fetchStatus, 5000)
     return () => clearInterval(timer)
   }, [orderId])
 
-  if (loading) {
-    return <p className="text-center py-20 text-gray-400">로딩 중…</p>
-  }
-  if (error) {
-    return <p className="text-center py-20 text-red-500">{error}</p>
-  }
-  if (!order) {
-    return null
-  }
+  if (loading) return <p className="text-center text-gray-500">로딩 중…</p>
+  if (error)   return <p className="text-center text-red-500">{error}</p>
+  if (!order) return null
 
   return (
-    <div className="max-w-md mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-center mb-6">주문 #{order.id} 상태</h2>
-      <div className="bg-zinc-800 rounded-xl p-6 space-y-4">
-        <p>
-          상태:{' '}
-          <span className="font-semibold text-blue-400">{order.status}</span>
-        </p>
-        <h3 className="font-semibold">주문 내역</h3>
-        <ul className="space-y-2">
-          {order.items.map((it, i) => (
-            <li key={i} className="flex justify-between">
-              <span>{it.menuName}</span>
-              <span>× {it.quantity}</span>
+    <div className="px-2 py-4 max-w-lg mx-auto sm:px-4">
+      <h2 className="text-2xl font-bold mb-6 text-center">주문 상태</h2>
+      <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        <div className="text-lg font-semibold">
+          상태: <span className="text-blue-700">{order.status}</span>
+        </div>
+        <ul className="flex flex-col gap-2">
+          {order.items.map((item, idx) => (
+            <li
+              key={idx}
+              className="flex justify-between items-center border-b last:border-b-0 pb-1"
+            >
+              <span>{item.menuName}</span>
+              <span className="font-semibold">× {item.quantity}</span>
             </li>
           ))}
         </ul>
