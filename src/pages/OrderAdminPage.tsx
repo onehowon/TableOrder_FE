@@ -1,75 +1,53 @@
 import { useEffect, useState } from 'react'
 import api from '../api'
 
-interface Item  { menuName:string; quantity:number }
-interface Order { id:number; tableNumber:number; totalAmount:number; status:string; estimatedTime?:number; items:Item[] }
+interface Item {
+  menuName: string
+  quantity: number
+}
+
+interface Order {
+  id: number
+  tableId: number
+  status: string
+  createdAt?: string
+  items: Item[]
+}
 
 export default function OrderAdminPage() {
   const [orders, setOrders] = useState<Order[]>([])
-  const [eta,    setEta]    = useState<Record<number,string>>({})
-
-  const fetchOrders = () =>
-    api.get('/admin/orders').then(r => setOrders(r.data.data))
 
   useEffect(() => {
-    fetchOrders()
-    const iv = setInterval(fetchOrders, 5000)
-    return () => clearInterval(iv)
+    api.get('/admin/orders').then(res => setOrders(res.data.data))
   }, [])
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">주문 관리</h2>
-      {orders.map(o => (
-        <div key={o.id} className="border rounded p-4 mb-4">
-          <p>테이블 {o.tableNumber} | 금액 {o.totalAmount.toLocaleString()}원</p>
-          <p>상태: {o.status} {o.estimatedTime && `(ETA: ${o.estimatedTime}분)`}</p>
-          <ul className="pl-4">
-            {o.items.map((i, idx) =>
-              <li key={idx}>{i.menuName} x {i.quantity}</li>
-            )}
-          </ul>
+    <div style={{ padding: 24 }}>
+      <h2 style={{ fontSize: 24, marginBottom: 24 }}>주문 관리</h2>
 
-          {o.status === 'WAITING' && (
-            <div className="mt-2 flex gap-2">
-              <input
-                type="number"
-                placeholder="예상(분)"
-                value={eta[o.id]||''}
-                onChange={e =>
-                  setEta(prev => ({ ...prev, [o.id]: e.target.value }))
-                }
-                className="border px-2 py-1"
-              />
-              <button
-                className="bg-blue-600 text-white px-3 rounded"
-                onClick={() => {
-                  api.put(`/admin/orders/${o.id}/status`, {
-                    status: 'COOKING',
-                    estimatedTime: Number(eta[o.id]||0)
-                  }).then(fetchOrders)
-                }}
-              >
-                조리 시작
-              </button>
+      <ul style={{ padding: 0 }}>
+        {orders.map(o => (
+          <li
+            key={o.id}
+            style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 12 }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span>
+                #{o.id} | {o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}
+              </span>
+              <span>{o.status}</span>
             </div>
-          )}
 
-          {o.status === 'COOKING' && (
-            <button
-              className="mt-2 bg-green-600 text-white px-3 rounded"
-              onClick={() => {
-                api.put(`/admin/orders/${o.id}/status`, {
-                  status: 'SERVED',
-                  estimatedTime: null
-                }).then(fetchOrders)
-              }}
-            >
-              서빙 완료
-            </button>
-          )}
-        </div>
-      ))}
+            <ul>
+              {o.items.map((it, idx) => (
+                <li key={idx}>
+                  {it.menuName} x {it.quantity}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
