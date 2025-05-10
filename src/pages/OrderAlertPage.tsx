@@ -14,7 +14,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 
 interface PageLayoutProps {
-  children: ReactNode
+  children?: ReactNode
   isAdmin?: boolean
 }
 
