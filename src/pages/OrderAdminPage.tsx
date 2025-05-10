@@ -1,64 +1,59 @@
+// src/pages/TableAdminSummaryPage.tsx
 import { useEffect, useState } from 'react'
-import { useParams }           from 'react-router-dom'
-import api                     from '../api'
-import PageWrapper             from '../components/PageWrapper'
+import { getAllAdminTableSummaries } from '../api'
+import type { TableSummaryDTO } from '../types'
 
-interface ItemSummary {
-  name: string
-  quantity: number
-  totalPrice: number
-}
-
-interface TableSummaryResponse {
-  tableNumber: number
-  totalOrders: number
-  totalAmount: number
-  items: ItemSummary[]
-}
-
-export default function TableSummaryPage() {
-  const { tableId } = useParams<{ tableId: string }>()
-  const [summary, setSummary] = useState<TableSummaryResponse | null>(null)
-  const [loading, setLoading] = useState(true)
+export default function TableAdminSummaryPage() {
+  const [summaries, setSummaries] = useState<TableSummaryDTO[]>([])
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetch = async () => {
-      if (!tableId) {
-        setError('테이블 정보가 없습니다.')
-        setLoading(false)
-        return
-      }
-      try {
-        const res = await api.get(`/customer/tables/${tableId}/summary`)
-        setSummary(res.data.data)
-      } catch {
-        setError('요약 정보를 불러올 수 없습니다.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetch()
-  }, [tableId])
+    setLoading(true)
+    getAllAdminTableSummaries()
+      .then(res => setSummaries(res.data.data))
+      .catch(() => setError('테이블 요약을 불러오지 못했습니다.'))
+      .finally(() => setLoading(false))
+  }, [])
 
-  if (loading) return <PageWrapper title="테이블 요약"><p>로딩 중…</p></PageWrapper>
-  if (error)   return <PageWrapper title="테이블 요약"><p className="text-red-500">{error}</p></PageWrapper>
-  if (!summary) return null
+  if (loading) return <p className="text-center">로딩중…</p>
+  if (error) return <p className="text-center text-red-500">{error}</p>
 
   return (
-    <PageWrapper title={`테이블 ${summary.tableNumber} 요약`}>
-      <p>총 주문 건수: {summary.totalOrders}회</p>
-      <p>
-        총 금액: <b>{summary.totalAmount.toLocaleString()}원</b>
-      </p>
-      <h3 className="mt-4 font-semibold">메뉴별 합계</h3>
-      <ul className="list-disc pl-5">
-        {summary.items.map(it => (
-          <li key={it.name}>
-            {it.name} × {it.quantity}개 ({it.totalPrice.toLocaleString()}원)
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <h2 className="text-3xl font-bold mb-6 text-center">
+        테이블별 요약
+      </h2>
+
+      <ul className="space-y-6">
+        {summaries.map((summary: TableSummaryDTO, idx: number) => (
+          <li
+            key={idx}
+            className="border border-zinc-700 rounded-xl p-4"
+          >
+            <h3 className="font-semibold mb-2">
+              테이블 {summary.tableNumber}
+            </h3>
+            <p className="mb-2">
+              총 금액:{' '}
+              <span className="text-blue-400 font-semibold">
+                {summary.totalAmount.toLocaleString()}원
+              </span>
+            </p>
+            <ul className="list-disc list-inside">
+              {Array.isArray(summary.items)
+                ? summary.items.map(
+                    (it: { menuName: string; quantity: number }, idx2: number) => (
+                      <li key={idx2}>
+                        {it.menuName} × {it.quantity}
+                      </li>
+                    )
+                  )
+                : null}
+            </ul>
           </li>
         ))}
       </ul>
-    </PageWrapper>
+    </div>
   )
 }

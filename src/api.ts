@@ -52,13 +52,14 @@ export const deactivateAdminMenu = (id: number) => api.put(`/admin/menus/${id}/d
 export const getAdminOrders = () => api.get('/admin/orders');
 export const updateAdminOrderStatus = (
   orderId: number,
-  status: 'COOKING' | 'SERVED',
+  status: OrderStatus,
   eta?: number
 ) =>
   api.put(`/admin/orders/${orderId}/status`, {
     status,
-    ...(eta != null ? { estimatedTime: eta } : {}),
-  });
+    estimatedTime: eta
+  })
+// …
 
 // 매출 / 테이블 요약
 export const getTodaySalesSummary = () => api.get('/admin/orders/today-summary');
@@ -70,5 +71,9 @@ export const getAllAdminTableSummaries = () =>
 // 관리자 편의 요청 (직원 호출)
 export const postAdminRequest = (payload: { tableNumber: number; type: string }) =>
   api.post('/admin/requests', payload);
+
+export type OrderStatus = 'CREATED' | 'COOKING' | 'SERVED'
+
+
 
 export default api;
