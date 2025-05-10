@@ -21,7 +21,6 @@ export default function WelcomePage() {
     <div className="flex flex-col items-center justify-center h-screen gap-6 px-4">
       <h1 className="text-4xl font-bold">어서오세요 👋</h1>
       <p>테이블 {tableId}번입니다.</p>
-
       <div className="flex gap-4">
         <button onClick={() => nav('/menu')} className="btn-primary">주문하기</button>
         <button onClick={() => nav(`/orders/history/${tableId}`)} className="btn-secondary">
