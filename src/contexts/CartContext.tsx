@@ -3,80 +3,73 @@ import {
   useContext,
   useEffect,
   useState,
-  type ReactNode,      // ← 타입 전용 import
+  type ReactNode,
 } from 'react'
+import { useTable } from './TableContext'
 
-/* ─────────────────── 타입 ─────────────────── */
 export interface CartItem {
   menuId: number
-  name: string
-  price: number
-  quantity: number
+  name:    string
+  price:   number
+  quantity:number
 }
 
 interface CartCtx {
   cart: CartItem[]
-  addItem:       (item: Omit<CartItem, 'quantity'>, qty?: number) => void
-  decrement:     (menuId: number, qty?: number) => void
-  remove:        (menuId: number) => void
-  clear:         () => void
-  /** `clear()` 의 별칭. 기존 코드 호환용 */
-  clearCart:     () => void
+  addItem     (item: Omit<CartItem,'quantity'>, qty?: number): void
+  decrement   (menuId:number, qty?:number): void
+  remove      (menuId:number): void
+  clear       (): void
+  clearCart   (): void          // alias (기존 호환)
 }
 
-/* ─────────────────── 컨텍스트 ─────────────────── */
-const CartContext = createContext<CartCtx | undefined>(undefined)
+const CartContext = createContext<CartCtx|undefined>(undefined)
 
+/* ────────────────────────── Provider ────────────────────────── */
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { tableId } = useTable()
+
+  /** key = table‑{id} (테이블별 개별 저장) */
+  const storageKey  = tableId ? `cart-table-${tableId}` : 'cart-temp'
+
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('cart')
-    return saved ? JSON.parse(saved) : []
+    try {
+      const saved = localStorage.getItem(storageKey)
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
   })
 
-  /* 로컬 저장소 동기화 */
-  useEffect(() => localStorage.setItem('cart', JSON.stringify(cart)), [cart])
+  /* 테이블이 바뀌면 해당 테이블의 장바구니를 불러옴 */
+  useEffect(() => {
+    const saved = tableId ? localStorage.getItem(storageKey) : '[]'
+    setCart(saved ? JSON.parse(saved) : [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableId])
 
-  /* CRUD helpers */
-  const addItem = (data: Omit<CartItem, 'quantity'>, qty = 1) =>
-    setCart(prev => {
-      const inCart = prev.find(i => i.menuId === data.menuId)
-      return inCart
-        ? prev.map(i =>
-            i.menuId === data.menuId ? { ...i, quantity: i.quantity + qty } : i
-          )
-        : [...prev, { ...data, quantity: qty }]
-    })
+  /* 항상 자신의 key 에 저장 */
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(cart))
+  }, [cart, storageKey])
 
-  const decrement = (menuId: number, qty = 1) =>
-    setCart(prev =>
-      prev
-        .map(i =>
-          i.menuId === menuId ? { ...i, quantity: i.quantity - qty } : i
-        )
-        .filter(i => i.quantity > 0)
-    )
+  /* helper ============================= */
+  const addItem   = (d:Omit<CartItem,'quantity'>, q=1)=>setCart(p=>{
+    const ex=p.find(i=>i.menuId===d.menuId)
+    return ex
+      ? p.map(i=>i.menuId===d.menuId ? {...i,quantity:i.quantity+q}:i)
+      : [...p,{...d,quantity:q}]
+  })
+  const decrement = (id:number,q=1)=>setCart(p=>
+    p.map(i=>i.menuId===id?{...i,quantity:i.quantity-q}:i)
+     .filter(i=>i.quantity>0))
+  const remove    = (id:number)=>setCart(p=>p.filter(i=>i.menuId!==id))
+  const clear     = ()=>setCart([])
 
-  const remove = (menuId: number) =>
-    setCart(prev => prev.filter(i => i.menuId !== menuId))
-
-  const clear = () => setCart([])
-
-  /* 값을 한 번에 제공 */
-  const value: CartCtx = {
-    cart,
-    addItem,
-    decrement,
-    remove,
-    clear,
-    clearCart: clear, // ← 별칭
-  }
-
+  const value:CartCtx={cart,addItem,decrement,remove,clear,clearCart:clear}
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
-/* 사용 훅 */
-export function useCart() {
-  const ctx = useContext(CartContext)
-  if (!ctx) throw new Error('useCart must be used inside <CartProvider>')
+export function useCart(){
+  const ctx=useContext(CartContext)
+  if(!ctx) throw new Error('useCart outside provider')
   return ctx
 }

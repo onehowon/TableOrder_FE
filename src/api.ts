@@ -23,11 +23,6 @@ export const getOrderStatus = (orderId: string) =>
 export const getTableSummary = (tableNumber: string) =>
   api.get(`/customer/tables/${tableNumber}/summary`);
 // 편의 요청 전송
-export const postCustomerRequest = (payload: {
-  tableNumber: number;
-  type: 'WATER' | 'TISSUE' | 'CALL';
-}) => api.post('/customer/requests', payload);
-
 // ─ 관리자용 ────────────────────────────────────────────────────────
 
 // 메뉴 CRUD
@@ -55,5 +50,10 @@ export const getAllAdminTableSummaries = () =>
 // 관리자 편의 요청
 export const postAdminRequest = (payload: { tableNumber: number; type: string }) =>
   api.post('/admin/requests', payload);
+
+export const postCustomerRequest = (payload: {
+  tableNumber: number;
+  type: 'WATER' | 'TISSUE' | 'CALL' | 'CHOPSTICKS';  // CHOPSTICKS 추가
+}) => api.post('/customer/requests', payload)
 
 export default api;

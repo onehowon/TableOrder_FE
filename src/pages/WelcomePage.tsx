@@ -1,33 +1,47 @@
+// src/pages/WelcomePage.tsx
+import { useTable } from '../contexts/TableContext'
 import { useNavigate } from 'react-router-dom'
-import { useTable }    from '../contexts/TableContext'
+import { postCustomerRequest } from '../api'
 
 export default function WelcomePage() {
   const { tableId } = useTable()
-  const nav         = useNavigate()
+  const nav = useNavigate()
+
+  // 호출 공통 핸들러
+  const call = async (type: 'WATER' | 'TISSUE' | 'CHOPSTICKS' | 'CALL') => {
+    if (!tableId) return alert('테이블 번호가 없습니다.')
+    try {
+      await postCustomerRequest({ tableNumber: Number(tableId), type })
+      alert('요청이 전송되었습니다!')
+    } catch {
+      alert('전송 실패! 잠시 후 다시 시도해주세요.')
+    }
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
-      <h1 className="text-3xl font-bold mb-6">어서오세요 👋</h1>
-
-      <p className="text-gray-600 mb-8 leading-relaxed">
-        테이블 <span className="font-semibold">{tableId}</span>번입니다.<br />
+    <div className="flex flex-col items-center justify-center h-screen gap-6 px-4">
+      <h1 className="text-4xl sm:text-5xl font-extrabold flex items-center gap-2">
+        어서오세요 <span>👋</span>
+      </h1>
+      <p className="text-center text-lg">
+        테이블 {tableId ?? '?'}번입니다.<br />
         아래 메뉴를 선택해 주세요.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs sm:max-w-md">
-        <button
-          onClick={() => nav('/menu')}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-4 font-semibold"
-        >
-          주문하기
+      {/* 메인 액션 */}
+      <div className="flex gap-4">
+        <button onClick={()=>nav('/menu')}          className="btn-primary">주문하기</button>
+        <button onClick={()=>nav(`/orders/history/${tableId}`)} className="btn-secondary">
+          영수증 / 과거 주문
         </button>
+      </div>
 
-        <button
-          onClick={() => nav(`/orders/history/${tableId}`)}
-          className="flex-1 bg-slate-700 hover:bg-slate-800 text-white rounded-lg px-6 py-4 font-semibold"
-        >
-          영수증&nbsp;/&nbsp;과거 주문
-        </button>
+      {/* ─ 직원 호출 4종 ─ */}
+      <div className="grid grid-cols-2 gap-3 mt-8 w-full max-w-xs">
+        <button onClick={()=>call('WATER')}       className="btn-call">물 주세요 🚰</button>
+        <button onClick={()=>call('TISSUE')}      className="btn-call">티슈 🧻</button>
+        <button onClick={()=>call('CHOPSTICKS')}  className="btn-call">젓가락 🥢</button>
+        <button onClick={()=>call('CALL')}        className="btn-call">직원 호출 🙋‍♂️</button>
       </div>
     </div>
   )
