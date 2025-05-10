@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react'
 import api from '../api'
 
 interface OrderRow {
-  tableNumber: string
+  tableNumber: string  // 서버에서 string으로 받으시면 그대로, number면 toString() 자동 처리
   itemsSummary: string
   status: string
 }
 
-const statusColors: Record<string,string> = {
+const statusColors: Record<string, string> = {
   '제조완료': 'bg-green-100 text-green-700',
   '제조중':   'bg-purple-100 text-purple-700',
   '주문내역×': 'bg-red-100 text-red-700',
@@ -37,10 +37,19 @@ export default function OrderAdminPage() {
           <tbody>
             {rows.map(r => (
               <tr key={r.tableNumber} className="border-b last:border-0">
-                <td className="px-6 py-4">{r.tableNumber.padStart(5,'0')}</td>
-                <td className="px-6 py-4 text-gray-600">{r.itemsSummary || '-'}</td>
+                {/* 숫자인 경우 toString() 후 padStart */}
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-sm ${statusColors[r.status] || 'bg-gray-100 text-gray-700'}`}>
+                  {r.tableNumber.toString().padStart(5, '0')}
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {r.itemsSummary || '-'}
+                </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      statusColors[r.status] || 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
                     {r.status}
                   </span>
                 </td>
