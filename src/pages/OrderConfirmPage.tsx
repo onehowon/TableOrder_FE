@@ -1,4 +1,4 @@
-import React, { useState }           from 'react';
+import { useState }           from 'react';
 import { useCart }                   from '../contexts/CartContext';
 import { useTable }                  from '../contexts/TableContext';
 import { useNavigate }               from 'react-router-dom';
