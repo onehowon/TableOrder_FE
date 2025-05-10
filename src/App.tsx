@@ -1,40 +1,29 @@
+// src/App.tsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PageLayout from './components/PageLayout'
 
-import TableOrderPage from './pages/TableOrderPage'
-import WelcomePage from './pages/WelcomePage'
-import GuestHomePage from './pages/GuestHomePage'
-import MenuPage from './pages/MenuPage'
-import OrderConfirmPage from './pages/OrderConfirmPage'
-import OrderStatusPage from './pages/OrderStatusPage'
-import OrderHistoryPage from './pages/OrderHistoryPage'
-import TableSummaryPage from './pages/TableSummaryPage'
+import TableOrderPage           from './pages/TableOrderPage'
+import WelcomePage             from './pages/WelcomePage'
+import GuestHomePage           from './pages/GuestHomePage'
+import MenuPage                from './pages/MenuPage'
+import OrderConfirmPage        from './pages/OrderConfirmPage'
+import OrderStatusPage         from './pages/OrderStatusPage'
+import OrderHistoryPage        from './pages/OrderHistoryPage'
+import TableSummaryPage        from './pages/TableSummaryPage'
 
-import AdminHomePage from './pages/AdminHomePage'
-import AdminPage from './pages/AdminPage'
-import OrderAdminPage from './pages/OrderAdminPage'
-import TableAdminSummaryPage from './pages/TableAdminSummaryPage'
+import OrderAdminPage          from './pages/OrderAdminPage'
+import TableAdminSummaryPage   from './pages/TableAdminSummaryPage'
 
 export default function App() {
   return (
     <Routes>
       {/** ─── 관리자용 ─── **/}
+      {/* /admin → /admin/orders 로 바로 리다이렉트 */}
       <Route
         path="/admin"
-        element={
-          <PageLayout isAdmin>
-            <AdminHomePage />
-          </PageLayout>
-        }
+        element={<Navigate to="/admin/orders" replace />}
       />
-      <Route
-        path="/admin/menus"
-        element={
-          <PageLayout isAdmin>
-            <AdminPage />
-          </PageLayout>
-        }
-      />
+      {/* 주문 리스트 */}
       <Route
         path="/admin/orders"
         element={
@@ -43,6 +32,7 @@ export default function App() {
           </PageLayout>
         }
       />
+      {/* 테이블 요약 */}
       <Route
         path="/admin/tables"
         element={
@@ -110,7 +100,7 @@ export default function App() {
         }
       />
 
-      {/** ─── 마지막: QR → Context 세팅 (dynamic) ─── **/}
+      {/** ─── QR 스캔용 (dynamic) ─── **/}
       <Route
         path="/:tableId"
         element={
