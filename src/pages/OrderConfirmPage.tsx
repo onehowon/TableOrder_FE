@@ -1,5 +1,5 @@
 // src/pages/OrderConfirmPage.tsx
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useCart } from '../contexts/CartContext'
 import { useTable } from '../contexts/TableContext'
 import api from '../api'
