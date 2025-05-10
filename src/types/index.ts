@@ -14,11 +14,11 @@ export interface TableSummaryDTO {
   items: { menuName: string; quantity: number }[]
 }
 
-// ← 이 부분이 반드시 있어야 합니다!
+// 관리자 주문 알림용 타입
 export interface OrderAlertDTO {
   tableNumber: number
   items: AlertItem[]
-  createdAt: string
+  createdAt: string  // ISO 문자열
 }
 
 export interface AlertItem {
