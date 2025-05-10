@@ -1,0 +1,70 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../api';
+
+interface ItemSummary {
+  name: string;
+  quantity: number;
+  totalPrice: number;
+}
+
+interface TableSummaryResponse {
+  tableNumber: number;
+  totalOrders: number;
+  totalAmount: number;
+  items: ItemSummary[];
+}
+
+export default function TableAdminSummaryPage() {
+  const { tableNumber } = useParams<{ tableNumber: string }>();
+  const [summary, setSummary] = useState<TableSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!tableNumber) return;
+    setLoading(true);
+    setError(null);
+    api.get(`/admin/tables/${tableNumber}/summary`)
+      .then(res => setSummary(res.data.data))
+      .catch(() => setError('요약 정보를 불러오지 못했습니다.'))
+      .finally(() => setLoading(false));
+  }, [tableNumber]);
+
+  if (loading) return <p className="text-center text-gray-500">로딩 중...</p>;
+  if (error)   return <p className="text-center text-red-500">{error}</p>;
+  if (!summary) return null;
+
+  return (
+    <div className="px-2 py-4 max-w-lg mx-auto sm:px-4">
+      <button
+        onClick={() => navigate(-1)}
+        className="text-blue-500 mb-4"
+      >
+        &larr; 뒤로
+      </button>
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        관리자용 테이블 {summary.tableNumber} 요약
+      </h2>
+      <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        <div><b>총 주문 건수:</b> {summary.totalOrders}회</div>
+        <div><b>총 주문 금액:</b> <span className="text-blue-700 font-semibold">{summary.totalAmount.toLocaleString()}원</span></div>
+        <h3 className="text-lg font-semibold">메뉴별 합계</h3>
+        <ul className="flex flex-col gap-2">
+          {summary.items.map(item => (
+            <li key={item.name} className="flex justify-between border-b last:border-b-0 pb-1">
+              <div>
+                <span>{item.name}</span>
+                <span className="text-gray-500 text-sm ml-2">({item.totalPrice.toLocaleString()}원)</span>
+              </div>
+              <div>
+                <span className="font-semibold">× {item.quantity}개</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}

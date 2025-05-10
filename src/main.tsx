@@ -1,19 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
-import App from './App'
+import { BrowserRouter } from 'react-router-dom'
 import { CartProvider } from './contexts/CartContext'
 import { TableProvider } from './contexts/TableContext'
-import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <CartProvider>
-      <TableProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <CartProvider>
+        <TableProvider>
           <App />
-        </BrowserRouter>
-      </TableProvider>
-    </CartProvider>
-  </React.StrictMode>,
+        </TableProvider>
+      </CartProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 )
