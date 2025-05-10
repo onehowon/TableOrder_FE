@@ -1,43 +1,46 @@
+// src/pages/MenuPage.tsx
 import { useEffect, useState } from 'react'
 import { getCustomerMenus }    from '../api'
 import { useCart }             from '../contexts/CartContext'
 
 interface MenuDTO {
-  id:number; name:string; description:string; price:number; imageUrl?:string
+  id:number; name:string; description:string; price:number; isAvailable:boolean; imageUrl?:string
 }
 
 export default function MenuPage() {
-  const [menus,setMenus] = useState<MenuDTO[]>([])
-  const { addItem }      = useCart()
-  const [qty,setQty]     = useState<Record<number,number>>({})
+  const [menus, setMenus] = useState<MenuDTO[]>([])
+  const { addItem }       = useCart()
+  const [qty, setQty]     = useState<Record<number,number>>({})
 
-  useEffect(()=>{ getCustomerMenus().then(r=>setMenus(r.data.data)) },[])
+  useEffect(()=>{
+    getCustomerMenus()
+      .then(r => {
+        // 중단된 메뉴 필터링
+        const avail = r.data.data.filter((m:MenuDTO) => m.isAvailable)
+        setMenus(avail)
+      })
+  },[])
 
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-10">
       <h2 className="text-4xl font-bold text-center mb-10">메뉴</h2>
-
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {menus.map(m=>(
+        {menus.map(m => (
           <div key={m.id} className="bg-zinc-800 rounded-xl p-4 flex flex-col">
             {m.imageUrl &&
               <img src={m.imageUrl} alt={m.name}
                    className="rounded-lg aspect-square object-cover mb-3"/>}
-
             <h3 className="font-semibold text-lg">{m.name}</h3>
             <p className="text-sm text-gray-400 line-clamp-2 mb-2">{m.description}</p>
             <b className="mb-3">{m.price.toLocaleString()}원</b>
-
             <div className="mt-auto flex gap-2">
               <input type="number" min={1}
                      value={qty[m.id] ?? 1}
                      onChange={e=>setQty(q=>({...q,[m.id]:+e.target.value||1}))}
                      className="w-16 bg-zinc-900 border border-zinc-700 rounded text-center" />
-
               <button
                 onClick={()=>addItem({menuId:m.id,name:m.name,price:m.price}, qty[m.id]??1)}
-                className="flex-1 btn-primary"
-              >
+                className="flex-1 btn-primary">
                 담기
               </button>
             </div>

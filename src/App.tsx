@@ -1,28 +1,32 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+// src/App.tsx
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import GuestHomePage         from './pages/GuestHomePage'
+import WelcomePage           from './pages/WelcomePage'
+import MenuPage              from './pages/MenuPage'
+import OrderConfirmPage      from './pages/OrderConfirmPage'
+import OrderStatusPage       from './pages/OrderStatusPage'
+import OrderHistoryPage      from './pages/OrderHistoryPage'
+import TableSummaryPage      from './pages/TableSummaryPage'
+import TableOrderPage        from './pages/TableOrderPage'
 
-import TableOrderPage           from './pages/TableOrderPage';
-import GuestHomePage            from './pages/GuestHomePage';
-import MenuPage                 from './pages/MenuPage';
-import OrderConfirmPage         from './pages/OrderConfirmPage';
-import OrderStatusPage          from './pages/OrderStatusPage';
-import OrderHistoryPage         from './pages/OrderHistoryPage';
-import TableSummaryPage         from './pages/TableSummaryPage';
-import WelcomePage from './pages/WelcomePage' 
+import AdminHeader           from './components/AdminHeader'
+import AdminHomePage         from './pages/AdminHomePage'
+import AdminPage             from './pages/AdminPage'
+import OrderAdminPage        from './pages/OrderAdminPage'
+import TableAdminSummaryPage from './pages/TableAdminSummaryPage'
 
-
-import AdminHomePage            from './pages/AdminHomePage';
-import AdminPage                from './pages/AdminPage';
-import OrderAdminPage           from './pages/OrderAdminPage';
-import TableAdminSummaryPage    from './pages/TableAdminSummaryPage';
-
-import CartMiniWidget           from './components/CartMiniWidget';
-import './App.css';
+import CartMiniWidget        from './components/CartMiniWidget'
+import './App.css'
 
 export default function App() {
+  const loc = useLocation()
+  const isAdmin = loc.pathname.startsWith('/admin')
+
   return (
     <>
+      {isAdmin && <AdminHeader title="관리자 대시보드" />}
       <Routes>
-        {/* QR 코드로 들어오는 /:tableId → Context에 저장 후 /menu로 */}
+        {/* QR 스캔 → Context 저장 → Welcome으로 */}
         <Route path="/:tableId" element={<TableOrderPage />} />
         <Route path="/welcome"  element={<WelcomePage   />} />
 
@@ -40,11 +44,12 @@ export default function App() {
         <Route path="/admin/orders"            element={<OrderAdminPage />} />
         <Route path="/admin/tables"            element={<TableAdminSummaryPage />} />
 
-        {/* 기타 잘못된 경로는 홈으로 */}
+        {/* 나머지 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <CartMiniWidget />
+      {/* 관리자 화면에는 숨기기 */}
+      {!isAdmin && <CartMiniWidget />}
     </>
-  );
+  )
 }
