@@ -1,10 +1,12 @@
 // src/main.tsx
+import './index.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
+
 // 전역 스타일(꼭 이 파일을 불러와야 Tailwind가 적용됩니다)
-import './index.css'
+
 
 import App from './App'
 

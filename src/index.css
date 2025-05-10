@@ -3,12 +3,4 @@
 @tailwind components;
 @tailwind utilities;
 
-.sidebar {
-  @apply bg-sidebar-bg w-sidebar-w h-full;
-}
-.content {
-  @apply bg-content-bg;
-}
-.alert-card-body {
-  @apply bg-card-bg rounded-xl2;
-}
+/* 나중에 @apply 로 묶을 때까지는 빈 상태로 둡니다 */

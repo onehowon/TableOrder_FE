@@ -1,10 +1,9 @@
 // src/pages/OrderAlertPage.tsx
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import api from '../api'
 import type { OrderAlertDTO } from '../types'
 
 export default function OrderAlertPage() {
-  // ① alerts 상태 선언
   const [alerts, setAlerts] = useState<OrderAlertDTO[]>([])
 
   useEffect(() => {
@@ -23,16 +22,32 @@ export default function OrderAlertPage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* 사이드바 생략 */}
-      <main className="flex-1 p-8 overflow-auto">
+    <div className="flex min-h-screen">
+      {/* 사이드바 */}
+      <aside className="bg-white w-[240px] h-full flex flex-col p-6 space-y-4">
+        <h2 className="text-xl font-bold">Admin Dashboard</h2>
+        <nav className="space-y-2">
+          <div className="flex items-center space-x-3 py-2 px-4 rounded-lg bg-gray-100">
+            {/* 아이콘 */}
+            <span>📢</span>
+            <span>주문 알림</span>
+          </div>
+          <div className="flex items-center space-x-3 py-2 px-4 rounded-lg hover:bg-gray-100 cursor-pointer">
+            <span>📋</span>
+            <span>주문 리스트</span>
+          </div>
+          {/* 추가 메뉴... */}
+        </nav>
+      </aside>
+
+      {/* 메인 콘텐츠 */}
+      <main className="flex-1 bg-[#F5F7FF] p-8 overflow-auto">
         <h1 className="text-2xl font-bold mb-6">주문 알림</h1>
         <div className="space-y-6">
-          {/* ② i에 타입 명시 */}
-          {alerts.map((a, i: number) => (
-            <div key={i} className="flex items-start">
-              <div className="w-10 h-10 rounded-full bg-gray-200 mr-4" />
-              <div className="relative bg-gray-100 p-4 rounded-xl flex-1">
+          {alerts.map((a, i) => (
+            <div key={i} className="flex items-start space-x-4">
+              <div className="w-10 h-10 rounded-full bg-gray-200" />
+              <div className="relative bg-gray-100 p-4 rounded-[1.5rem] flex-1">
                 <p className="text-gray-800">
                   <strong>{a.tableNumber}번 테이블</strong>에서{' '}
                   {a.items.map(x => `${x.menuName} ${x.quantity}개`).join(', ')} 주문하셨습니다.
