@@ -1,4 +1,5 @@
-import { useState } from 'react'
+// src/pages/OrderConfirmPage.tsx
+import React, { useState } from 'react'
 import { useCart } from '../contexts/CartContext'
 import { useTable } from '../contexts/TableContext'
 import api from '../api'
@@ -32,12 +33,12 @@ export default function OrderConfirmPage() {
           quantity: item.quantity
         }))
       })
-      clearCart()
-      const orderId = res.data.data.id
+      const { orderId } = res.data.data
       if (!orderId) {
         setError('주문 아이디를 받지 못했습니다.')
         return
       }
+      clearCart()
       navigate(`/order/status/${orderId}`)
     } catch (e: any) {
       setError(
