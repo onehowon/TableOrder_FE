@@ -1,59 +1,55 @@
-// src/pages/TableAdminSummaryPage.tsx
 import { useEffect, useState } from 'react'
-import { getAllAdminTableSummaries } from '../api'
-import type { TableSummaryDTO } from '../types'
+import api from '../api'
+import { useNavigate } from 'react-router-dom'
 
-export default function TableAdminSummaryPage() {
-  const [summaries, setSummaries] = useState<TableSummaryDTO[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+interface OrderRow {
+  tableNumber: string
+  itemsSummary: string
+  status: string
+}
+
+const statusColors: Record<string,string> = {
+  '제조완료': 'bg-green-100 text-green-700',
+  '제조중':   'bg-purple-100 text-purple-700',
+  '주문내역×': 'bg-red-100 text-red-700',
+}
+
+export default function OrderAdminPage() {
+  const [rows, setRows] = useState<OrderRow[]>([])
+  const nav = useNavigate()
 
   useEffect(() => {
-    setLoading(true)
-    getAllAdminTableSummaries()
-      .then(res => setSummaries(res.data.data))
-      .catch(() => setError('테이블 요약을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false))
+    api.get<{ data: OrderRow[] }>('/admin/orders')
+      .then(res => setRows(res.data.data))
   }, [])
 
-  if (loading) return <p className="text-center">로딩중…</p>
-  if (error) return <p className="text-center text-red-500">{error}</p>
-
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        테이블별 요약
-      </h2>
-
-      <ul className="space-y-6">
-        {summaries.map((summary: TableSummaryDTO, idx: number) => (
-          <li
-            key={idx}
-            className="border border-zinc-700 rounded-xl p-4"
-          >
-            <h3 className="font-semibold mb-2">
-              테이블 {summary.tableNumber}
-            </h3>
-            <p className="mb-2">
-              총 금액:{' '}
-              <span className="text-blue-400 font-semibold">
-                {summary.totalAmount.toLocaleString()}원
-              </span>
-            </p>
-            <ul className="list-disc list-inside">
-              {Array.isArray(summary.items)
-                ? summary.items.map(
-                    (it: { menuName: string; quantity: number }, idx2: number) => (
-                      <li key={idx2}>
-                        {it.menuName} × {it.quantity}
-                      </li>
-                    )
-                  )
-                : null}
-            </ul>
-          </li>
-        ))}
-      </ul>
+    <div>
+      <h2 className="text-2xl font-bold mb-6">주문 리스트</h2>
+      <div className="overflow-x-auto bg-white rounded-2xl shadow">
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="px-6 py-4 text-left">테이블 번호</th>
+              <th className="px-6 py-4 text-left">menu & 수량</th>
+              <th className="px-6 py-4 text-left">STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(r => (
+              <tr key={r.tableNumber} className="border-b last:border-0">
+                <td className="px-6 py-4">{r.tableNumber.padStart(5,'0')}</td>
+                <td className="px-6 py-4 text-gray-600">{r.itemsSummary || '-'}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-3 py-1 rounded-full text-sm ${statusColors[r.status] || 'bg-gray-100 text-gray-700'}`}>
+                    {r.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
