@@ -6,23 +6,36 @@ const api = axios.create({
 
 // ─ 고객용 ────────────────────────────────────────────────────────────
 
-// 메뉴 조회
-export const getCustomerMenus = () => api.get('/customer/menus');
+// 메뉴 조회 (활성화된 것만)
+export const getCustomerMenus = () =>
+  api.get('/customer/menus').then(res =>
+    res.data.data.filter((m: any) => m.isAvailable)
+  );
+
 // 주문 생성
 export const createOrder = (payload: {
   tableNumber: number;
   items: { menuId: number; quantity: number }[];
 }) => api.post('/customer/orders', payload);
+
 // 테이블별 주문 조회
 export const getOrdersByTable = (tableNumber: string) =>
   api.get(`/customer/orders/table/${tableNumber}`);
+
 // 단일 주문 상태 조회
 export const getOrderStatus = (orderId: string) =>
   api.get(`/customer/orders/${orderId}`);
+
 // 테이블 요약 조회
 export const getTableSummary = (tableNumber: string) =>
   api.get(`/customer/tables/${tableNumber}/summary`);
-// 편의 요청 전송
+
+// 편의 요청 전송 (4가지 타입 지원)
+export const postCustomerRequest = (payload: {
+  tableNumber: number;
+  type: 'WATER' | 'TISSUE' | 'CALL' | 'CHOPSTICKS';
+}) => api.post('/customer/requests', payload);
+
 // ─ 관리자용 ────────────────────────────────────────────────────────
 
 // 메뉴 CRUD
@@ -37,8 +50,15 @@ export const deactivateAdminMenu = (id: number) => api.put(`/admin/menus/${id}/d
 
 // 주문 관리
 export const getAdminOrders = () => api.get('/admin/orders');
-export const updateAdminOrderStatus = (orderId: number, status: string, eta?: number) =>
-  api.put(`/admin/orders/${orderId}/status`, { status, estimatedTime: eta });
+export const updateAdminOrderStatus = (
+  orderId: number,
+  status: 'COOKING' | 'SERVED',
+  eta?: number
+) =>
+  api.put(`/admin/orders/${orderId}/status`, {
+    status,
+    ...(eta != null ? { estimatedTime: eta } : {}),
+  });
 
 // 매출 / 테이블 요약
 export const getTodaySalesSummary = () => api.get('/admin/orders/today-summary');
@@ -47,13 +67,8 @@ export const getAdminTableSummary = (table: number) =>
 export const getAllAdminTableSummaries = () =>
   api.get('/admin/tables/summary-all');
 
-// 관리자 편의 요청
+// 관리자 편의 요청 (직원 호출)
 export const postAdminRequest = (payload: { tableNumber: number; type: string }) =>
   api.post('/admin/requests', payload);
-
-export const postCustomerRequest = (payload: {
-  tableNumber: number;
-  type: 'WATER' | 'TISSUE' | 'CALL' | 'CHOPSTICKS';  // CHOPSTICKS 추가
-}) => api.post('/customer/requests', payload)
 
 export default api;
