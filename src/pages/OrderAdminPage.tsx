@@ -1,79 +1,75 @@
 import { useEffect, useState } from 'react'
 import api from '../api'
 
-interface OrderItem {
-  menuName: string
-  quantity: number
-}
-
-interface Order {
-  id: number
-  tableNumber: number
-  totalAmount: number
-  status: string
-  items: OrderItem[]
-}
+interface Item  { menuName:string; quantity:number }
+interface Order { id:number; tableNumber:number; totalAmount:number; status:string; estimatedTime?:number; items:Item[] }
 
 export default function OrderAdminPage() {
   const [orders, setOrders] = useState<Order[]>([])
+  const [eta,    setEta]    = useState<Record<number,string>>({})
 
-  const fetchOrders = () => {
-    api
-      .get('/admin/orders')
-      .then(res => setOrders(res.data.data || []))
-      .catch(() => alert('주문 목록을 불러오지 못했습니다.'))
-  }
-
-  const markAsServed = (orderId: number) => {
-    api
-      .put('/admin/orders/' + orderId + '/status', { status: 'SERVED' })
-      .then(fetchOrders)
-      .catch(() => alert('상태 변경에 실패했습니다.'))
-  }
+  const fetchOrders = () =>
+    api.get('/admin/orders').then(r => setOrders(r.data.data))
 
   useEffect(() => {
     fetchOrders()
+    const iv = setInterval(fetchOrders, 5000)
+    return () => clearInterval(iv)
   }, [])
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-        주문 관리
-      </h2>
-      <ul style={{ padding: 0 }}>
-        {orders.map(order => (
-          <li
-            key={order.id}
-            style={{ border: '1px solid #ddd', padding: 12, marginBottom: 12 }}
-          >
-            <p>테이블: {order.tableNumber}</p>
-            <p>총 금액: {order.totalAmount.toLocaleString()}원</p>
-            <p>상태: {order.status}</p>
-            <ul style={{ fontSize: 14, marginTop: 8 }}>
-              {order.items.map((it, i) => (
-                <li key={i}>
-                  {it.menuName} x {it.quantity}
-                </li>
-              ))}
-            </ul>
-            {order.status !== 'SERVED' && (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">주문 관리</h2>
+      {orders.map(o => (
+        <div key={o.id} className="border rounded p-4 mb-4">
+          <p>테이블 {o.tableNumber} | 금액 {o.totalAmount.toLocaleString()}원</p>
+          <p>상태: {o.status} {o.estimatedTime && `(ETA: ${o.estimatedTime}분)`}</p>
+          <ul className="pl-4">
+            {o.items.map((i, idx) =>
+              <li key={idx}>{i.menuName} x {i.quantity}</li>
+            )}
+          </ul>
+
+          {o.status === 'WAITING' && (
+            <div className="mt-2 flex gap-2">
+              <input
+                type="number"
+                placeholder="예상(분)"
+                value={eta[o.id]||''}
+                onChange={e =>
+                  setEta(prev => ({ ...prev, [o.id]: e.target.value }))
+                }
+                className="border px-2 py-1"
+              />
               <button
-                onClick={() => markAsServed(order.id)}
-                style={{
-                  marginTop: 8,
-                  padding: '4px 12px',
-                  background: '#22c55e',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 4,
+                className="bg-blue-600 text-white px-3 rounded"
+                onClick={() => {
+                  api.put(`/admin/orders/${o.id}/status`, {
+                    status: 'COOKING',
+                    estimatedTime: Number(eta[o.id]||0)
+                  }).then(fetchOrders)
                 }}
               >
-                완료 처리
+                조리 시작
               </button>
-            )}
-          </li>
-        ))}
-      </ul>
+            </div>
+          )}
+
+          {o.status === 'COOKING' && (
+            <button
+              className="mt-2 bg-green-600 text-white px-3 rounded"
+              onClick={() => {
+                api.put(`/admin/orders/${o.id}/status`, {
+                  status: 'SERVED',
+                  estimatedTime: null
+                }).then(fetchOrders)
+              }}
+            >
+              서빙 완료
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   )
 }

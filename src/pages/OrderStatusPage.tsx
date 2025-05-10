@@ -1,74 +1,88 @@
+// src/pages/OrderStatusPage.tsx
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import api from '../api'
 
-interface OrderItem {
+interface Item {
   name: string
   quantity: number
 }
 
-interface OrderStatus {
-  id: number
+interface Status {
   status: string
-  items: OrderItem[]
+  estimatedTime?: number    // 남은 예상 시간(분) – 없으면 undefined
+  items: Item[]
 }
 
 export default function OrderStatusPage() {
-  const { orderId } = useParams<{ orderId: string }>()
-  const navigate = useNavigate()
-  const [order, setOrder] = useState<OrderStatus | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { orderId } = useParams<{ orderId: string }>()           // URL 파라미터
+  const [data, setData]     = useState<Status | null>(null)      // 주문 상태 전체
+  const [remain, setRemain] = useState<number | null>(null)      // 남은 시간(분)
 
+  /* ─────────────────────────────
+     1) 5초마다 주문 상태 폴링
+  ──────────────────────────────*/
   useEffect(() => {
-    if (!orderId) {
-      navigate('/', { replace: true })
-      return
-    }
-    let timer: ReturnType<typeof setInterval>
-    const fetchStatus = () => {
-      setLoading(true)
-      api
-        .get(`/customer/orders/${orderId}`)
-        .then(res => {
-          setOrder(res.data.data)
-          setError(null)
-        })
-        .catch(() => {
-          setError('주문 상태를 불러오지 못했습니다.')
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    }
-    fetchStatus()
-    timer = setInterval(fetchStatus, 5000)
-    return () => clearInterval(timer)
-  }, [orderId, navigate])
+    // setInterval 반환값 타입(Node·브라우저 모두 호환)
+    let iv: ReturnType<typeof setInterval> | undefined
 
-  if (loading) return <p className="text-center text-gray-500">로딩 중…</p>
-  if (error) return <p className="text-center text-red-500">{error}</p>
-  if (!order) return null
+    // 주문 상태 요청 함수
+    const fetchStatus = () =>
+      api.get(`/customer/orders/${orderId}`)
+         .then(res => {
+           const d = res.data.data as Status
+           setData(d)
+           setRemain(d.estimatedTime ?? null)
+         })
+         .catch(console.error)
+
+    if (orderId) {
+      fetchStatus()                    // 최초 1회
+      iv = setInterval(fetchStatus, 5000)  // 이후 5초 간격
+    }
+
+    // cleanup – 정리 함수는 void만 반환
+    return () => {
+      if (iv) clearInterval(iv)
+    }
+  }, [orderId])
+
+  /* ─────────────────────────────
+     2) 남은 분(minute) 카운트다운
+  ──────────────────────────────*/
+  useEffect(() => {
+    if (remain !== null && remain > 0) {
+      const to = setTimeout(() => setRemain(r => (r !== null ? r - 1 : null)), 60000)
+      return () => clearTimeout(to)
+    }
+  }, [remain])
+
+  /* ─────────────────────────────
+     3) 렌더링
+  ──────────────────────────────*/
+  if (!data) return <p style={{ textAlign: 'center', marginTop: 40 }}>로딩 중…</p>
 
   return (
-    <div className="px-2 py-4 max-w-lg mx-auto sm:px-4">
-      <h2 className="text-2xl font-bold mb-6 text-center">주문 상태</h2>
-      <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
-        <div className="text-lg font-semibold mb-2">
-          상태: <span className="text-blue-700">{order.status}</span>
-        </div>
-        <ul className="flex flex-col gap-2">
-          {order.items.map((item, idx) => (
-            <li
-              key={idx}
-              className="flex justify-between items-center border-b last:border-b-0 pb-1"
-            >
-              <span>{item.name}</span>
-              <span className="font-semibold">x {item.quantity}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">주문 상태</h2>
+
+      <p className="mb-2">
+        상태: <strong>{data.status}</strong>
+      </p>
+
+      {remain !== null && (
+        <p className="mb-4">
+          남은 시간: <strong>{remain}분</strong>
+        </p>
+      )}
+
+      <ul className="list-disc pl-5">
+        {data.items.map((item, idx) => (
+          <li key={idx}>
+            {item.name} x {item.quantity}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
