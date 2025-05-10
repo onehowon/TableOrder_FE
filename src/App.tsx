@@ -1,4 +1,3 @@
-// src/App.tsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PageLayout from './components/PageLayout'
 
@@ -19,12 +18,46 @@ import TableAdminSummaryPage from './pages/TableAdminSummaryPage'
 export default function App() {
   return (
     <Routes>
-      {/* QR → Context 세팅 */}
+      {/** ─── 관리자용 ─── **/}
       <Route
-        path="/:tableId"
+        path="/admin"
+        element={
+          <PageLayout isAdmin>
+            <AdminHomePage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/admin/menus"
+        element={
+          <PageLayout isAdmin>
+            <AdminPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <PageLayout isAdmin>
+            <OrderAdminPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/admin/tables"
+        element={
+          <PageLayout isAdmin>
+            <TableAdminSummaryPage />
+          </PageLayout>
+        }
+      />
+
+      {/** ─── 고객용 ─── **/}
+      <Route
+        path="/"
         element={
           <PageLayout>
-            <TableOrderPage />
+            <GuestHomePage />
           </PageLayout>
         }
       />
@@ -33,16 +66,6 @@ export default function App() {
         element={
           <PageLayout>
             <WelcomePage />
-          </PageLayout>
-        }
-      />
-
-      {/* 고객용 */}
-      <Route
-        path="/"
-        element={
-          <PageLayout>
-            <GuestHomePage />
           </PageLayout>
         }
       />
@@ -87,41 +110,17 @@ export default function App() {
         }
       />
 
-      {/* 관리자용 */}
+      {/** ─── 마지막: QR → Context 세팅 (dynamic) ─── **/}
       <Route
-        path="/admin"
+        path="/:tableId"
         element={
-          <PageLayout isAdmin>
-            <AdminHomePage />
-          </PageLayout>
-        }
-      />
-      <Route
-        path="/admin/menus"
-        element={
-          <PageLayout isAdmin>
-            <AdminPage />
-          </PageLayout>
-        }
-      />
-      <Route
-        path="/admin/orders"
-        element={
-          <PageLayout isAdmin>
-            <OrderAdminPage />
-          </PageLayout>
-        }
-      />
-      <Route
-        path="/admin/tables"
-        element={
-          <PageLayout isAdmin>
-            <TableAdminSummaryPage />
+          <PageLayout>
+            <TableOrderPage />
           </PageLayout>
         }
       />
 
-      {/* 그 외 리디렉션 */}
+      {/** ─── 그 외는 홈으로 ─── **/}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

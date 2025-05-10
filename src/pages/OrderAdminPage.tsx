@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react'
 import api from '../api'
 
 interface OrderRow {
-  tableNumber: string  // 서버에서 string으로 받으시면 그대로, number면 toString() 자동 처리
+  tableNumber: string
   itemsSummary: string
   status: string
 }
 
 const statusColors: Record<string, string> = {
-  '제조완료': 'bg-green-100 text-green-700',
-  '제조중':   'bg-purple-100 text-purple-700',
-  '주문내역×': 'bg-red-100 text-red-700',
+  'WAITING':    'bg-gray-100 text-gray-700',
+  'COOKING':    'bg-purple-100 text-purple-700',
+  'COMPLETED':  'bg-green-100 text-green-700',
+  'CANCELLED':  'bg-red-100    text-red-700',
+  // 필요에 따라 다른 상태 추가
 }
 
 export default function OrderAdminPage() {
@@ -20,6 +22,9 @@ export default function OrderAdminPage() {
   useEffect(() => {
     api.get<{ data: OrderRow[] }>('/admin/orders')
       .then(res => setRows(res.data.data))
+      .catch(err => {
+        console.error('주문 목록 로딩 실패', err)
+      })
   }, [])
 
   return (
@@ -37,8 +42,8 @@ export default function OrderAdminPage() {
           <tbody>
             {rows.map(r => (
               <tr key={r.tableNumber} className="border-b last:border-0">
-                {/* 숫자인 경우 toString() 후 padStart */}
                 <td className="px-6 py-4">
+                  {/** 숫자일 경우 toString() 후 padStart */}
                   {r.tableNumber.toString().padStart(5, '0')}
                 </td>
                 <td className="px-6 py-4 text-gray-600">
@@ -47,7 +52,7 @@ export default function OrderAdminPage() {
                 <td className="px-6 py-4">
                   <span
                     className={`px-3 py-1 rounded-full text-sm ${
-                      statusColors[r.status] || 'bg-gray-100 text-gray-700'
+                      statusColors[r.status] ?? 'bg-gray-100 text-gray-700'
                     }`}
                   >
                     {r.status}
