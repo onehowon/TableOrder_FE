@@ -1,71 +1,64 @@
-// src/pages/OrderAdminPage.tsx
 import { useEffect, useState } from 'react'
-import {
-  getAdminOrders,
-  updateAdminOrderStatus
-} from '../api'
+import { useParams }           from 'react-router-dom'
+import api                     from '../api'
+import PageWrapper             from '../components/PageWrapper'
 
-interface AdminOrder {
-  id:number
-  tableId:number
-  status:'WAITING'|'COOKING'|'SERVED'
-  totalAmount:number
-  items:{ menuName:string; quantity:number }[]
-  createdAt:string
+interface ItemSummary {
+  name: string
+  quantity: number
+  totalPrice: number
 }
 
-export default function OrderAdminPage() {
-  const [orders,  setOrders]  = useState<AdminOrder[]>([])
-  const [loading, setLoading] = useState(false)
+interface TableSummaryResponse {
+  tableNumber: number
+  totalOrders: number
+  totalAmount: number
+  items: ItemSummary[]
+}
 
-  const fetch = () => {
-    setLoading(true)
-    getAdminOrders()
-      .then(r=>setOrders(r.data.data))
-      .finally(()=>setLoading(false))
-  }
-  useEffect(fetch,[])
+export default function TableSummaryPage() {
+  const { tableId } = useParams<{ tableId: string }>()
+  const [summary, setSummary] = useState<TableSummaryResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const onUpdate = async (id:number, status:'COOKING'|'SERVED') => {
-    await updateAdminOrderStatus(id,status)
+  useEffect(() => {
+    const fetch = async () => {
+      if (!tableId) {
+        setError('테이블 정보가 없습니다.')
+        setLoading(false)
+        return
+      }
+      try {
+        const res = await api.get(`/customer/tables/${tableId}/summary`)
+        setSummary(res.data.data)
+      } catch {
+        setError('요약 정보를 불러올 수 없습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
     fetch()
-  }
+  }, [tableId])
+
+  if (loading) return <PageWrapper title="테이블 요약"><p>로딩 중…</p></PageWrapper>
+  if (error)   return <PageWrapper title="테이블 요약"><p className="text-red-500">{error}</p></PageWrapper>
+  if (!summary) return null
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold mb-6 text-center">주문 관리</h2>
-      {loading && <p className="text-center">로딩중…</p>}
-      <ul className="space-y-6">
-        {orders.map(o=>(
-          <li key={o.id} className="border border-zinc-700 rounded-xl p-4">
-            <div className="flex justify-between mb-2">
-              <span>#{o.id} • 테이블 {o.tableId}</span>
-              <span className="text-blue-400 font-semibold">{o.status}</span>
-            </div>
-            <ul className="text-sm mb-3">
-              {o.items.map((it,i)=>(
-                <li key={i}>{it.menuName} × {it.quantity}</li>
-              ))}
-            </ul>
-            <div className="flex gap-2">
-              {o.status==='WAITING' && (
-                <button
-                  onClick={()=>onUpdate(o.id,'COOKING')}
-                  className="btn-secondary flex-1">
-                  COOKING
-                </button>
-              )}
-              {o.status!=='SERVED' && (
-                <button
-                  onClick={()=>onUpdate(o.id,'SERVED')}
-                  className="btn-primary flex-1">
-                  SERVED
-                </button>
-              )}
-            </div>
+    <PageWrapper title={`테이블 ${summary.tableNumber} 요약`}>
+      <p>총 주문 건수: {summary.totalOrders}회</p>
+      <p>
+        총 금액: <b>{summary.totalAmount.toLocaleString()}원</b>
+      </p>
+      <h3 className="mt-4 font-semibold">메뉴별 합계</h3>
+      <ul className="list-disc pl-5">
+        {summary.items.map(it => (
+          <li key={it.name}>
+            {it.name} × {it.quantity}개 ({it.totalPrice.toLocaleString()}원)
           </li>
         ))}
       </ul>
-    </div>
+    </PageWrapper>
   )
 }
