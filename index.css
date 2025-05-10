@@ -1,0 +1,6 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* (선택) 전역 스타일 추가 가능 */
