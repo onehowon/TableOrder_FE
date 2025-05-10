@@ -1,67 +1,57 @@
-// src/pages/OrderAdminPage.tsx
+// src/pages/OrderAlertPage.tsx
 import { useEffect, useState } from 'react'
 import api from '../api'
 
-interface OrderRow {
-  tableNumber: string
-  itemsSummary: string
-  status: string
+interface Alert {
+  id: number
+  message: string
+  time: string
 }
 
-const statusColors: Record<string, string> = {
-  'WAITING':    'bg-gray-100 text-gray-700',
-  'COOKING':    'bg-purple-100 text-purple-700',
-  'COMPLETED':  'bg-green-100 text-green-700',
-  'CANCELLED':  'bg-red-100    text-red-700',
-  // 필요에 따라 다른 상태 추가
-}
+export default function OrderAlertPage() {
+  const [alerts, setAlerts] = useState<Alert[]>([])
 
-export default function OrderAdminPage() {
-  const [rows, setRows] = useState<OrderRow[]>([])
+  // 1) 데이터를 fetch 하는 함수
+  const fetchAlerts = () => {
+    api.get<{ data: Alert[] }>('/admin/alerts')
+      .then(res => setAlerts(res.data.data))
+      .catch(console.error)
+  }
 
   useEffect(() => {
-    api.get<{ data: OrderRow[] }>('/admin/orders')
-      .then(res => setRows(res.data.data))
-      .catch(err => {
-        console.error('주문 목록 로딩 실패', err)
-      })
+    fetchAlerts()
+    const iv = setInterval(fetchAlerts, 5000)  // 5초마다 갱신
+    return () => clearInterval(iv)
   }, [])
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6">주문 리스트</h2>
-      <div className="overflow-x-auto bg-white rounded-2xl shadow">
-        <table className="min-w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="px-6 py-4 text-left">테이블 번호</th>
-              <th className="px-6 py-4 text-left">menu & 수량</th>
-              <th className="px-6 py-4 text-left">STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(r => (
-              <tr key={r.tableNumber} className="border-b last:border-0">
-                <td className="px-6 py-4">
-                  {/** 숫자일 경우 toString() 후 padStart */}
-                  {r.tableNumber.toString().padStart(5, '0')}
-                </td>
-                <td className="px-6 py-4 text-gray-600">
-                  {r.itemsSummary || '-'}
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      statusColors[r.status] ?? 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {r.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="flex h-full">
+      {/* 좌측 메뉴 */}
+      <aside className="w-80 bg-white rounded-2xl shadow p-6 mr-6 flex-shrink-0">
+        <button className="w-full bg-blue-500 text-white py-2 rounded mb-6">Table order</button>
+        <ul className="space-y-3">
+          {['주문','추가','삭제','수정'].map(label => (
+            <li key={label}>
+              <button className="w-full text-left px-4 py-3 bg-blue-50 rounded">{label}</button>
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      {/* 우측 알림 창 */}
+      <div className="flex-1 bg-white rounded-2xl shadow p-6 overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-4">주문 알림</h2>
+        <div className="space-y-6">
+          {alerts.map(a => (
+            <div key={a.id} className="flex items-start">
+              <div className="w-10 h-10 rounded-full bg-gray-200 mr-4"></div>
+              <div className="relative bg-gray-100 p-4 rounded-xl flex-1">
+                <p className="text-gray-800">{a.message}</p>
+                <span className="absolute bottom-2 right-3 text-xs text-gray-500">{a.time}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
