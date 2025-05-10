@@ -2,25 +2,54 @@
 import { NavLink } from 'react-router-dom'
 
 export default function SideNav() {
+  const base   = 'block flex items-center px-4 py-3 rounded transition'
+  const active = 'bg-blue-100 font-semibold text-blue-800'
+  const hover  = 'hover:bg-blue-50 text-gray-700'
+
   return (
-    <nav className="space-y-2">
-      <NavLink
-        to="/admin/alerts"
-        className={({ isActive }) =>
-          `block px-4 py-2 rounded ${isActive ? 'bg-blue-100 font-bold' : 'hover:bg-blue-50'}`
-        }
-      >
-        주문 알림
-      </NavLink>
-      <NavLink to="/admin/orders" className="block px-4 py-2 rounded hover:bg-blue-50">
-        주문 리스트
-      </NavLink>
-      <NavLink to="/admin/tables" className="block px-4 py-2 rounded hover:bg-blue-50">
-        테이블 번호
-      </NavLink>
-      <NavLink to="/admin/stats" className="block px-4 py-2 rounded hover:bg-blue-50">
-        매출
-      </NavLink>
+    <nav className="w-[200px] bg-white border-r shadow-sm flex-shrink-0">
+      <ul className="space-y-1">
+        <li>
+          <NavLink
+            to="/admin/alerts"
+            className={({ isActive }) =>
+              `${base} ${isActive ? active : hover}`
+            }
+          >
+            📢 주문 알림
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/orders"
+            className={({ isActive }) =>
+              `${base} ${isActive ? active : hover}`
+            }
+          >
+            📋 주문 리스트
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/tables"
+            className={({ isActive }) =>
+              `${base} ${isActive ? active : hover}`
+            }
+          >
+            🔢 테이블 번호
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/sales"
+            className={({ isActive }) =>
+              `${base} ${isActive ? active : hover}`
+            }
+          >
+            💰 매출
+          </NavLink>
+        </li>
+      </ul>
     </nav>
   )
 }
