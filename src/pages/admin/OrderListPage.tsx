@@ -3,10 +3,9 @@ import {
   listOrders,
   updateOrderStatus,
   OrderDetailDTO,
-  StatusUpdateReq,
 } from '@/api'
 
-// WAITING / COOKING / SERVED 로 매핑
+// WAITING / COOKING / SERVED → 화면용 라벨
 const STATUS_LABEL: Record<OrderDetailDTO['status'], { text: string; bg: string; textColor: string }> = {
   WAITING: { text: '주문 접수', bg: 'bg-red-100',    textColor: 'text-red-800'   },
   COOKING: { text: '제조 중',   bg: 'bg-purple-100', textColor: 'text-purple-800'},
@@ -39,7 +38,7 @@ export default function OrderListPage() {
   }, [])
 
   const onChangeStatus = async (orderId: number, newStatus: NextStatus) => {
-    const body: StatusUpdateReq = { status: newStatus }
+    const body: { status: NextStatus; estimatedTime?: number } = { status: newStatus }
     if (newStatus === 'COOKING') {
       const m = window.prompt('예상 소요 시간을 분 단위로 입력하세요', '10')
       body.estimatedTime = m ? Number(m) : 0
@@ -100,7 +99,8 @@ export default function OrderListPage() {
               </tbody>
             </table>
           </div>
-        )}
+        )
+      }
     </div>
   )
 }

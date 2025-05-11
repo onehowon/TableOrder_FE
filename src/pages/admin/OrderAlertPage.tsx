@@ -36,7 +36,6 @@ export default function OrderAlertsPage() {
                 const time = new Date(alert.createdAt).toLocaleTimeString('ko-KR', {
                   hour: '2-digit', minute: '2-digit'
                 })
-                // ↓ 여기서도 menuName → name
                 const itemsText = alert.items
                   .map(i => `${i.name} ${i.quantity}개`)
                   .join(', ')
@@ -55,7 +54,8 @@ export default function OrderAlertsPage() {
                 )
               })}
             </div>
-          )}
+          )
+        }
       </main>
     </div>
   )
