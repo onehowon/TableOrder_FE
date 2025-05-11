@@ -53,7 +53,7 @@ export interface TableSummaryResponse {
 
 export interface HourlySales {
   hour:   number
-  amount: number
+  revenue: number
 }
 
 export interface SalesStatsDTO {

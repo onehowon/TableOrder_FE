@@ -34,7 +34,7 @@ const data = Array.from({ length: 24 }, (_, hour) => {
   const point = stats.salesByHour.find(dp => dp.hour === hour);
   return {
     hour:   `${hour}시`,
-    amount: point?.amount ?? 0,
+    amount: point?.revenue ?? 0,
   };
 });
 // …
