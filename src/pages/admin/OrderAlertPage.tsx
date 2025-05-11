@@ -1,6 +1,7 @@
 // src/pages/admin/OrderAlertPage.tsx
 import { useEffect, useState } from 'react'
-import { getAlerts, OrderAlertDTO } from '@/api'
+import { getAlerts } from '@/api'
+import type { OrderAlertDTO } from '@/api'
 import dayjs from 'dayjs'
 
 export default function OrderAlertPage() {

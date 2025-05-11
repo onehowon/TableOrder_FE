@@ -1,10 +1,9 @@
 // src/pages/admin/OrderAdminPage.tsx
 import { useEffect, useState } from 'react'
+import type { OrderDetailDTO, StatusUpdateReq } from '@/api'
 import {
   listOrders,
   updateOrderStatus,
-  OrderDetailDTO,
-  StatusUpdateReq
 } from '@/api'
 
 export default function OrderAdminPage() {

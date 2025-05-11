@@ -1,8 +1,9 @@
 // src/pages/admin/TableAdminSummaryPage.tsx
 import { useEffect, useState } from 'react'
+import type { TableSummaryResponse } from '@/api'
+
 import {
   getAllTablesSummary,
-  TableSummaryResponse
 } from '@/api'
 
 export default function TableAdminSummaryPage() {

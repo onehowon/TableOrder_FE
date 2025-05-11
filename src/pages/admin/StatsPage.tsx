@@ -1,6 +1,7 @@
 // src/pages/admin/StatsPage.tsx
 import { useEffect, useState } from 'react'
-import { getSalesStats, SalesStatsDTO } from '@/api'
+import { getSalesStats, } from '@/api'
+import type { SalesStatsDTO } from '@/api'
 import {
   LineChart,
   Line,
