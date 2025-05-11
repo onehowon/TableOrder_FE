@@ -38,8 +38,10 @@ export interface TableSummaryResponseDTO {
 
 type CommonResp<T> = { data: T; message: string }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL as string
+
 const customerApi = axios.create({
-  baseURL: '/customer',
+  baseURL: `${API_BASE}/customer`,    // ← /customer 대신 전체 백엔드 URL + /customer
   headers: { 'Content-Type': 'application/json' }
 })
 
