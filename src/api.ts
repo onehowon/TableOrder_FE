@@ -27,12 +27,15 @@ export interface OrderAlertDTO {
   createdAt: string   // ISO timestamp
 }
 
+export interface StatusUpdateReq {
+  status: 'PREPARING' | 'DONE'   // ← 서버가 실제로 기대하는 값
+  estimatedTime?: number
+}
 export interface OrderDetailDTO {
   orderId:     number
   tableNumber: number
-  items:       OrderItemDTO[]
-  status:      'WAITING' | 'COOKING' | 'SERVED'  // ← 백엔드 enum 그대로
-  estimatedTime?: number
+  items:       { name: string; quantity: number }[]
+  status:      'WAITING' | 'PREPARING' | 'DONE'    // ← COOKING/SERVED 가 아니라 PREPARING/DONE
   createdAt:   string
 }
 
@@ -98,12 +101,11 @@ export const listMenus = () =>
 export const listOrders = () =>
   api.get<CommonResp<OrderDetailDTO[]>>('/orders')
 
+
 export interface StatusUpdateReq {
-  // WAITING 은 API에서 받지 않고, COOKING(제조중)과 SERVED(제조완료)만 가능
-  status: 'COOKING' | 'SERVED'
+  status: 'PREPARING' | 'DONE'   // ← 서버가 실제로 기대하는 값
   estimatedTime?: number
 }
-
 export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
   api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
 
