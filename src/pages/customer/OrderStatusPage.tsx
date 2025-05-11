@@ -20,7 +20,9 @@ export default function OrderStatusPage() {
       .catch(console.error)
   }, [orderId])
 
-  if (!orderId) return <p>잘못된 접근입니다.</p>
+  if (!orderId) return <p className="p-4">잘못된 접근입니다.</p>
+
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
   return (
     <div className="p-4 space-y-4">
@@ -35,6 +37,9 @@ export default function OrderStatusPage() {
           </li>
         ))}
       </ul>
+      <div className="text-right font-semibold">
+        합계 {total.toLocaleString()}원
+      </div>
     </div>
   )
 }
