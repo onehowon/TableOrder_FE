@@ -1,63 +1,60 @@
 // src/App.tsx
-import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import PageLayout from './components/PageLayout'
 
-// 관리자 페이지 컴포넌트
-import OrderAlertPage        from './pages/OrderAlertPage'
-import OrderAdminPage        from './pages/OrderAdminPage'
-import TableAdminSummaryPage from './pages/TableAdminSummaryPage'
-import StatsPage             from './pages/StatsPage'
-
-// 고객 페이지 컴포넌트
-import GuestHomePage    from './pages/GuestHomePage'
-import WelcomePage      from './pages/WelcomePage'
-import MenuPage         from './pages/MenuPage'
-import OrderConfirmPage from './pages/OrderConfirmPage'
-import OrderStatusPage  from './pages/OrderStatusPage'
-import OrderHistoryPage from './pages/OrderHistoryPage'
-import TableSummaryPage from './pages/TableSummaryPage'
-import TableOrderPage   from './pages/TableOrderPage'
+import AdminLayout                from './components/layout/AdminLayout'
+import OrderAlertPage             from './pages/admin/OrderAlertPage'
+import OrderAdminPage             from './pages/admin/OrderAdminPage'
+import TableAdminSummaryPage      from './pages/admin/TableAdminSummaryPage'
+import StatsPage                  from './pages/admin/StatsPage'
+import ErrorBoundary              from './components/ErrorBoundary'
 
 export default function App() {
   return (
     <Routes>
-
-      {/** ─── 관리자용 ─── **/}
+      {/* 루트와 /admin 은 Alerts로 */}
+      <Route path="/"      element={<Navigate to="/admin/alerts" replace />} />
       <Route path="/admin" element={<Navigate to="/admin/alerts" replace />} />
 
-      <Route
-        path="/admin/alerts"
-        element={<PageLayout isAdmin><OrderAlertPage/></PageLayout>}
-      />
-      <Route
-        path="/admin/orders"
-        element={<PageLayout isAdmin><OrderAdminPage/></PageLayout>}
-      />
-      <Route
-        path="/admin/tables"
-        element={<PageLayout isAdmin><TableAdminSummaryPage/></PageLayout>}
-      />
-      <Route
-        path="/admin/sales"
-        element={<PageLayout isAdmin><StatsPage/></PageLayout>}
-      />
+      {/* AdminLayout 안에만 4개 라우트 */}
+      <Route path="admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="alerts" replace />} />
 
-      {/** ─── 고객용 ─── **/}
-      <Route path="/" element={<PageLayout><GuestHomePage/></PageLayout>} />
-      <Route path="/welcome" element={<PageLayout><WelcomePage/></PageLayout>} />
-      <Route path="/menu" element={<PageLayout><MenuPage/></PageLayout>} />
-      <Route path="/order/confirm" element={<PageLayout><OrderConfirmPage/></PageLayout>} />
-      <Route path="/order/status/:orderId" element={<PageLayout><OrderStatusPage/></PageLayout>} />
-      <Route path="/orders/history/:tableId" element={<PageLayout><OrderHistoryPage/></PageLayout>} />
-      <Route path="/table/:tableId/summary" element={<PageLayout><TableSummaryPage/></PageLayout>} />
+        <Route
+          path="alerts"
+          element={
+            <ErrorBoundary>
+              <OrderAlertPage />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <ErrorBoundary>
+              <OrderAdminPage />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="tables"
+          element={
+            <ErrorBoundary>
+              <TableAdminSummaryPage />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="sales"
+          element={
+            <ErrorBoundary>
+              <StatsPage />
+            </ErrorBoundary>
+          }
+        />
+      </Route>
 
-      {/** ─── QR 스캔용 ─── **/}
-      <Route path="/:tableId" element={<PageLayout><TableOrderPage/></PageLayout>} />
-
-      {/** ─── 기타는 홈으로 ─── **/}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
+      {/* 그 외 전부 Alerts로 */}
+      <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
     </Routes>
   )
 }

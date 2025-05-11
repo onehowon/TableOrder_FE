@@ -1,55 +1,38 @@
 // src/components/SideNav.tsx
 import { NavLink } from 'react-router-dom'
+import {
+  HiOutlineBell,
+  HiOutlineListBullet,
+  HiOutlineTableCells,
+  HiOutlineChartBar
+} from 'react-icons/hi2'
+
+const menus = [
+  { to: '/admin/alerts', icon: <HiOutlineBell />,       label: '주문 알림' },
+  { to: '/admin/orders', icon: <HiOutlineListBullet />, label: '주문 리스트' },
+  { to: '/admin/tables', icon: <HiOutlineTableCells />, label: '테이블 번호' },
+  { to: '/admin/sales',  icon: <HiOutlineChartBar />,   label: '매출' },
+]
 
 export default function SideNav() {
-  const base   = 'block flex items-center px-4 py-3 rounded transition'
-  const active = 'bg-blue-100 font-semibold text-blue-800'
-  const hover  = 'hover:bg-blue-50 text-gray-700'
-
   return (
-    <nav className="w-[200px] bg-white border-r shadow-sm flex-shrink-0">
-      <ul className="space-y-1">
-        <li>
+    <aside className="w-60 bg-white shadow-sm flex-shrink-0">
+      <nav className="mt-6 flex flex-col space-y-2">
+        {menus.map(m => (
           <NavLink
-            to="/admin/alerts"
+            key={m.to}
+            to={m.to}
             className={({ isActive }) =>
-              `${base} ${isActive ? active : hover}`
+              `flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-r-lg transition ${
+                isActive ? 'bg-blue-500 text-white' : ''
+              }`
             }
           >
-            📢 주문 알림
+            <span className="text-lg mr-3">{m.icon}</span>
+            <span>{m.label}</span>
           </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/admin/orders"
-            className={({ isActive }) =>
-              `${base} ${isActive ? active : hover}`
-            }
-          >
-            📋 주문 리스트
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/admin/tables"
-            className={({ isActive }) =>
-              `${base} ${isActive ? active : hover}`
-            }
-          >
-            🔢 테이블 번호
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/admin/sales"
-            className={({ isActive }) =>
-              `${base} ${isActive ? active : hover}`
-            }
-          >
-            💰 매출
-          </NavLink>
-        </li>
-      </ul>
-    </nav>
+        ))}
+      </nav>
+    </aside>
   )
 }

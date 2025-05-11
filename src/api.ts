@@ -1,79 +1,127 @@
-import axios from 'axios';
+// src/api.ts
+import axios from 'axios'
+
+/** 1) DTO 타입 정의 *****************************************/
+
+export interface MenuDTO {
+  id: number
+  name: string
+  description: string
+  price: number
+  isAvailable: boolean
+  imageUrl?: string | null
+}
+
+export interface OrderItemDTO {
+  menuName: string
+  quantity: number
+}
+
+export interface OrderAlertDTO {
+  tableNumber: number
+  items: OrderItemDTO[]
+  createdAt: string   // ISO timestamp
+}
+
+export interface OrderDetailDTO {
+  orderId: number
+  tableNumber: number
+  items: OrderItemDTO[]
+  status: string
+  estimatedTime?: number
+  createdAt: string
+}
+
+export interface SalesSummaryDTO {
+  totalCustomers: number
+  totalOrders: number
+  totalSalesAmount: number
+  hourlySales: { hour: number; amount: number }[]
+}
+
+export interface TableSummaryResponse {
+  tableNumber: number
+  ordersCount: number
+  totalAmount: number
+}
+
+export interface SalesStatsDTO {
+  totalCustomers: number
+  totalOrders: number
+  totalSales: number
+  salesByHour: Record<string, number>
+}
+
+type CommonResp<T> = { data: T; message: string }
+
+/** 2) Axios 인스턴스 ****************************************/
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-});
+  baseURL: '/admin',
+  headers: { 'Content-Type': 'application/json' }
+})
 
-// ─ 고객용 ────────────────────────────────────────────────────────────
+/** 3) API 함수 모음 *****************************************/
 
-// 메뉴 조회 (활성화된 것만)
-export const getCustomerMenus = () =>
-  api.get('/customer/menus').then(res =>
-    res.data.data.filter((m: any) => m.isAvailable)
-  );
+// 메뉴 관리
+export const createMenu = (fd: FormData) =>
+  api.post<CommonResp<MenuDTO>>('/menus', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 
-// 주문 생성
-export const createOrder = (payload: {
-  tableNumber: number;
-  items: { menuId: number; quantity: number }[];
-}) => api.post('/customer/orders', payload);
+export const updateMenu = (id: number, fd: FormData) =>
+  api.put<CommonResp<MenuDTO>>(`/menus/${id}`, fd, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 
-// 테이블별 주문 조회
-export const getOrdersByTable = (tableNumber: string) =>
-  api.get(`/customer/orders/table/${tableNumber}`);
+export const deleteMenu = (id: number) =>
+  api.delete<CommonResp<null>>(`/menus/${id}`)
 
-// 단일 주문 상태 조회
-export const getOrderStatus = (orderId: string) =>
-  api.get(`/customer/orders/${orderId}`);
+export const activateMenu = (id: number) =>
+  api.put<CommonResp<null>>(`/menus/${id}/activate`)
 
-// 테이블 요약 조회
-export const getTableSummary = (tableNumber: string) =>
-  api.get(`/customer/tables/${tableNumber}/summary`);
+export const deactivateMenu = (id: number) =>
+  api.put<CommonResp<null>>(`/menus/${id}/deactivate`)
 
-// 편의 요청 전송 (4가지 타입 지원)
-export const postCustomerRequest = (payload: {
-  tableNumber: number;
-  type: 'WATER' | 'TISSUE' | 'CALL' | 'CHOPSTICKS';
-}) => api.post('/customer/requests', payload);
-
-// ─ 관리자용 ────────────────────────────────────────────────────────
-
-// 메뉴 CRUD
-export const getAdminMenus = () => api.get('/admin/menus');
-export const createAdminMenu = (fd: FormData) =>
-  api.post('/admin/menus', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-export const updateAdminMenu = (id: number, fd: FormData) =>
-  api.put(`/admin/menus/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-export const deleteAdminMenu = (id: number) => api.delete(`/admin/menus/${id}`);
-export const activateAdminMenu = (id: number) => api.put(`/admin/menus/${id}/activate`);
-export const deactivateAdminMenu = (id: number) => api.put(`/admin/menus/${id}/deactivate`);
+export const listMenus = () =>
+  api.get<CommonResp<MenuDTO[]>>('/menus')
 
 // 주문 관리
-export const getAdminOrders = () => api.get('/admin/orders');
-export const updateAdminOrderStatus = (
-  orderId: number,
-  status: OrderStatus,
-  eta?: number
-) =>
-  api.put(`/admin/orders/${orderId}/status`, {
-    status,
-    estimatedTime: eta
-  })
-// …
+export const listOrders = () =>
+  api.get<CommonResp<OrderDetailDTO[]>>('/orders')
 
-// 매출 / 테이블 요약
-export const getTodaySalesSummary = () => api.get('/admin/orders/today-summary');
-export const getAdminTableSummary = (table: number) =>
-  api.get(`/admin/tables/summary?table=${table}`);
-export const getAllAdminTableSummaries = () =>
-  api.get('/admin/tables/summary-all');
+export interface StatusUpdateReq {
+  status: string
+  estimatedTime?: number
+}
+export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
+  api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
 
-// 관리자 편의 요청 (직원 호출)
-export const postAdminRequest = (payload: { tableNumber: number; type: string }) =>
-  api.post('/admin/requests', payload);
+// 오늘 매출 요약
+export const getTodaySummary = () =>
+  api.get<CommonResp<SalesSummaryDTO>>('/orders/today-summary')
 
-export type OrderStatus = 'CREATED' | 'COOKING' | 'SERVED'
+// 테이블 요약
+export const getTableSummary = (tableNumber: number) =>
+  api.get<CommonResp<TableSummaryResponse>>(`/tables/${tableNumber}/summary`)
 
+export const getAllTablesSummary = () =>
+  api.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
 
+// 임시: 고객 요청 전송
+export interface RequestDTO {
+  tableNumber: number
+  items: { menuId: number; quantity: number }[]
+}
+export const postRequest = (body: RequestDTO) =>
+  api.post<CommonResp<null>>('/requests', body)
 
-export default api;
+// 알림(새 주문)
+export const getAlerts = () =>
+  api.get<CommonResp<OrderAlertDTO[]>>('/alerts')
+
+// 매출 통계
+export const getSalesStats = () =>
+  api.get<CommonResp<SalesStatsDTO>>('/sales')
+
+export default api
