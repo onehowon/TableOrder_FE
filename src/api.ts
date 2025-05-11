@@ -94,6 +94,8 @@ export const getAlerts = () =>
 /**── 테이블 요약 ──────────────────────────────────────────**/
 export const getTableSummary     = (tableNumber: number) =>
   api.get<CommonResp<TableSummaryResponse>>(`/tables/${tableNumber}/summary`)
+export const resetTable          = (tableNumber: number) =>
+  api.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 export const getAllTablesSummary = () =>
   api.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
 
@@ -106,5 +108,7 @@ export const getTodaySummary = () =>
   api.get<CommonResp<any>>('/orders/today-summary')
 export const getSalesStats   = () =>
   api.get<CommonResp<SalesStatsDTO>>('/sales')
+
+
 
 export default api
