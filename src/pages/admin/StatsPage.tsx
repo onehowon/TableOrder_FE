@@ -15,7 +15,12 @@ export default function StatsPage() {
   const [stats, setStats] = useState<SalesStatsDTO | null>(null)
 
   useEffect(() => {
-    getSalesStats().then((res) => setStats(res.data.data))
+    getSalesStats()
+      .then(res => setStats(res.data.data))
+      .catch(err => {
+        console.error('매출 통계 조회 실패', err)
+        setStats(null)
+      })
   }, [])
 
   if (!stats) {
@@ -23,9 +28,9 @@ export default function StatsPage() {
   }
 
   // 차트용 데이터 변환
-  const data = Object.entries(stats.salesByHour).map(([hour, amount]) => ({
+  const data = Object.entries(stats.salesByHour ?? {}).map(([hour, amount]) => ({
     hour: `${hour}시`,
-    amount,
+    amount: amount ?? 0
   }))
 
   return (
@@ -36,19 +41,19 @@ export default function StatsPage() {
         <div className="p-4 bg-white rounded shadow">
           <p className="text-gray-500">총 고객수</p>
           <p className="text-2xl font-semibold">
-            {stats.totalCustomers.toLocaleString()}명
+            {(stats.totalCustomers ?? 0).toLocaleString()}명
           </p>
         </div>
         <div className="p-4 bg-white rounded shadow">
           <p className="text-gray-500">총 주문수</p>
           <p className="text-2xl font-semibold">
-            {stats.totalOrders.toLocaleString()}건
+            {(stats.totalOrders ?? 0).toLocaleString()}건
           </p>
         </div>
         <div className="p-4 bg-white rounded shadow">
           <p className="text-gray-500">총 매출 금액</p>
           <p className="text-2xl font-semibold">
-            {stats.totalRevenue.toLocaleString()}원
+            {(stats.totalRevenue ?? 0).toLocaleString()}원
           </p>
         </div>
       </div>
@@ -58,11 +63,18 @@ export default function StatsPage() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <XAxis dataKey="hour" />
-            <YAxis
-              tickFormatter={(val) => `${Math.round(val / 10000)}만`}
-            />
-            <Tooltip
-              formatter={(val: number) => `${val.toLocaleString()}원`}
+            <YAxis tickFormatter={val => `${Math.round(Number(val) / 10000)}만`} />
+            <Tooltip 
+              formatter={(
+                value: number | string,
+                name: string,
+                props: any
+              ) => {
+                const num = typeof value === 'number'
+                  ? value
+                  : parseFloat(String(value)) || 0
+                return `${num.toLocaleString()}원`
+              }}
             />
             <Line
               type="monotone"
