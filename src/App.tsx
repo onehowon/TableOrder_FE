@@ -12,6 +12,7 @@ import MenuPage              from './pages/customer/MenuPage'
 import ConfirmPage           from './pages/customer/ConfirmPage'
 import OrderStatusPage       from './pages/customer/OrderStatusPage'
 import SummaryPage           from './pages/customer/SummaryPage'
+import WelcomePage from './pages/customer/WelcomePage'
 
 export default function App() {
   return (
@@ -58,13 +59,15 @@ export default function App() {
         />
       </Route>
 
-      {/* 고객 영역 */}
-     <Route path="customer/:tableNumber" element={<CustomerLayout />}>
-       <Route index element={<MenuPage />} />
-       <Route path="order/confirm" element={<ConfirmPage />} />
-       <Route path="orders" element={<OrderStatusPage />} />
-       <Route path="summary" element={<SummaryPage />} />
-     </Route>
+      // src/App.tsx 에서 고객 영역
+    <Route path="customer/:tableNumber" element={<CustomerLayout />}>
+      <Route index element={<WelcomePage />} />
+      <Route path="menu" element={<MenuPage />} />
+      <Route path="order/confirm" element={<ConfirmPage />} />
+      <Route path="orders" element={<OrderStatusPage />} />
+      <Route path="summary" element={<SummaryPage />} />
+    </Route>
+
 
       {/* 그 외 전부 Alerts로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
