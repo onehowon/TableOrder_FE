@@ -40,11 +40,9 @@ export interface OrderDetailDTO {
 export interface TableSummaryResponse {
   tableNumber: number
 
-  // 백엔드에서 실제 내려주는 필드는 totalAmount 입니다
   totalOrders: number
   totalAmount: number
 
-  // (summary-all 응답에 포함되는) 메뉴별 집계
   items: {
     name: string
     quantity: number
