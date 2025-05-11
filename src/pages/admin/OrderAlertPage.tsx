@@ -58,7 +58,7 @@ export default function OrderAlertsPage() {
               const id = alert.createdAt + '-' + alert.tableNumber
               const isRead = readIds.has(id)
               const itemText = alert.items
-                .map(i => `${i.menuName} ${i.quantity}개`)
+                .map(i => `${i.name} ${i.quantity}개`)
                 .join(', ')
               const time = new Date(alert.createdAt).toLocaleTimeString('ko-KR', {
                 hour: '2-digit', minute: '2-digit'

@@ -17,7 +17,7 @@ export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
 
 
 export interface OrderItemDTO {
-  menuName: string
+  name: string
   quantity: number
 }
 
@@ -28,12 +28,12 @@ export interface OrderAlertDTO {
 }
 
 export interface OrderDetailDTO {
-  orderId: number
+  orderId:     number
   tableNumber: number
-  items: OrderItemDTO[]
-  status:      'WAITING' | 'COOKING' | 'SERVED'
+  items:       OrderItemDTO[]
+  status:      'WAITING' | 'COOKING' | 'SERVED'  // ← 백엔드 enum 그대로
   estimatedTime?: number
-  createdAt: string
+  createdAt:   string
 }
 
 export interface SalesSummaryDTO {
@@ -97,10 +97,13 @@ export const listMenus = () =>
 // 주문 관리
 export const listOrders = () =>
   api.get<CommonResp<OrderDetailDTO[]>>('/orders')
+
 export interface StatusUpdateReq {
+  // WAITING 은 API에서 받지 않고, COOKING(제조중)과 SERVED(제조완료)만 가능
   status: 'COOKING' | 'SERVED'
   estimatedTime?: number
 }
+
 export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
   api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
 
