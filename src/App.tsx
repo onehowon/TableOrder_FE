@@ -25,58 +25,22 @@ export default function App() {
       {/* AdminLayout 안에만 4개 라우트 */}
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="alerts" replace />} />
-
-        <Route
-          path="alerts"
-          element={
-            <ErrorBoundary>
-              <OrderAlertPage />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="orders"
-          element={
-            <ErrorBoundary>
-              <OrderAdminPage />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="tables"
-          element={
-            <ErrorBoundary>
-              <TableAdminSummaryPage />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="sales"
-          element={
-            <ErrorBoundary>
-              <StatsPage />
-            </ErrorBoundary>
-          }
-        />
+        <Route path="alerts" element={<ErrorBoundary><OrderAlertPage/></ErrorBoundary>} />
+        <Route path="orders" element={<ErrorBoundary><OrderAdminPage/></ErrorBoundary>} />
+        <Route path="tables" element={<ErrorBoundary><TableAdminSummaryPage/></ErrorBoundary>} />
+        <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
       </Route>
 
-      // src/App.tsx 에서 고객 영역
-      <Routes>
-  {/* …Admin 생략… */}
-
-  {/* 고객 영역 */}
-  <Route path="customer/:tableNumber" element={<CustomerLayout />}>
-    <Route index element={<WelcomePage />} />
-    <Route path="welcome" element={<WelcomePage />} />
-    <Route path="menu"    element={<MenuPage />} />
-    <Route path="confirm" element={<ConfirmPage />} />
-    <Route path="orders"  element={<OrderStatusPage />} />
-    <Route path="summary" element={<SummaryPage />} />
-    <Route path="request" element={<RequestPage />} />
-  </Route>
-
-  </Routes>
-
+      {/* 고객 영역: 한 번만 Routes 내에서 선언 */}
+      <Route path="customer/:tableNumber" element={<CustomerLayout />}>
+        <Route index    element={<WelcomePage />} />
+        <Route path="welcome" element={<WelcomePage />} />
+        <Route path="menu"    element={<MenuPage />} />
+        <Route path="confirm" element={<ConfirmPage />} />
+        <Route path="orders"  element={<OrderStatusPage />} />
+        <Route path="summary" element={<SummaryPage />} />
+        <Route path="request" element={<RequestPage />} />
+      </Route>
 
       {/* 그 외 전부 Alerts로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
