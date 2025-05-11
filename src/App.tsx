@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import AdminLayout                from './components/layout/AdminLayout'
 import OrderAlertPage             from './pages/admin/OrderAlertPage'
-import OrderAdminPage             from './pages/admin/OrderAdminPage'
 import TableAdminSummaryPage      from './pages/admin/TableAdminSummaryPage'
 import StatsPage                  from './pages/admin/StatsPage'
 import ErrorBoundary              from './components/ErrorBoundary'
@@ -14,6 +13,7 @@ import OrderStatusPage       from './pages/customer/OrderStatusPage'
 import SummaryPage           from './pages/customer/SummaryPage'
 import WelcomePage from './pages/customer/WelcomePage'
 import RequestPage from './pages/customer/RequestPage'
+import OrderListPage from './pages/admin/OrderListPage'
 
 export default function App() {
   return (
@@ -24,7 +24,7 @@ export default function App() {
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="alerts" replace />} />
         <Route path="alerts" element={<ErrorBoundary><OrderAlertPage/></ErrorBoundary>} />
-        <Route path="orders" element={<ErrorBoundary><OrderAdminPage/></ErrorBoundary>} />
+        <Route path="orders" element={<ErrorBoundary><OrderListPage/></ErrorBoundary>} />
         <Route path="tables" element={<ErrorBoundary><TableAdminSummaryPage/></ErrorBoundary>} />
         <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
       </Route>
