@@ -5,6 +5,7 @@ import type { OrderAlertDTO } from '@/api'
 export default function OrderAlertsPage() {
   const [alerts, setAlerts] = useState<OrderAlertDTO[]>([])
   const [loading, setLoading] = useState(true)
+  const [readIds, setReadIds] = useState<Set<string>>(new Set())
 
   const loadAlerts = async () => {
     try {
@@ -22,6 +23,10 @@ export default function OrderAlertsPage() {
     const iv = setInterval(loadAlerts, 5000)
     return () => clearInterval(iv)
   }, [])
+
+  const markAsRead = (id: string) => {
+    setReadIds(prev => new Set(prev).add(id))
+  }
 
   return (
     <div className="flex h-full">
@@ -50,18 +55,27 @@ export default function OrderAlertsPage() {
         ) : (
           <div className="space-y-6">
             {alerts.map((alert, idx) => {
+              const id = alert.createdAt + '-' + alert.tableNumber
+              const isRead = readIds.has(id)
+              const itemText = alert.items
+                .map(i => `${i.menuName} ${i.quantity}개`)
+                .join(', ')
               const time = new Date(alert.createdAt).toLocaleTimeString('ko-KR', {
                 hour: '2-digit', minute: '2-digit'
               })
-              const itemsText = alert.items
-                .map(i => `${i.menuName} ${i.quantity}개`)
-                .join(', ')
               return (
-                <div key={idx} className="flex items-start space-x-4">
+                <div
+                  key={id}
+                  onClick={() => markAsRead(id)}
+                  className={
+                    `flex items-start space-x-4 p-2 rounded-lg cursor-pointer transition-colors ` +
+                    (isRead ? 'bg-gray-200' : 'bg-white')
+                  }
+                >
                   <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0"></div>
-                  <div className="flex-1 bg-white rounded-lg p-4 shadow">
+                  <div className="flex-1">
                     <p className="text-gray-800">
-                      {alert.tableNumber}번 테이블에서 {itemsText}를 주문하였습니다.
+                      {alert.tableNumber}번 테이블에서 {itemText}를 주문하였습니다.
                     </p>
                     <span className="text-xs text-gray-500 block text-right mt-2">
                       {time}

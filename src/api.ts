@@ -13,6 +13,9 @@ export interface MenuDTO {
   imageUrl?: string | null
 }
 
+export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
+
+
 export interface OrderItemDTO {
   menuName: string
   quantity: number
@@ -28,7 +31,7 @@ export interface OrderDetailDTO {
   orderId: number
   tableNumber: number
   items: OrderItemDTO[]
-  status: 'WAITING' | 'PREPARING' | 'DONE'
+  status:      'WAITING' | 'COOKING' | 'SERVED'
   estimatedTime?: number
   createdAt: string
 }
@@ -95,7 +98,7 @@ export const listMenus = () =>
 export const listOrders = () =>
   api.get<CommonResp<OrderDetailDTO[]>>('/orders')
 export interface StatusUpdateReq {
-  status: 'PREPARING' | 'DONE'
+  status: 'COOKING' | 'SERVED'
   estimatedTime?: number
 }
 export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
