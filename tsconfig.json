@@ -1,15 +1,28 @@
+// tsconfig.json
 {
-  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    // 이 아래 옵션들은 루트에서만 한 번 선언
+    "target": "ES2020",
+    "module": "ESNext",               // Vite가 ESNext 모듈을 처리합니다
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    // Vite + Tailwind + alias
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "paths": { "@/*": ["src/*"] },
+
+    // CommonJS 호환
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // 엄격 모드, 외부 라이브러리 타입 체크 건너뜀
+    "strict": true,
+    "skipLibCheck": true,
+
+    // Vite가 실제 JS를 번들링하므로 emit은 끔
+    "noEmit": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.d.ts"        // 전역 선언 파일 포함
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }
