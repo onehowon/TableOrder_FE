@@ -91,13 +91,15 @@ export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
 export const getAlerts = () =>
   api.get<CommonResp<OrderAlertDTO[]>>('/alerts')
 
-/**── 테이블 요약 ──────────────────────────────────────────**/
+// ── 테이블 요약 ──────────────────────────────────────────
 export const getTableSummary     = (tableNumber: number) =>
   api.get<CommonResp<TableSummaryResponse>>(`/tables/${tableNumber}/summary`)
-export const resetTable          = (tableNumber: number) =>
-  api.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 export const getAllTablesSummary = () =>
   api.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
+
+// ── 테이블 초기화 ────────────────────────────────────────
+export const resetTable = (tableNumber: number) =>
+  api.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 
 /**── 고객 요청 전송 ───────────────────────────────────────**/
 export const postRequest   = (body: RequestDTO) =>
