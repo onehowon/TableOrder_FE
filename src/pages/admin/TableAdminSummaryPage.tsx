@@ -1,10 +1,7 @@
 // src/pages/admin/TableAdminSummaryPage.tsx
 import { useEffect, useState } from 'react'
 import type { TableSummaryResponse } from '@/api'
-
-import {
-  getAllTablesSummary,
-} from '@/api'
+import { getAllTablesSummary } from '@/api'
 
 export default function TableAdminSummaryPage() {
   const [tables, setTables]   = useState<TableSummaryResponse[]>([])
@@ -15,6 +12,16 @@ export default function TableAdminSummaryPage() {
       setLoading(true)
       try {
         const res = await getAllTablesSummary()
+
+        // ─── ① 원본 응답 객체 확인
+        console.log('▶ raw response:', res)
+
+        // ─── ② res.data 객체 확인
+        console.log('▶ res.data:', res.data)
+
+        // ─── ③ 실제 데이터 배열 확인
+        console.log('▶ res.data.data:', res.data.data)
+
         setTables(res.data?.data ?? [])
       } catch (err) {
         console.error('테이블 요약 조회 실패', err)
@@ -22,6 +29,7 @@ export default function TableAdminSummaryPage() {
         setLoading(false)
       }
     }
+
     load()
     // 주기적 갱신이 필요하면 주석 해제
     // const iv = setInterval(load, 10000)
@@ -35,7 +43,7 @@ export default function TableAdminSummaryPage() {
         <p>로딩 중…</p>
       ) : (
         <ul className="space-y-2">
-          {tables.map(t => (
+          {tables.map((t) => (
             <li
               key={t.tableNumber}
               className="p-4 bg-white rounded shadow flex justify-between"

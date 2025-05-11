@@ -1,10 +1,7 @@
 // src/pages/admin/OrderAdminPage.tsx
 import { useEffect, useState } from 'react'
 import type { OrderDetailDTO, StatusUpdateReq } from '@/api'
-import {
-  listOrders,
-  updateOrderStatus,
-} from '@/api'
+import { listOrders, updateOrderStatus } from '@/api'
 
 export default function OrderAdminPage() {
   const [orders, setOrders]   = useState<OrderDetailDTO[]>([])
@@ -15,6 +12,16 @@ export default function OrderAdminPage() {
       setLoading(true)
       try {
         const res = await listOrders()
+
+        // ─── ① 콘솔로 응답 전체 찍기
+        console.log('▶ raw response:', res)
+
+        // ─── ② res.data 찍기
+        console.log('▶ res.data:', res.data)
+
+        // ─── ③ 실제 리스트 배열 찍기
+        console.log('▶ res.data.data:', res.data.data)
+
         setOrders(res.data?.data ?? [])
       } catch (err) {
         console.error('주문 리스트 조회 실패', err)
@@ -22,6 +29,7 @@ export default function OrderAdminPage() {
         setLoading(false)
       }
     }
+
     load()
     // // 주기적 갱신이 필요하면 주석 해제
     // const iv = setInterval(load, 5000)
