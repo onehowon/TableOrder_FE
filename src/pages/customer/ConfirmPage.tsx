@@ -19,7 +19,8 @@ export default function ConfirmPage() {
       const items = cart.map(i => ({ menuId: i.menuId, quantity: i.quantity }))
       const res = await postCustomerOrder(Number(tableId), items)
       const orderId = res.data.data.orderId
-      clear()                      // 장바구니 비우기
+      clear()
+      // 주문 완료 후에도 절대 경로 사용
       nav(`/customer/${tableId}/orders?orderId=${orderId}`)
     } catch (e) {
       console.error('주문 실패', e)
