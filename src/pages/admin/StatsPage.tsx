@@ -1,6 +1,6 @@
 // src/pages/admin/StatsPage.tsx
 import { useEffect, useState } from 'react'
-import { getSalesStats, } from '@/api'
+import { getSalesStats } from '@/api'
 import type { SalesStatsDTO } from '@/api'
 import {
   LineChart,
@@ -48,7 +48,7 @@ export default function StatsPage() {
         <div className="p-4 bg-white rounded shadow">
           <p className="text-gray-500">총 매출 금액</p>
           <p className="text-2xl font-semibold">
-            {stats.totalSales.toLocaleString()}원
+            {stats.totalRevenue.toLocaleString()}원
           </p>
         </div>
       </div>

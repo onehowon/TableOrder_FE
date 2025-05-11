@@ -1,4 +1,3 @@
-// src/api.ts
 import axios from 'axios'
 
 // 🚀 Axios 인스턴스
@@ -36,10 +35,10 @@ export interface TableSummaryResponse {
 
 // 매출 통계
 export interface SalesStatsDTO {
-  totalCustomers: number;
-  totalOrders: number;
-  totalRevenue: number;
-  hourly: { hour: number; revenue: number }[];
+  totalCustomers: number
+  totalOrders:   number
+  totalRevenue:  number
+  salesByHour:   Record<string, number>
 }
 
 // 메뉴
@@ -65,10 +64,6 @@ export const fetchOrders = () =>
 // 3) 테이블 요약
 export const fetchTableSummary = (tableNumber: number) =>
   api.get<{ data: TableSummaryResponse }>(`/tables/${tableNumber}/summary`)
-
-// 4) 매출 통계
-export const fetchStats = () =>
-  api.get<{ data: SalesStatsDTO }>('/sales')
 
 // 5) 메뉴 목록
 export const fetchMenus = () =>

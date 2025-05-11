@@ -48,9 +48,9 @@ export interface TableSummaryResponse {
 
 export interface SalesStatsDTO {
   totalCustomers: number
-  totalOrders: number
-  totalRevenue:   number;
-  salesByHour: Record<string, number>
+  totalOrders:   number
+  totalRevenue:  number
+  salesByHour:   Record<string, number>
 }
 
 type CommonResp<T> = { data: T; message: string }
@@ -126,6 +126,6 @@ export const getAlerts = () =>
 
 // ─── 매출 통계 ─────────────────────────────────────────────────
 export const getSalesStats = () =>
-  api.get<CommonResp<SalesStatsDTO>>('/sales')
+  api.get<{ data: SalesStatsDTO }>('/sales')
 
 export default api
