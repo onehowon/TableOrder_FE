@@ -23,20 +23,17 @@ export interface OrderItemDTO {
 
 export interface OrderAlertDTO {
   tableNumber: number
-  items: OrderItemDTO[]
-  createdAt: string   // ISO timestamp
+  items: { name: string; quantity: number }[]   // ← menuName → name
+  createdAt: string
 }
 
-export interface StatusUpdateReq {
-  status: 'PREPARING' | 'DONE'   // ← 서버가 실제로 기대하는 값
-  estimatedTime?: number
-}
 export interface OrderDetailDTO {
   orderId:     number
   tableNumber: number
-  items:       { name: string; quantity: number }[]
-  status:      'WAITING' | 'PREPARING' | 'DONE'    // ← COOKING/SERVED 가 아니라 PREPARING/DONE
+  items:       { name: string; quantity: number }[]  // ← menuName → name
+  status:      'WAITING' | 'COOKING' | 'SERVED'      // ← backend enum
   createdAt:   string
+  estimatedTime?: number
 }
 
 export interface SalesSummaryDTO {
@@ -103,11 +100,11 @@ export const listOrders = () =>
 
 
 export interface StatusUpdateReq {
-  status: 'PREPARING' | 'DONE'   // ← 서버가 실제로 기대하는 값
-  estimatedTime?: number
+  status: 'COOKING' | 'SERVED';
+  estimatedTime?: number;
 }
 export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
-  api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
+  api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body);
 
 // 알림
 export const getAlerts = () =>
