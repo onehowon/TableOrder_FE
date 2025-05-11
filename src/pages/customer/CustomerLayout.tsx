@@ -1,13 +1,12 @@
-// ─ src/pages/customer/CustomerLayout.tsx ───────────────────────
+// src/pages/customer/CustomerLayout.tsx
 import React, { useEffect } from 'react'
-import { Outlet, useParams, useNavigate, NavLink } from 'react-router-dom'
-import { useTable } from '@/contexts/TableContext'
-import CartMiniWidget from '@/components/CartMiniWidget'
+import { Outlet, useParams }      from 'react-router-dom'
+import { useTable }               from '@/contexts/TableContext'
+import CartMiniWidget             from '@/components/CartMiniWidget'
 
 export default function CustomerLayout() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const { tableId, setTableId } = useTable()
-  const nav = useNavigate()
 
   useEffect(() => {
     if (tableNumber && tableNumber !== tableId) {
@@ -19,14 +18,12 @@ export default function CustomerLayout() {
     <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20">
       <header className="p-4 bg-white shadow sticky top-0 z-10">
         <h1 className="text-xl font-bold">IBIZ에 오신 걸 환영합니다!</h1>
-        <p className="text-sm text-gray-600">
-          여기는 테이블 <b>{tableNumber}</b> 번입니다.
-        </p>
+        <p className="text-sm">여기는 테이블 {tableNumber} 번입니다.</p>
         <nav className="mt-2 space-x-4 text-blue-600">
-          <NavLink to=""               end   className="hover:underline">메뉴 보기</NavLink>
-          <NavLink to="orders"        className="hover:underline">주문 현황</NavLink>
-          <NavLink to="summary"       className="hover:underline">테이블 요약</NavLink>
-          <NavLink to="request"       className="hover:underline">직원 부르기</NavLink>
+          <a href={`#/customer/${tableNumber}/welcome`}>메뉴 보기</a>
+          <a href={`#/customer/${tableNumber}/orders`}>주문 현황</a>
+          <a href={`#/customer/${tableNumber}/summary`}>테이블 요약</a>
+          <a href={`#/customer/${tableNumber}/request`}>직원 부르기</a>
         </nav>
       </header>
 
@@ -34,7 +31,7 @@ export default function CustomerLayout() {
         <Outlet />
       </main>
 
-      {/* 공통: 우측 하단에 Mini Cart */}
+      {/* 카트 미니 위젯 */}
       <CartMiniWidget />
     </div>
   )

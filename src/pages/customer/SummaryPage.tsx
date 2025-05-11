@@ -20,12 +20,14 @@ export default function SummaryPage() {
 
   if (!summary) return <p className="p-4">로딩 중…</p>
 
+  const { totalOrders, totalSpent = 0, lastOrderAt } = summary
+
   return (
     <div className="p-4 space-y-2">
       <h1 className="text-2xl font-bold">테이블 {tableNumber} 요약</h1>
-      <p>주문 건수: {summary.totalOrders}</p>
-      <p>총 결제액: {summary.totalSpent.toLocaleString()}원</p>
-      <p>마지막 주문: {new Date(summary.lastOrderAt).toLocaleTimeString()}</p>
+      <p>주문 건수: {totalOrders}</p>
+      <p>총 결제액: {totalSpent.toLocaleString()}원</p>
+      <p>마지막 주문: {new Date(lastOrderAt).toLocaleTimeString()}</p>
     </div>
   )
 }

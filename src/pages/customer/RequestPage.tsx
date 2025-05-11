@@ -1,25 +1,27 @@
-// ─ src/pages/customer/RequestPage.tsx ─────────────────────────
-import { useState } from 'react'
-import { useTable } from '@/contexts/TableContext'
+// src/pages/customer/RequestPage.tsx
+import { useState }           from 'react'
+import { useTable }           from '@/contexts/TableContext'
 import { postCustomerRequest } from '@/api/customer'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate }        from 'react-router-dom'
 
 export default function RequestPage() {
   const { tableId } = useTable()
-  const [type, setType] = useState<'WATER'|'TISSUE'|'CHOPSTICKS'|'CALL'>('WATER')
+  const nav         = useNavigate()
+  const [type, setType] = useState<'WATER'|'TISSUE'|'CALL'|'CHOPSTICKS'>('CALL')
   const [loading, setLoading] = useState(false)
-  const nav = useNavigate()
 
-  const handleSubmit = async () => {
+  const handleSend = async () => {
     if (!tableId) return
     setLoading(true)
     try {
-      await postCustomerRequest(Number(tableId), type)
-      alert('직원 호출 요청이 전송되었습니다.')
-      nav(`/customer/${tableId}/summary`)
-    } catch (err) {
-      console.error(err)
-      alert('요청 전송 중 오류가 발생했습니다.')
+      await postCustomerRequest(
+        Number(tableId),
+        type
+      )
+      alert('요청이 전송되었습니다!')
+      nav(`/customer/${tableId}/welcome`)
+    } catch {
+      alert('요청 전송에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -28,25 +30,20 @@ export default function RequestPage() {
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-2xl font-bold">요청 사항</h1>
-
-      <label className="block">
-        <span className="text-gray-700">원하는 요청</span>
-        <select
-          value={type}
-          onChange={e => setType(e.target.value as any)}
-          className="mt-1 block w-full border rounded p-2"
-        >
-          <option value="WATER">물</option>
-          <option value="TISSUE">휴지</option>
-          <option value="CHOPSTICKS">젓가락</option>
-          <option value="CALL">직원 부르기</option>
-        </select>
-      </label>
-
+      <select
+        value={type}
+        onChange={e => setType(e.target.value as any)}
+        className="border p-2 rounded"
+      >
+        <option value="WATER">물</option>
+        <option value="TISSUE">휴지</option>
+        <option value="CALL">직원 부르기</option>
+        <option value="CHOPSTICKS">젓가락</option>
+      </select>
       <button
-        onClick={handleSubmit}
+        onClick={handleSend}
         disabled={loading}
-        className="btn-primary w-full"
+        className="btn-primary"
       >
         {loading ? '전송 중…' : '전송하기'}
       </button>
