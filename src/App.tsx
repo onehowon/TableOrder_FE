@@ -7,6 +7,11 @@ import OrderAdminPage             from './pages/admin/OrderAdminPage'
 import TableAdminSummaryPage      from './pages/admin/TableAdminSummaryPage'
 import StatsPage                  from './pages/admin/StatsPage'
 import ErrorBoundary              from './components/ErrorBoundary'
+import CustomerLayout        from './pages/customer/CustomerLayout'
+import MenuPage              from './pages/customer/MenuPage'
+import ConfirmPage           from './pages/customer/ConfirmPage'
+import OrderStatusPage       from './pages/customer/OrderStatusPage'
+import SummaryPage           from './pages/customer/SummaryPage'
 
 export default function App() {
   return (
@@ -52,6 +57,14 @@ export default function App() {
           }
         />
       </Route>
+
+      {/* 고객 영역 */}
+     <Route path="customer/:tableNumber" element={<CustomerLayout />}>
+       <Route index element={<MenuPage />} />
+       <Route path="order/confirm" element={<ConfirmPage />} />
+       <Route path="orders" element={<OrderStatusPage />} />
+       <Route path="summary" element={<SummaryPage />} />
+     </Route>
 
       {/* 그 외 전부 Alerts로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
