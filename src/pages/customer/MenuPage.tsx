@@ -31,7 +31,11 @@ export default function MenuPage() {
             <h2 className="font-semibold">{m.name}</h2>
             <p className="text-sm text-gray-600">{m.description}</p>
             <div className="mt-2 flex justify-between items-center">
-              <span>{m.price.toLocaleString()}원</span>
+            + <span>
+                {m.price != null
+                    ? m.price.toLocaleString() + '원'
+                    : '-'}
+                </span>
               <button
                 onClick={() => addItem({ menuId: m.id, name: m.name, price: m.price })}
                 className="btn-primary btn-xs"

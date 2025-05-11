@@ -33,7 +33,11 @@ export default function OrderStatusPage() {
         {items.map((i, idx) => (
           <li key={idx} className="flex justify-between">
             <span>{i.menuName} x {i.quantity}</span>
-            <span>{(i.price * i.quantity).toLocaleString()}원</span>
+            +    <span>
+                {i.price != null && i.quantity != null
+                    ? (i.price * i.quantity).toLocaleString() + '원'
+                    : '-'}
+                </span>
           </li>
         ))}
       </ul>

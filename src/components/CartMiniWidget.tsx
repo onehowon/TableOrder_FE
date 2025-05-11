@@ -33,7 +33,11 @@ export default function CartMiniWidget() {
       </ul>
 
       <div className="text-right mb-2 text-white">
-        합계 <b>{sum.toLocaleString()}원</b>
+      합계 <b>
+            {sum != null
+              ? sum.toLocaleString() + '원'
+              : '-'}
+          </b>
       </div>
 
       <button
