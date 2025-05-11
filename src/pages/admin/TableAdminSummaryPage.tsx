@@ -49,8 +49,8 @@ export default function TableAdminSummaryPage() {
               className="p-4 bg-white rounded shadow flex justify-between"
             >
               <span>테이블 {t.tableNumber}</span>
-              <span>주문수 {t.ordersCount}건</span>
-              <span>금액 {t.totalAmount.toLocaleString()}원</span>
+              <span>주문수 {t.totalOrders.toLocaleString()}건</span>
+              <span>금액 {t.totalSpent.toLocaleString()}원</span>
             </li>
           ))}
         </ul>

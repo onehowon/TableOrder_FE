@@ -41,8 +41,9 @@ export interface SalesSummaryDTO {
 
 export interface TableSummaryResponse {
   tableNumber: number
-  ordersCount: number
-  totalAmount: number
+  totalOrders: number    // ← 백엔드: totalOrders
+  totalSpent: number     // ← 백엔드: totalSpent
+  lastOrderAt: string    // ← 백엔드가 내려주는 lastOrderAt 도 함께 받으실 수 있습니다
 }
 
 export interface SalesStatsDTO {
