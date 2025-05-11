@@ -36,12 +36,22 @@ export interface OrderDetailDTO {
   estimatedTime?: number
 }
 
+// ── DTO 타입 정의 ───────────────────────────────────────
 export interface TableSummaryResponse {
   tableNumber: number
-  totalOrders:  number
-  totalSpent:   number
-  lastOrderAt:  string
+
+  // 백엔드에서 실제 내려주는 필드는 totalAmount 입니다
+  totalOrders: number
+  totalAmount: number
+
+  // (summary-all 응답에 포함되는) 메뉴별 집계
+  items: {
+    name: string
+    quantity: number
+    totalPrice: number
+  }[]
 }
+
 
 export interface HourlySales {
   hour:   number
