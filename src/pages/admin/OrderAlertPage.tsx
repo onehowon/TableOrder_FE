@@ -55,7 +55,7 @@ export default function OrderAlertPage() {
               })
               // ← menuName 이 아닌 name 으로 변경
               const itemsText = alert.items
-                .map(i => `${i.name} ${i.quantity}개`)
+                .map(i => `${i.menuName} ${i.quantity}개`)
                 .join(', ')
               return (
                 <div key={idx} className="flex items-start space-x-4">

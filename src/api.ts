@@ -23,7 +23,7 @@ export interface OrderItemDTO {
 
 export interface OrderAlertDTO {
   tableNumber: number
-  items: OrderItemDTO[]
+  items: { menuName: string; quantity: number }[]
   createdAt: string
 }
 
