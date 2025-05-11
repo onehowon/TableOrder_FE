@@ -10,6 +10,9 @@ const __dirname  = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    sourcemap: false,    // ← 이 줄 추가
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
