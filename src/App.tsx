@@ -18,30 +18,30 @@ import RequestPage from './pages/customer/RequestPage'
 export default function App() {
   return (
     <Routes>
-      {/* ── Admin ── */}
-      <Route path="/" element={<Navigate to="/admin/alerts" replace />} />
+      {/* ───────────────── Admin ───────────────── */}
+      <Route path="/"      element={<Navigate to="/admin/alerts" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin/alerts" replace />} />
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="alerts" replace />} />
         <Route path="alerts" element={<ErrorBoundary><OrderAlertPage/></ErrorBoundary>} />
         <Route path="orders" element={<ErrorBoundary><OrderAdminPage/></ErrorBoundary>} />
         <Route path="tables" element={<ErrorBoundary><TableAdminSummaryPage/></ErrorBoundary>} />
-        <Route path="sales" element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
-        <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
+        <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
       </Route>
 
-      {/* ── Customer ── */}
+      {/* ───────────────── Customer ───────────────── */}
       <Route path="customer/:tableNumber" element={<CustomerLayout />}>
-        <Route index    element={<WelcomePage />} />
-        <Route path="welcome" element={<WelcomePage />} />
-        <Route path="menu"    element={<MenuPage />} />
-        <Route path="confirm" element={<ConfirmPage />} />
-        <Route path="orders"  element={<OrderStatusPage />} />
-        <Route path="summary" element={<SummaryPage />} />
-        <Route path="request" element={<RequestPage />} />
-        <Route path="*"       element={<Navigate to="welcome" replace />} />
+        {/* 기본 진입 시 웰컴 페이지 */}
+        <Route index element={<WelcomePage />} />
+        <Route path="welcome"  element={<WelcomePage />} />
+        <Route path="menu"     element={<MenuPage />} />
+        <Route path="confirm"  element={<ConfirmPage />} />
+        <Route path="orders"   element={<OrderStatusPage />} />
+        <Route path="summary"  element={<SummaryPage />} />
+        <Route path="request"  element={<RequestPage />} />
       </Route>
 
-      {/* 그 외 전부 Admin alerts 로 */}
+      {/* 그 외 모두 Admin alerts 로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
     </Routes>
   )

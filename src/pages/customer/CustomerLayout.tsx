@@ -1,14 +1,16 @@
 // src/pages/customer/CustomerLayout.tsx
-import React, { useEffect } from 'react'
-import { Outlet, useParams }      from 'react-router-dom'
-import { useTable }               from '@/contexts/TableContext'
-import CartMiniWidget             from '@/components/CartMiniWidget'
+import { Outlet, NavLink, useParams, useNavigate } from 'react-router-dom'
+import { useTable } from '@/contexts/TableContext'
+import CartMiniWidget from '@/components/CartMiniWidget'  // 장바구니 위젯
+import React from 'react'
 
 export default function CustomerLayout() {
-  const { tableNumber } = useParams<{ tableNumber: string }>()
+  const { tableNumber } = useParams<{tableNumber: string}>()
   const { tableId, setTableId } = useTable()
+  const nav = useNavigate()
 
-  useEffect(() => {
+  // URL에 따라 context 세팅
+  React.useEffect(() => {
     if (tableNumber && tableNumber !== tableId) {
       setTableId(tableNumber)
     }
@@ -17,13 +19,12 @@ export default function CustomerLayout() {
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20">
       <header className="p-4 bg-white shadow sticky top-0 z-10">
-        <h1 className="text-xl font-bold">IBIZ에 오신 걸 환영합니다!</h1>
-        <p className="text-sm">여기는 테이블 {tableNumber} 번입니다.</p>
-        <nav className="mt-2 space-x-4 text-blue-600">
-          <a href={`#/customer/${tableNumber}/welcome`}>메뉴 보기</a>
-          <a href={`#/customer/${tableNumber}/orders`}>주문 현황</a>
-          <a href={`#/customer/${tableNumber}/summary`}>테이블 요약</a>
-          <a href={`#/customer/${tableNumber}/request`}>직원 부르기</a>
+        <h1 className="text-xl font-bold">IBIZ 주점 — 테이블 {tableNumber}</h1>
+        <nav className="mt-2 space-x-4 text-sm">
+          <NavLink to="menu"    className={({isActive})=> isActive? 'font-bold':'underline'}>메뉴 보기</NavLink>
+          <NavLink to="orders"  className={({isActive})=> isActive? 'font-bold':'underline'}>주문 현황</NavLink>
+          <NavLink to="summary" className={({isActive})=> isActive? 'font-bold':'underline'}>테이블 요약</NavLink>
+          <NavLink to="request" className={({isActive})=> isActive? 'font-bold':'underline'}>직원 부르기</NavLink>
         </nav>
       </header>
 
@@ -31,7 +32,6 @@ export default function CustomerLayout() {
         <Outlet />
       </main>
 
-      {/* 카트 미니 위젯 */}
       <CartMiniWidget />
     </div>
   )
