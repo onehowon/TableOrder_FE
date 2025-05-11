@@ -1,24 +1,27 @@
+// src/pages/admin/OrderListPage.tsx
 import { useEffect, useState } from 'react'
 import {
   listOrders,
   updateOrderStatus,
   OrderDetailDTO,
-  StatusUpdateReq,
 } from '@/api'
 
-// 화면 표시용 레이블 매핑 (WAITING도 표기는 하지만, 변경 옵션엔 빠집니다)
-const STATUS_LABEL: Record<OrderDetailDTO['status'], { text: string; bg: string; textColor: string }> = {
-  WAITING:   { text: '주문 접수', bg: 'bg-red-100',     textColor: 'text-red-800'   },
-  COOKING:   { text: '제조 중',   bg: 'bg-purple-100',  textColor: 'text-purple-800'},
-  SERVED:    { text: '제조 완료', bg: 'bg-green-100',   textColor: 'text-green-800' },
+// 백엔드 enum 그대로 사용
+type Status = OrderDetailDTO['status']
+
+const STATUS_LABEL: Record<Status, { text: string; bg: string; textColor: string }> = {
+  WAITING:   { text: '주문 접수', bg: 'bg-red-100',    textColor: 'text-red-800'   },
+  COOKING:   { text: '제조 중',   bg: 'bg-purple-100', textColor: 'text-purple-800'},
+  SERVED:    { text: '제조 완료', bg: 'bg-green-100',  textColor: 'text-green-800' },
 }
 
-// WAITING을 뺀, 실제로 API에 보낼 수 있는 다음 상태 타입
-type NextStatus = Exclude<OrderDetailDTO['status'], 'WAITING'>  // → 'COOKING' | 'SERVED'
+type NextStatus = Exclude<Status, 'WAITING'>  // → 'COOKING' | 'SERVED'
 
 export default function OrderListPage() {
-  const [orders, setOrders]   = useState<OrderDetailDTO[]>([])
-  const [loading, setLoading] = useState(false)
+  const [orders, setOrders]     = useState<OrderDetailDTO[]>([])
+  const [loading, setLoading]   = useState(false)
+  // 행별로 ETA 편집 중인지, 그리고 그 값을 저장
+  const [etaEdits, setEtaEdits] = useState<Record<number,string>>({})
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -38,20 +41,35 @@ export default function OrderListPage() {
     return () => clearInterval(iv)
   }, [])
 
-  const onChangeStatus = async (orderId: number, newStatus: NextStatus) => {
-    // 요청 페이로드를 DTO 형태로 준비
-    const body: StatusUpdateReq = { status: newStatus }
-    // COOKING(제조 중)일 때만 ETA 입력받아서 추가
+  // 드롭다운 변경 핸들러
+  const handleStatusSelect = (orderId: number, newStatus: NextStatus) => {
     if (newStatus === 'COOKING') {
-      const minutes = window.prompt('예상 소요 시간을 분 단위로 입력하세요', '10')
-      body.estimatedTime = minutes ? Number(minutes) : undefined
+      // 직접 API 호출하지 말고, 인라인 input 띄우기
+      setEtaEdits(prev => ({ ...prev, [orderId]: '' }))
+    } else {
+      // 바로 '제조 완료' API 호출
+      onChangeStatus(orderId, newStatus, undefined)
     }
+  }
 
+  // 확인 버튼 눌렀을 때—API 호출
+  const onChangeStatus = async (
+    orderId: number,
+    status: NextStatus,
+    estimatedTime?: number
+  ) => {
     try {
-      await updateOrderStatus(orderId, body)
-      await fetchOrders()  // 업데이트 후 리스트 리프레시
+      await updateOrderStatus(orderId, { status, estimatedTime })
+      fetchOrders()
     } catch (e) {
       console.error('상태 변경 실패', e)
+    } finally {
+      // 편집 UI 초기화
+      setEtaEdits(prev => {
+        const copy = { ...prev }
+        delete copy[orderId]
+        return copy
+      })
     }
   }
 
@@ -67,7 +85,7 @@ export default function OrderListPage() {
               <tr className="bg-gray-100 text-left text-gray-600 uppercase text-sm">
                 <th className="px-6 py-3">Order ID</th>
                 <th className="px-6 py-3">테이블 번호</th>
-                <th className="px-6 py-3">메뉴 &amp; 수량</th>
+                <th className="px-6 py-3">메뉴 & 수량</th>
                 <th className="px-6 py-3">Status</th>
               </tr>
             </thead>
@@ -77,6 +95,8 @@ export default function OrderListPage() {
                 const menuText = o.items.length
                   ? o.items.map(i => `${i.name} ${i.quantity}개`).join(', ')
                   : '-'
+                const isEditingEta = o.orderId in etaEdits
+
                 return (
                   <tr key={o.orderId} className="border-b last:border-none hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">{o.orderId}</td>
@@ -84,22 +104,69 @@ export default function OrderListPage() {
                       {String(o.tableNumber).padStart(5, '0')}
                     </td>
                     <td className="px-6 py-4">{menuText}</td>
-                    <td className="px-6 py-4 whitespace-nowrap flex items-center space-x-2">
-                      <span className={`px-2 py-1 rounded-full text-sm font-medium ${label.bg} ${label.textColor}`}>
-                        {label.text}
-                      </span>
-                      <select
-                        value={o.status}
-                        onChange={e => onChangeStatus(
-                          o.orderId,
-                          e.target.value as NextStatus
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${label.bg} ${label.textColor}`}>
+                          {label.text}
+                        </span>
+
+                        {isEditingEta ? (
+                          <>
+                            <input
+                              type="number"
+                              min="1"
+                              value={etaEdits[o.orderId]}
+                              onChange={e =>
+                                setEtaEdits(prev => ({
+                                  ...prev,
+                                  [o.orderId]: e.target.value
+                                }))
+                              }
+                              placeholder="예상시간(분)"
+                              className="w-20 border rounded px-2 py-1 text-sm"
+                            />
+                            <button
+                              onClick={() =>
+                                onChangeStatus(
+                                  o.orderId,
+                                  'COOKING',
+                                  Number(etaEdits[o.orderId]) || 0
+                                )
+                              }
+                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                            >
+                              확인
+                            </button>
+                            <button
+                              onClick={() =>
+                                setEtaEdits(prev => {
+                                  const c = { ...prev }
+                                  delete c[o.orderId]
+                                  return c
+                                })
+                              }
+                              className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm"
+                            >
+                              취소
+                            </button>
+                          </>
+                        ) : (
+                          <select
+                            value={o.status === 'WAITING' ? '' : o.status}
+                            onChange={e =>
+                              handleStatusSelect(
+                                o.orderId,
+                                e.target.value as NextStatus
+                              )
+                            }
+                            className="border border-gray-300 rounded px-2 py-1 text-sm"
+                          >
+                            <option value="" disabled>변경</option>
+                            <option value="COOKING">제조 중</option>
+                            <option value="SERVED">제조 완료</option>
+                          </select>
                         )}
-                        className="border border-gray-300 rounded px-2 py-1 text-sm"
-                      >
-                        {/* WAITING은 API 호출하지 않으므로 옵션에서 뺍니다 */}
-                        <option value="COOKING">제조 중</option>
-                        <option value="SERVED">제조 완료</option>
-                      </select>
+                      </div>
                     </td>
                   </tr>
                 )
