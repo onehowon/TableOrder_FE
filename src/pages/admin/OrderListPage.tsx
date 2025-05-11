@@ -6,15 +6,15 @@ import {
   StatusUpdateReq,
 } from '@/api'
 
-// 화면용 라벨 매핑
+// 화면 표시용 레이블 매핑 (WAITING도 표기는 하지만, 변경 옵션엔 빠집니다)
 const STATUS_LABEL: Record<OrderDetailDTO['status'], { text: string; bg: string; textColor: string }> = {
-  WAITING: { text: '주문 접수', bg: 'bg-red-100',    textColor: 'text-red-800'   },
-  COOKING: { text: '제조 중',   bg: 'bg-purple-100', textColor: 'text-purple-800'},
-  SERVED:  { text: '제조 완료', bg: 'bg-green-100',  textColor: 'text-green-800' },
+  WAITING:   { text: '주문 접수', bg: 'bg-red-100',     textColor: 'text-red-800'   },
+  COOKING:   { text: '제조 중',   bg: 'bg-purple-100',  textColor: 'text-purple-800'},
+  SERVED:    { text: '제조 완료', bg: 'bg-green-100',   textColor: 'text-green-800' },
 }
 
-// WAITING 을 뺀 다음 상태 타입
-type NextStatus = Exclude<OrderDetailDTO['status'], 'WAITING'> // → 'COOKING' | 'SERVED'
+// WAITING을 뺀, 실제로 API에 보낼 수 있는 다음 상태 타입
+type NextStatus = Exclude<OrderDetailDTO['status'], 'WAITING'>  // → 'COOKING' | 'SERVED'
 
 export default function OrderListPage() {
   const [orders, setOrders]   = useState<OrderDetailDTO[]>([])
@@ -39,15 +39,17 @@ export default function OrderListPage() {
   }, [])
 
   const onChangeStatus = async (orderId: number, newStatus: NextStatus) => {
+    // 요청 페이로드를 DTO 형태로 준비
     const body: StatusUpdateReq = { status: newStatus }
-    // COOKING(제조 중)일 때만 ETA 받기
+    // COOKING(제조 중)일 때만 ETA 입력받아서 추가
     if (newStatus === 'COOKING') {
-      const m = window.prompt('예상 소요 시간을 분 단위로 입력하세요', '10')
-      body.estimatedTime = m ? Number(m) : 0
+      const minutes = window.prompt('예상 소요 시간을 분 단위로 입력하세요', '10')
+      body.estimatedTime = minutes ? Number(minutes) : undefined
     }
+
     try {
       await updateOrderStatus(orderId, body)
-      await fetchOrders()
+      await fetchOrders()  // 업데이트 후 리스트 리프레시
     } catch (e) {
       console.error('상태 변경 실패', e)
     }
@@ -88,9 +90,13 @@ export default function OrderListPage() {
                       </span>
                       <select
                         value={o.status}
-                        onChange={e => onChangeStatus(o.orderId, e.target.value as NextStatus)}
+                        onChange={e => onChangeStatus(
+                          o.orderId,
+                          e.target.value as NextStatus
+                        )}
                         className="border border-gray-300 rounded px-2 py-1 text-sm"
                       >
+                        {/* WAITING은 API 호출하지 않으므로 옵션에서 뺍니다 */}
                         <option value="COOKING">제조 중</option>
                         <option value="SERVED">제조 완료</option>
                       </select>
