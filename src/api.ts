@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 /**── 공통 타입 ───────────────────────────────────────────**/
-type CommonResp<T> = { data: T; message: string }
+export type CommonResp<T> = { data: T; message: string }
 
 /**── DTO 타입 정의 ───────────────────────────────────────**/
 export interface MenuDTO {
@@ -13,7 +13,7 @@ export interface MenuDTO {
   imageUrl?: string | null
 }
 
-// 백엔드에 정의된 enum 그대로 사용
+// 백엔드 enum 그대로
 export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
 
 export interface OrderItemDTO {
@@ -23,14 +23,14 @@ export interface OrderItemDTO {
 
 export interface OrderAlertDTO {
   tableNumber: number
-  items: OrderItemDTO[]       // <-- menuName → name
+  items: OrderItemDTO[]
   createdAt: string
 }
 
 export interface OrderDetailDTO {
   orderId:     number
   tableNumber: number
-  items:       OrderItemDTO[] // <-- menuName → name
+  items:       OrderItemDTO[]
   status:      OrderStatus
   createdAt:   string
   estimatedTime?: number
@@ -68,15 +68,18 @@ const api = axios.create({
 })
 
 /**── 메뉴 관리 ───────────────────────────────────────────**/
-export const createMenu    = (fd: FormData) => api.post<CommonResp<MenuDTO>>('/menus', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
-export const updateMenu    = (id: number, fd: FormData) => api.put<CommonResp<MenuDTO>>(`/menus/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
-export const deleteMenu    = (id: number) => api.delete<CommonResp<null>>(`/menus/${id}`)
-export const activateMenu  = (id: number) => api.put<CommonResp<null>>(`/menus/${id}/activate`)
-export const deactivateMenu= (id: number) => api.put<CommonResp<null>>(`/menus/${id}/deactivate`)
-export const listMenus     = () => api.get<CommonResp<MenuDTO[]>>('/menus')
+export const createMenu     = (fd: FormData) => api.post<CommonResp<MenuDTO>>('/menus', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateMenu     = (id: number, fd: FormData) => api.put<CommonResp<MenuDTO>>(`/menus/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteMenu     = (id: number) => api.delete<CommonResp<null>>(`/menus/${id}`)
+export const activateMenu   = (id: number) => api.put<CommonResp<null>>(`/menus/${id}/activate`)
+export const deactivateMenu = (id: number) => api.put<CommonResp<null>>(`/menus/${id}/deactivate`)
+export const listMenus      = () => api.get<CommonResp<MenuDTO[]>>('/menus')
 
 /**── 주문 관리 ───────────────────────────────────────────**/
-export const listOrders        = () => api.get<CommonResp<OrderDetailDTO[]>>('/orders')
+export const listOrders = () =>
+  api.get<CommonResp<OrderDetailDTO[]>>('/orders')
+
+// 상태 변경 요청 DTO: COOKING or SERVED + optional ETA
 export interface StatusUpdateReq {
   status: 'COOKING' | 'SERVED'
   estimatedTime?: number
@@ -89,19 +92,19 @@ export const getAlerts = () =>
   api.get<CommonResp<OrderAlertDTO[]>>('/alerts')
 
 /**── 테이블 요약 ──────────────────────────────────────────**/
-export const getTableSummary    = (tableNumber: number) =>
+export const getTableSummary     = (tableNumber: number) =>
   api.get<CommonResp<TableSummaryResponse>>(`/tables/${tableNumber}/summary`)
-export const getAllTablesSummary= () =>
+export const getAllTablesSummary = () =>
   api.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
 
 /**── 고객 요청 전송 ───────────────────────────────────────**/
-export const postRequest    = (body: RequestDTO) =>
+export const postRequest   = (body: RequestDTO) =>
   api.post<CommonResp<null>>('/requests', body)
 
 /**── 매출 통계 ───────────────────────────────────────────**/
-export const getTodaySummary= () =>
-  api.get<CommonResp<any>>('/orders/today-summary')  // (필요 시 DTO 교체)
-export const getSalesStats  = () =>
+export const getTodaySummary = () =>
+  api.get<CommonResp<any>>('/orders/today-summary')
+export const getSalesStats   = () =>
   api.get<CommonResp<SalesStatsDTO>>('/sales')
 
 export default api
