@@ -28,10 +28,17 @@ export default function StatsPage() {
   }
 
   // 차트용 데이터 변환
-  const data = Object.entries(stats.salesByHour ?? {}).map(([hour, amount]) => ({
-    hour: `${hour}시`,
-    amount: amount ?? 0
-  }))
+// src/pages/admin/StatsPage.tsx
+// …
+const data = Array.from({ length: 24 }, (_, hour) => {
+  const point = stats.salesByHour.find(dp => dp.hour === hour);
+  return {
+    hour:   `${hour}시`,
+    amount: point?.amount ?? 0,
+  };
+});
+// …
+
 
   return (
     <div className="space-y-6">

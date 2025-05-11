@@ -39,7 +39,7 @@ export default function TableAdminSummaryPage() {
         <ul className="space-y-2">
           {tables.map((t) => {
             const orders = t.totalOrders ?? 0
-            const spent  = t.totalSpent  ?? 0
+            const spent  = t.totalSpent   ?? 0
 
             return (
               <li
