@@ -1,15 +1,15 @@
-// src/components/CartMiniWidget.tsx
-import { useCart } from '@/contexts/CartContext'
-import { useTable } from '@/contexts/TableContext'
+// src/components/layout/CartMiniWidget.tsx
+import { useCart }     from '@/contexts/CartContext'
+import { useTable }    from '@/contexts/TableContext'
 import { useNavigate } from 'react-router-dom'
 
 export default function CartMiniWidget() {
   const { cart, addItem, decrement, remove } = useCart()
-  const { tableId } = useTable()
-  const nav = useNavigate()
+  const { tableId }    = useTable()
+  const nav             = useNavigate()
 
   const cnt = cart.reduce((s, i) => s + i.quantity, 0)
-  const sum = cart.reduce((s, i) => s + i.quantity * i.price, 0)
+  const sum = cart.reduce((s, i) => s + (i.price ?? 0) * (i.quantity ?? 0), 0)
 
   if (cnt === 0 || !tableId) return null
 
@@ -25,26 +25,32 @@ export default function CartMiniWidget() {
             <div className="flex items-center gap-1">
               <button onClick={() => decrement(i.menuId)} className="btn-xs">-</button>
               <span>{i.quantity}</span>
-              <button onClick={() => addItem({ menuId: i.menuId, name: i.name, price: i.price })} className="btn-xs">+</button>
-              <button onClick={() => remove(i.menuId)} className="text-red-400 text-lg leading-none">×</button>
+              <button
+                onClick={() => addItem({ menuId: i.menuId, name: i.name, price: i.price })}
+                className="btn-xs"
+              >
+                +
+              </button>
+              <button
+                onClick={() => remove(i.menuId)}
+                className="text-red-400 text-lg leading-none"
+              >
+                ×
+              </button>
             </div>
           </li>
         ))}
       </ul>
 
       <div className="text-right mb-2 text-white">
-      합계 <b>
-            {sum != null
-              ? sum.toLocaleString() + '원'
-              : '-'}
-          </b>
+        합계 <b>{sum > 0 ? sum.toLocaleString() + '원' : '-'}</b>
       </div>
 
       <button
         onClick={() => nav(`/customer/${tableId}/confirm`)}
         className="btn-primary w-full"
       >
-        주문 확인
+        주문 확인 ({cnt}개)
       </button>
     </aside>
   )

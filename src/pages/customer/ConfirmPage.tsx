@@ -10,7 +10,10 @@ export default function ConfirmPage() {
   const { tableId } = useTable()
   const nav = useNavigate()
   const [loading, setLoading] = useState(false)
-  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+  const total = cart.reduce(
+    (s, i) => s + ((i.price ?? 0) * (i.quantity ?? 0)),
+    0
+    )
 
   const handleOrder = async () => {
     if (!tableId || cart.length === 0) return
@@ -36,7 +39,11 @@ export default function ConfirmPage() {
       {cart.map(i => (
         <div key={i.menuId} className="flex justify-between">
           <span>{i.name} x {i.quantity}</span>
-          <span>{(i.price * i.quantity).toLocaleString()}원</span>
+            <span>
+                {i.price != null && i.quantity != null
+                    ? ((i.price * i.quantity).toLocaleString() + '원')
+                    : '-'}
+                </span>
         </div>
       ))}
       <div className="flex justify-between font-semibold">
