@@ -1,37 +1,54 @@
-// src/pages/customer/RequestPage.tsx
+// ─ src/pages/customer/RequestPage.tsx ─────────────────────────
+import { useState } from 'react'
 import { useTable } from '@/contexts/TableContext'
 import { postCustomerRequest } from '@/api/customer'
-import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function RequestPage() {
   const { tableId } = useTable()
-  const [note, setNote] = useState('')
-  const [sent, setSent] = useState(false)
+  const [type, setType] = useState<'WATER'|'TISSUE'|'CHOPSTICKS'|'CALL'>('WATER')
+  const [loading, setLoading] = useState(false)
+  const nav = useNavigate()
 
-  const send = async () => {
-    if (!tableId || !note) return
-    await postCustomerRequest(Number(tableId), note)
-    setSent(true)
+  const handleSubmit = async () => {
+    if (!tableId) return
+    setLoading(true)
+    try {
+      await postCustomerRequest(Number(tableId), type)
+      alert('직원 호출 요청이 전송되었습니다.')
+      nav(`/customer/${tableId}/summary`)
+    } catch (err) {
+      console.error(err)
+      alert('요청 전송 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }
-
-  if (sent) return <p className="p-4">점원에게 알림을 전송했습니다.</p>
 
   return (
     <div className="p-4 space-y-4">
-      <h2 className="text-xl font-semibold">요청 사항</h2>
-      <textarea
-        className="w-full border p-2 rounded"
-        rows={3}
-        placeholder="예) 물 좀 더 주세요"
-        value={note}
-        onChange={e => setNote(e.target.value)}
-      />
+      <h1 className="text-2xl font-bold">요청 사항</h1>
+
+      <label className="block">
+        <span className="text-gray-700">원하는 요청</span>
+        <select
+          value={type}
+          onChange={e => setType(e.target.value as any)}
+          className="mt-1 block w-full border rounded p-2"
+        >
+          <option value="WATER">물</option>
+          <option value="TISSUE">휴지</option>
+          <option value="CHOPSTICKS">젓가락</option>
+          <option value="CALL">직원 부르기</option>
+        </select>
+      </label>
+
       <button
-        className="btn-primary"
-        onClick={send}
-        disabled={!note.trim()}
+        onClick={handleSubmit}
+        disabled={loading}
+        className="btn-primary w-full"
       >
-        전송하기
+        {loading ? '전송 중…' : '전송하기'}
       </button>
     </div>
   )

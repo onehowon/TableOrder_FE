@@ -66,7 +66,10 @@ export const fetchCustomerTableSummary = (tableNumber: number) =>
   customerApi.get<CommonResp<TableSummaryResponseDTO>>(`/tables/${tableNumber}/summary`)
 
 // 6) 요청(벨) 보내기
-export const postCustomerRequest = (tableNumber: number, note: string) =>
-  customerApi.post<CommonResp<null>>('/requests', { tableNumber, note })
+export const postCustomerRequest = (tableNumber: number, type: string) =>
+    customerApi.post<CommonResp<null>>(
+      '/requests',
+      { tableNumber, type }    // ← 여기서 tableNumber + type 둘 다 반드시 넘깁니다.
+    )
 
 export default customerApi

@@ -18,30 +18,33 @@ import RequestPage from './pages/customer/RequestPage'
 export default function App() {
   return (
     <Routes>
-      {/* 루트와 /admin 은 Alerts로 */}
-      <Route path="/"      element={<Navigate to="/admin/alerts" replace />} />
-      <Route path="/admin" element={<Navigate to="/admin/alerts" replace />} />
+      {/* 루트 접근은 어드민 알림으로 */}
+      <Route path="/" element={<Navigate to="/admin/alerts" replace />} />
 
-      {/* AdminLayout 안에만 4개 라우트 */}
-      <Route path="admin" element={<AdminLayout />}>
+      {/* ── Admin 영역 ── */}
+      <Route path="admin/*" element={<AdminLayout />}>
         <Route index element={<Navigate to="alerts" replace />} />
-        <Route path="alerts" element={<ErrorBoundary><OrderAlertPage/></ErrorBoundary>} />
-        <Route path="orders" element={<ErrorBoundary><OrderAdminPage/></ErrorBoundary>} />
-        <Route path="tables" element={<ErrorBoundary><TableAdminSummaryPage/></ErrorBoundary>} />
-        <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
+        <Route path="alerts" element={<OrderAlertPage />} />
+        <Route path="orders" element={<OrderAdminPage />} />
+        <Route path="tables" element={<TableAdminSummaryPage />} />
+        <Route path="sales" element={<StatsPage />} />
+        {/* Admin 내부 잘못된 경로는 어드민 alerts 로 */}
+        <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
       </Route>
 
-      {/* 고객 영역: 한 번만 Routes 내에서 선언 */}
-      <Route path="customer/:tableNumber" element={<CustomerLayout />}>
-        <Route index    element={<WelcomePage />} />
+      {/* ── Customer 영역 ── */}
+      <Route path="customer/:tableNumber/*" element={<CustomerLayout />}>
+        <Route index   element={<MenuPage />} />
         <Route path="menu"    element={<MenuPage />} />
         <Route path="confirm" element={<ConfirmPage />} />
         <Route path="orders"  element={<OrderStatusPage />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="request" element={<RequestPage />} />
+        {/* Customer 내부 잘못된 경로는 메뉴 페이지로 */}
+        <Route path="*" element={<Navigate to="" replace />} />
       </Route>
 
-      {/* 그 외 전부 Alerts로 */}
+      {/* 완전 잘못된 URL 은 어드민 알림으로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
     </Routes>
   )
