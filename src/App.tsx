@@ -34,7 +34,6 @@ export default function App() {
       {/* 고객 영역: 한 번만 Routes 내에서 선언 */}
       <Route path="customer/:tableNumber" element={<CustomerLayout />}>
         <Route index    element={<WelcomePage />} />
-        <Route path="welcome" element={<WelcomePage />} />
         <Route path="menu"    element={<MenuPage />} />
         <Route path="confirm" element={<ConfirmPage />} />
         <Route path="orders"  element={<OrderStatusPage />} />
