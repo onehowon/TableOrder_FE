@@ -49,7 +49,7 @@ export interface TableSummaryResponse {
 export interface SalesStatsDTO {
   totalCustomers: number
   totalOrders: number
-  totalSales: number
+  totalRevenue:   number;
   salesByHour: Record<string, number>
 }
 
