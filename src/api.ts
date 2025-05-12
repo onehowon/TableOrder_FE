@@ -35,6 +35,10 @@ export interface OrderItemDTO {
   quantity: number
 }
 
+export interface OrderRequestDTO {
+  tableNumber: number
+  items: { menuId: number; quantity: number }[]
+}
 export interface OrderAlertDTO {
   tableNumber: number
   items: { menuName: string; quantity: number }[]
@@ -143,6 +147,9 @@ export const getSalesStatsAdmin = () =>
 // 메뉴 조회
 export const listMenus = () =>
   customerApi.get<CommonResp<MenuDTO[]>>('/customer/menus')
+
+export const postOrder = (body: OrderRequestDTO) =>
+  customerApi.post<CommonResp<OrderDetailDTO>>('/customer/orders', body)
 
 // 주문/요청 전송
 export const postRequest = (body: RequestDTO) =>
