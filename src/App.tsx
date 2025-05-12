@@ -6,6 +6,7 @@ import TableAdminSummaryPage from './pages/admin/TableAdminSummaryPage'
 import StatsPage             from './pages/admin/StatsPage'
 import ErrorBoundary         from './components/ErrorBoundary'
 import OrderListPage         from './pages/admin/OrderListPage'
+import MenuManagementPage from './pages/admin/MenuManagementPage'
 
 // Customer
 import WelcomePage     from './pages/customer/WelcomePage'
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="orders" element={<ErrorBoundary><OrderListPage/></ErrorBoundary>} />
         <Route path="tables" element={<ErrorBoundary><TableAdminSummaryPage/></ErrorBoundary>} />
         <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
+        <Route path="menus"  element={<ErrorBoundary><MenuManagementPage/></ErrorBoundary>} />
       </Route>
 
 
