@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getAlerts, listOrders } from '../../api'
+import { getTableOrders } from '../../api'
 import type { OrderDetailDTO } from '../../api'
 
 export default function OrderStatusPage() {
@@ -12,14 +12,19 @@ export default function OrderStatusPage() {
   // 3초마다 현황 조회
   useEffect(() => {
     const iv = setInterval(async () => {
-      const res = await listOrders()
-      const my = res.data.data.find(o => o.tableNumber === Number(tableNumber))
-      if (my) {
-        setOrder(my)
-        if (my.status === 'SERVED') {
-          setDone(true)
-          clearInterval(iv)
+      try {
+        const res = await getTableOrders(Number(tableNumber))
+        const my = res.data.data
+        if (my) {
+          setOrder(my)
+          if (my.status === 'SERVED') {
+            setDone(true)
+            clearInterval(iv)
+          }
         }
+      } catch {
+        // 에러 시 폴링 중단
+        clearInterval(iv)
       }
     }, 3000)
     return () => clearInterval(iv)

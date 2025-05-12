@@ -1,3 +1,4 @@
+// src/api.ts
 import axios from 'axios'
 
 /**── 공통 타입 ───────────────────────────────────────────**/
@@ -13,13 +14,12 @@ export interface MenuDTO {
   imageUrl?: string | null
 }
 
-export interface RequestDTO{
+export interface RequestDTO {
   tableNumber: number
   type: 'ORDER' | 'CALL_STAFF'
-  items: {menuId: number; quantity:number}[]
+  items: { menuId: number; quantity: number }[]
 }
 
-// 백엔드 enum 그대로
 export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
 
 export interface OrderItemDTO {
@@ -27,28 +27,19 @@ export interface OrderItemDTO {
   quantity: number
 }
 
-export interface OrderAlertDTO {
-  tableNumber: number
-  items: { menuName: string; quantity: number }[]
-  createdAt: string
-}
-
 export interface OrderDetailDTO {
-  orderId:     number
+  orderId: number
   tableNumber: number
-  items:       OrderItemDTO[]
-  status:      OrderStatus
-  createdAt:   string
+  items: OrderItemDTO[]
+  status: OrderStatus
+  createdAt: string
   estimatedTime?: number
 }
 
-// ── DTO 타입 정의 ───────────────────────────────────────
 export interface TableSummaryResponse {
   tableNumber: number
-
   totalOrders: number
   totalAmount: number
-
   items: {
     name: string
     quantity: number
@@ -56,75 +47,132 @@ export interface TableSummaryResponse {
   }[]
 }
 
-
-export interface HourlySales {
-  hour:   number
-  revenue: number
-}
-
 export interface SalesStatsDTO {
   totalCustomers: number
-  totalOrders:    number
-  totalRevenue:   number
-  salesByHour:    HourlySales[]
+  totalOrders: number
+  totalRevenue: number
+  salesByHour: { hour: number; revenue: number }[]
 }
 
-export interface RequestDTO {
-  tableNumber: number
-  items: { menuId: number; quantity: number }[]
-}
-
-/**── Axios 인스턴스 ────────────────────────────────────**/
+/**── 환경 변수에서 API 베이스 URL 하나만 읽습니다 ───────────────────**/
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string
-const api = axios.create({
+
+/**── 관리자용 axios 인스턴스 (/admin/**) ─────────────────────────**/
+export const adminApi = axios.create({
   baseURL: `${API_BASE}/admin`,
   headers: { 'Content-Type': 'application/json' }
 })
 
-/**── 메뉴 관리 ───────────────────────────────────────────**/
-export const createMenu     = (fd: FormData) => api.post<CommonResp<MenuDTO>>('/menus', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
-export const updateMenu     = (id: number, fd: FormData) => api.put<CommonResp<MenuDTO>>(`/menus/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
-export const deleteMenu     = (id: number) => api.delete<CommonResp<null>>(`/menus/${id}`)
-export const activateMenu   = (id: number) => api.put<CommonResp<null>>(`/menus/${id}/activate`)
-export const deactivateMenu = (id: number) => api.put<CommonResp<null>>(`/menus/${id}/deactivate`)
-export const listMenus      = () => api.get<CommonResp<MenuDTO[]>>('/menus')
+/**── 고객용 axios 인스턴스 (그 외 /customer, /menus 등) ─────────────────**/
+export const customerApi = axios.create({
+  baseURL: API_BASE,
+  headers: { 'Content-Type': 'application/json' }
+})
 
-/**── 주문 관리 ───────────────────────────────────────────**/
-export const listOrders = () =>
-  api.get<CommonResp<OrderDetailDTO[]>>('/orders')
+/**── 관리자 API ───────────────────────────────────────────**/
+// 메뉴 관리
+export const createMenu = (fd: FormData) =>
+  adminApi.post<CommonResp<MenuDTO>>(
+    '/menus',
+    fd,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  )
+export const updateMenu = (id: number, fd: FormData) =>
+  adminApi.put<CommonResp<MenuDTO>>(
+    `/menus/${id}`,
+    fd,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  )
+export const deleteMenu = (id: number) =>
+  adminApi.delete<CommonResp<null>>(`/menus/${id}`)
+export const activateMenu = (id: number) =>
+  adminApi.put<CommonResp<null>>(`/menus/${id}/activate`)
+export const deactivateMenu = (id: number) =>
+  adminApi.put<CommonResp<null>>(`/menus/${id}/deactivate`)
+export const listAdminMenus = () =>
+  adminApi.get<CommonResp<MenuDTO[]>>('/menus')
 
-// 상태 변경 요청 DTO: COOKING or SERVED + optional ETA
+// 주문 관리
+export const listOrdersAdmin = () =>
+  adminApi.get<CommonResp<OrderDetailDTO[]>>('/orders')
+
 export interface StatusUpdateReq {
   status: 'COOKING' | 'SERVED'
   estimatedTime?: number
 }
-export const updateOrderStatus = (orderId: number, body: StatusUpdateReq) =>
-  api.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
+export const updateOrderStatus = (
+  orderId: number,
+  body: StatusUpdateReq
+) => adminApi.put<CommonResp<OrderDetailDTO>>(
+  `/orders/${orderId}/status`,
+  body
+)
 
-/**── 알림 ─────────────────────────────────────────────────**/
-export const getAlerts = () =>
-  api.get<CommonResp<OrderAlertDTO[]>>('/alerts')
+// 알림
+export const getAlertsAdmin = () =>
+  adminApi.get<CommonResp<OrderItemDTO[]>>('/alerts')
 
-// ── 테이블 요약 ──────────────────────────────────────────
-export const getTableSummary     = (tableNumber: number) =>
-  api.get<CommonResp<TableSummaryResponse>>(`/tables/${tableNumber}/summary`)
+// 테이블 요약
+export const getAllTablesSummaryAdmin = () =>
+  adminApi.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
+export const getTableSummaryAdmin = (tableNumber: number) =>
+  adminApi.get<CommonResp<TableSummaryResponse>>(
+    `/tables/${tableNumber}/summary`
+)
+
+// 테이블 리셋
+export const resetTableAdmin = (tableNumber: number) =>
+  adminApi.delete<CommonResp<null>>(
+    `/tables/${tableNumber}/reset`
+)
+
+// 매출 통계
+export const getSalesStatsAdmin = () =>
+  adminApi.get<CommonResp<SalesStatsDTO>>('/sales')
+
+/**── 고객용 API ───────────────────────────────────────────**/
+// 메뉴 조회 (public)
+export const listMenus = () =>
+  customerApi.get<CommonResp<MenuDTO[]>>('/customer/menus')
+
+// 주문 생성
+export const postOrder = (body: RequestDTO) =>
+  customerApi.post<CommonResp<null>>('/customer/requests', body)
+
+// 테이블별 주문 현황 조회
+export const getTableOrders = (tableNumber: number) =>
+  customerApi.get<CommonResp<OrderDetailDTO>>(
+    `/customer/orders/table/${tableNumber}`
+)
+
+// 개별 주문 상태 조회
+export const getOrderStatusCustomer = (orderId: number) =>
+  customerApi.get<CommonResp<OrderDetailDTO>>(
+    `/customer/orders/${orderId}`
+)
+
+// 테이블 요약 (고객)
+export const getTableSummary = (tableNumber: number) =>
+  customerApi.get<CommonResp<TableSummaryResponse>>(
+    `/customer/tables/${tableNumber}/summary`
+)
+
+// 오늘 테이블 전체 요약 (고객)
 export const getAllTablesSummary = () =>
-  api.get<CommonResp<TableSummaryResponse[]>>('/tables/summary-all')
+  customerApi.get<CommonResp<TableSummaryResponse[]>>(
+    `/customer/tables/summary-all`
+)
 
-// ── 테이블 초기화 ────────────────────────────────────────
-export const resetTable = (tableNumber: number) =>
-  api.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
-
-/**── 고객 요청 전송 ───────────────────────────────────────**/
-export const postRequest = (body: RequestDTO) =>
-  api.post<CommonResp<null>>('/requests', body)
-
-/**── 매출 통계 ───────────────────────────────────────────**/
+// 주문 당일 매출 요약 (고객)
 export const getTodaySummary = () =>
-  api.get<CommonResp<any>>('/orders/today-summary')
-export const getSalesStats   = () =>
-  api.get<CommonResp<SalesStatsDTO>>('/sales')
+  customerApi.get<CommonResp<any>>('/customer/orders/today-summary')
 
+// 매출 통계 (고객)
+export const getSalesStats = () =>
+  customerApi.get<CommonResp<SalesStatsDTO>>('/customer/sales')
 
+// 고객 요청 전송 (주문/직원호출)
+export const postRequest = (body: RequestDTO) =>
+  customerApi.post<CommonResp<null>>('/customer/requests', body)
 
-export default api
+// 기본 export: 둘 중 필요에 따라 개별 import 해서 사용하세요.
