@@ -12,8 +12,6 @@ export default function OrderPlacedPage() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-white p-4 space-y-8">
-      {/* 상단 타이틀 */}
-      <h1 className="self-end text-lg font-bold">완료</h1>
 
       {/* 로고 */}
       <img src={engineLogo} alt="EngiNE" className="w-32 h-auto" />
