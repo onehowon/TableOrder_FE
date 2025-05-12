@@ -16,7 +16,15 @@ export interface MenuDTO {
 
 export interface RequestDTO {
   tableNumber: number
-  type: 'ORDER' | 'CALL_STAFF'
+
+  // 고객 요청 타입을 모두 포함하도록 확장
+  type: 'ORDER'         // 주문 제출
+      | 'CALL_STAFF'    // 직원 호출 (관리자 용)
+      | 'WATER'         // 물 요청
+      | 'TISSUE'        // 휴지 요청
+      | 'CALL'          // 직원 호출 (고객 용)
+      | 'CHOPSTICKS'    // 젓가락 요청
+      // ... 필요한 추가 타입
   items: { menuId: number; quantity: number }[]
 }
 
