@@ -58,7 +58,7 @@ export interface SalesStatsDTO {
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string
 
 /**── 관리자용 axios 인스턴스 (/admin/**) ─────────────────────────**/
-export const adminApi = axios.create({
+const adminApi = axios.create({
   baseURL: `${API_BASE}/admin`,
   headers: { 'Content-Type': 'application/json' }
 })
@@ -103,10 +103,7 @@ export interface StatusUpdateReq {
 export const updateOrderStatus = (
   orderId: number,
   body: StatusUpdateReq
-) => adminApi.put<CommonResp<OrderDetailDTO>>(
-  `/orders/${orderId}/status`,
-  body
-)
+) => adminApi.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
 
 // 알림
 export const getAlertsAdmin = () =>
@@ -122,21 +119,19 @@ export const getTableSummaryAdmin = (tableNumber: number) =>
 
 // 테이블 리셋
 export const resetTableAdmin = (tableNumber: number) =>
-  adminApi.delete<CommonResp<null>>(
-    `/tables/${tableNumber}/reset`
-)
+  adminApi.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 
 // 매출 통계
 export const getSalesStatsAdmin = () =>
   adminApi.get<CommonResp<SalesStatsDTO>>('/sales')
 
-/**── 고객용 API ───────────────────────────────────────────**/
-// 메뉴 조회 (public)
+/**── customer API ─────────────────────────────────────────**/
+// 메뉴 조회
 export const listMenus = () =>
   customerApi.get<CommonResp<MenuDTO[]>>('/customer/menus')
 
-// 주문 생성
-export const postOrder = (body: RequestDTO) =>
+// 주문/요청 전송
+export const postRequest = (body: RequestDTO) =>
   customerApi.post<CommonResp<null>>('/customer/requests', body)
 
 // 테이블별 주문 현황 조회
@@ -149,7 +144,7 @@ export const getTableOrders = (tableNumber: number) =>
 export const getOrderStatusCustomer = (orderId: number) =>
   customerApi.get<CommonResp<OrderDetailDTO>>(
     `/customer/orders/${orderId}`
-)
+  )
 
 // 테이블 요약 (고객)
 export const getTableSummary = (tableNumber: number) =>
@@ -157,22 +152,24 @@ export const getTableSummary = (tableNumber: number) =>
     `/customer/tables/${tableNumber}/summary`
 )
 
-// 오늘 테이블 전체 요약 (고객)
+// 전체 테이블 요약 (고객)
 export const getAllTablesSummary = () =>
   customerApi.get<CommonResp<TableSummaryResponse[]>>(
     `/customer/tables/summary-all`
-)
+  )
 
-// 주문 당일 매출 요약 (고객)
+// 당일 테이블 매출 요약 (고객)
 export const getTodaySummary = () =>
   customerApi.get<CommonResp<any>>('/customer/orders/today-summary')
 
-// 매출 통계 (고객)
+// 고객 매출 통계
 export const getSalesStats = () =>
   customerApi.get<CommonResp<SalesStatsDTO>>('/customer/sales')
 
-// 고객 요청 전송 (주문/직원호출)
-export const postRequest = (body: RequestDTO) =>
-  customerApi.post<CommonResp<null>>('/customer/requests', body)
-
-// 기본 export: 둘 중 필요에 따라 개별 import 해서 사용하세요.
+/**── Admin 페이지 호환용 alias & default export ───────────────────**/
+// Admin 쪽에서 import api from '@/api'
+export default adminApi
+// Admin 쪽에서 import { listOrders, getAlerts, resetTable } from '@/api'
+export const listOrders = listOrdersAdmin
+export const getAlerts = getAlertsAdmin
+export const resetTable = resetTableAdmin
