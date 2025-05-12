@@ -43,14 +43,12 @@ export default function App() {
 +       <Route path="customer/:tableNumber/start" element={<StartPage />} />
 
       {/* ───────────────── Customer ───────────────── */}
-      <Route path="customer/:tableNumber/*" element={<CustomerLayout />}>
         {/* 첫 화면 */}
         <Route path="menu"    element={<MenuPage />} />
         <Route path="confirm" element={<ConfirmPage />} />
         <Route path="orders"  element={<OrderStatusPage />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="request" element={<RequestPage />} />
-      </Route>
 
       {/* 그 외 모두 Admin alerts 로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
