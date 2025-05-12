@@ -47,6 +47,12 @@ export interface TableSummaryResponse {
   }[]
 }
 
+export interface OrderAlertDTO {
+  tableNumber: number
+  items: { menuName: string; quantity: number }[]
+  createdAt: string
+}
+
 export interface SalesStatsDTO {
   totalCustomers: number
   totalOrders: number
@@ -107,7 +113,7 @@ export const updateOrderStatus = (
 
 // 알림
 export const getAlertsAdmin = () =>
-  adminApi.get<CommonResp<OrderItemDTO[]>>('/alerts')
+  adminApi.get<CommonResp<OrderAlertDTO[]>>('/alerts')  // 제네릭 수정
 
 // 테이블 요약
 export const getAllTablesSummaryAdmin = () =>
