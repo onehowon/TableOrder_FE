@@ -128,7 +128,7 @@ export const resetTableAdmin = (tableNumber: number) =>
   adminApi.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 
 // 매출 통계
-export const getSalesStatsAdmin = () =>
+export const getSalesStats = () =>
   adminApi.get<CommonResp<SalesStatsDTO>>('/sales')
 
 /**── customer API ─────────────────────────────────────────**/
@@ -168,9 +168,11 @@ export const getAllTablesSummary = () =>
 export const getTodaySummary = () =>
   customerApi.get<CommonResp<any>>('/customer/orders/today-summary')
 
-// 고객 매출 통계
-export const getSalesStats = () =>
+
+export const getCustomerSalesStats = () =>
   customerApi.get<CommonResp<SalesStatsDTO>>('/customer/sales')
+
+
 
 /**── Admin 페이지 호환용 alias & default export ───────────────────**/
 // Admin 쪽에서 import api from '@/api'
