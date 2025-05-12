@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams} from 'react-router-dom'
 
 import AdminLayout           from './components/layout/AdminLayout'
 import OrderAlertPage        from './pages/admin/OrderAlertPage'
@@ -8,7 +8,6 @@ import ErrorBoundary         from './components/ErrorBoundary'
 import OrderListPage         from './pages/admin/OrderListPage'
 
 // Customer
-import CustomerLayout  from './pages/customer/CustomerLayout'
 import WelcomePage     from './pages/customer/WelcomePage'
 import MenuPage        from './pages/customer/MenuPage'
 import ConfirmPage     from './pages/customer/ConfirmPage'
@@ -19,6 +18,11 @@ import StartPage from './pages/customer/StartPage'
 
 // 새로 추가된 로그인 페이지
 import LoginPage       from './pages/admin/LoginPage'
+
+function RedirectToCustomerIndex() {
+  const { tableNumber } = useParams<{ tableNumber: string }>()
+  return <Navigate to={`/customer/${tableNumber}`} replace />
+}
 
 export default function App() {
   return (
@@ -38,17 +42,20 @@ export default function App() {
       </Route>
 
 
-        <Route path="customer/:tableNumber" element={<WelcomePage />} />
-        {/* 시작하기 클릭 시 이동할 페이지 */}
-+       <Route path="customer/:tableNumber/start" element={<StartPage />} />
+       {/* Customer (모든 페이지 독립 선언) */}
+      <Route path="/customer/:tableNumber"       element={<WelcomePage />} />
+      <Route path="/customer/:tableNumber/start" element={<StartPage />} />
+      <Route path="/customer/:tableNumber/menu"  element={<MenuPage />} />
+      <Route path="/customer/:tableNumber/confirm" element={<ConfirmPage />} />
+      <Route path="/customer/:tableNumber/orders"  element={<OrderStatusPage />} />
+      <Route path="/customer/:tableNumber/summary" element={<SummaryPage />} />
+      <Route path="/customer/:tableNumber/request" element={<RequestPage />} />
 
-      {/* ───────────────── Customer ───────────────── */}
-        {/* 첫 화면 */}
-        <Route path="menu"    element={<MenuPage />} />
-        <Route path="confirm" element={<ConfirmPage />} />
-        <Route path="orders"  element={<OrderStatusPage />} />
-        <Route path="summary" element={<SummaryPage />} />
-        <Route path="request" element={<RequestPage />} />
+      {/* 잘못된 /customer/:tableNumber/* 경로는 인덱스로 돌려보냄 */}
+      <Route
+        path="/customer/:tableNumber/*"
+        element={<RedirectToCustomerIndex />}
+      />
 
       {/* 그 외 모두 Admin alerts 로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
