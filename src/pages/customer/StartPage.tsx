@@ -14,10 +14,8 @@ export default function StartPage() {
   const callStaff = async () => {
     try {
       await postRequest({
-        tableNumber: Number(tableNumber),
-        type: 'CALL_STAFF',
-        items: []
-      })
+        tableNumber: Number(tableNumber)
+        })
       alert('직원 호출이 전송되었습니다.')
     } catch {
       alert('직원 호출에 실패했습니다.')
