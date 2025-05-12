@@ -27,6 +27,12 @@ export interface OrderItemDTO {
   quantity: number
 }
 
+export interface OrderAlertDTO {
+  tableNumber: number
+  items: { menuName: string; quantity: number }[]
+  createdAt: string
+}
+
 export interface OrderDetailDTO {
   orderId: number
   tableNumber: number
@@ -45,12 +51,6 @@ export interface TableSummaryResponse {
     quantity: number
     totalPrice: number
   }[]
-}
-
-export interface OrderAlertDTO {
-  tableNumber: number
-  items: { menuName: string; quantity: number }[]
-  createdAt: string
 }
 
 export interface SalesStatsDTO {
@@ -79,14 +79,12 @@ export const customerApi = axios.create({
 // 메뉴 관리
 export const createMenu = (fd: FormData) =>
   adminApi.post<CommonResp<MenuDTO>>(
-    '/menus',
-    fd,
+    '/menus', fd,
     { headers: { 'Content-Type': 'multipart/form-data' } }
   )
 export const updateMenu = (id: number, fd: FormData) =>
   adminApi.put<CommonResp<MenuDTO>>(
-    `/menus/${id}`,
-    fd,
+    `/menus/${id}`, fd,
     { headers: { 'Content-Type': 'multipart/form-data' } }
   )
 export const deleteMenu = (id: number) =>
@@ -109,11 +107,13 @@ export interface StatusUpdateReq {
 export const updateOrderStatus = (
   orderId: number,
   body: StatusUpdateReq
-) => adminApi.put<CommonResp<OrderDetailDTO>>(`/orders/${orderId}/status`, body)
+) => adminApi.put<CommonResp<OrderDetailDTO>>(
+  `/orders/${orderId}/status`, body
+)
 
 // 알림
 export const getAlertsAdmin = () =>
-  adminApi.get<CommonResp<OrderAlertDTO[]>>('/alerts')  // 제네릭 수정
+  adminApi.get<CommonResp<OrderAlertDTO[]>>('/alerts')
 
 // 테이블 요약
 export const getAllTablesSummaryAdmin = () =>
@@ -128,10 +128,10 @@ export const resetTableAdmin = (tableNumber: number) =>
   adminApi.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 
 // 매출 통계
-export const getSalesStats = () =>
+export const getSalesStatsAdmin = () =>
   adminApi.get<CommonResp<SalesStatsDTO>>('/sales')
 
-/**── customer API ─────────────────────────────────────────**/
+/**── 고객용 API ───────────────────────────────────────────**/
 // 메뉴 조회
 export const listMenus = () =>
   customerApi.get<CommonResp<MenuDTO[]>>('/customer/menus')
@@ -159,7 +159,7 @@ export const getTableSummary = (tableNumber: number) =>
 )
 
 // 전체 테이블 요약 (고객)
-export const getAllTablesSummary = () =>
+export const getAllTablesSummaryCustomer = () =>
   customerApi.get<CommonResp<TableSummaryResponse[]>>(
     `/customer/tables/summary-all`
   )
@@ -168,16 +168,14 @@ export const getAllTablesSummary = () =>
 export const getTodaySummary = () =>
   customerApi.get<CommonResp<any>>('/customer/orders/today-summary')
 
-
+// 고객 매출 통계
 export const getCustomerSalesStats = () =>
   customerApi.get<CommonResp<SalesStatsDTO>>('/customer/sales')
 
-
-
 /**── Admin 페이지 호환용 alias & default export ───────────────────**/
-// Admin 쪽에서 import api from '@/api'
 export default adminApi
-// Admin 쪽에서 import { listOrders, getAlerts, resetTable } from '@/api'
 export const listOrders = listOrdersAdmin
 export const getAlerts = getAlertsAdmin
 export const resetTable = resetTableAdmin
+export const getAllTablesSummary = getAllTablesSummaryAdmin
+export const getSalesStats = getSalesStatsAdmin
