@@ -1,8 +1,14 @@
-// src/components/layout/AdminLayout.tsx
-import { Outlet } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 import SideNav from '../SideNav'
 
 export default function AdminLayout() {
+  // 1) 로그인 토큰 확인
+  const token = localStorage.getItem('accessToken')
+  if (!token) {
+    // 로그인되지 않은 상태면 /admin/login 으로 이동
+    return <Navigate to="/admin/login" replace />
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       <SideNav />
