@@ -16,6 +16,7 @@ import OrderStatusPage from './pages/customer/OrderStatusPage'
 import SummaryPage     from './pages/customer/SummaryPage'
 import RequestPage     from './pages/customer/RequestPage'
 import StartPage from './pages/customer/StartPage'
+import OrderPlacedPage        from './pages/customer/OrderPlacedPage'
 
 // 새로 추가된 로그인 페이지
 import LoginPage       from './pages/admin/LoginPage'
@@ -52,6 +53,7 @@ export default function App() {
       <Route path="/customer/:tableNumber/orders"  element={<OrderStatusPage />} />
       <Route path="/customer/:tableNumber/summary" element={<SummaryPage />} />
       <Route path="/customer/:tableNumber/request" element={<RequestPage />} />
+      <Route path="/customer/:tableNumber/placed"  element={<OrderPlacedPage />} />
 
       {/* 잘못된 /customer/:tableNumber/* 경로는 인덱스로 돌려보냄 */}
       <Route

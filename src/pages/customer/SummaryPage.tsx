@@ -1,13 +1,12 @@
-// src/pages/customer/SummaryPage.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { listMenus, postOrder } from '../../api'
 import type { MenuDTO, CommonResp } from '../../api'
 import type { AxiosResponse } from 'axios'
+import engineLogo from '../../assets/engine.png'
 
 type CartState = Record<number, number>
 
-// location.state 타입 정의
 interface LocationState {
   cart?: CartState
 }
@@ -16,7 +15,6 @@ export default function SummaryPage() {
   const { tableNumber } = useParams<{ tableNumber?: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  // nav 에서 넘긴 cart, 없으면 빈 객체
   const passedCart = (location.state as LocationState)?.cart ?? {}
 
   if (!tableNumber) {
@@ -30,12 +28,11 @@ export default function SummaryPage() {
   // 뒤로 가기
   const goBack = () => navigate(-1)
 
-  // cart: nav 로 받은 것이 있으면 그것, 없으면 localStorage 에서
+  // cart 초기값: nav.state 우선, 없으면 localStorage
   const [cart, setCart] = useState<CartState>(passedCart)
   const [menus, setMenus] = useState<MenuDTO[]>([])
 
   useEffect(() => {
-    // nav.state 가 없었다면 localStorage 로 복원
     if (!Object.keys(passedCart).length) {
       const saved = localStorage.getItem(`cart_${tableNumber}`)
       if (saved) setCart(JSON.parse(saved))
@@ -49,7 +46,6 @@ export default function SummaryPage() {
       })
   }, [tableNumber, passedCart])
 
-  // 아이템 목록 준비
   const items = menus
     .filter(m => cart[m.id] != null)
     .map(m => ({
@@ -71,8 +67,8 @@ export default function SummaryPage() {
           quantity: it.quantity,
         })),
       })
-      alert('주문이 정상 접수되었습니다.')
-      navigate(`/customer/${tableNumber}/orders`, { replace: true })
+      // 주문 성공 → 주문 완료 페이지로 이동
+      navigate(`/customer/${tableNumber}/placed`, { replace: true })
     } catch {
       alert('주문 중 오류가 발생했습니다.')
     }
@@ -92,7 +88,7 @@ export default function SummaryPage() {
           장바구니
         </h1>
         <img
-          src="/engine.png"
+          src={engineLogo}
           alt="EngiNE"
           className="w-20 h-auto object-contain"
         />
