@@ -1,49 +1,70 @@
-// src/pages/customer/OrderStatusPage.tsx
-import { useSearchParams, useParams } from 'react-router-dom'
-import { fetchOrderStatus } from '@/api/customer'
 import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getAlerts, listOrders } from '../../api'
+import type { OrderDetailDTO } from '../../api'
 
 export default function OrderStatusPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
-  const [qs] = useSearchParams()
-  const orderId = qs.get('orderId')
-  const [status, setStatus] = useState<string>('')
-  const [items, setItems] = useState<{ menuName: string; quantity: number; price: number }[]>([])
+  const nav = useNavigate()
+  const [order, setOrder] = useState<OrderDetailDTO | null>(null)
+  const [done, setDone] = useState(false)
 
+  // 3초마다 현황 조회
   useEffect(() => {
-    if (!orderId) return
-    fetchOrderStatus(Number(orderId))
-      .then(res => {
-        setStatus(res.data.data.status)
-        setItems(res.data.data.items)
-      })
-      .catch(console.error)
-  }, [orderId])
+    const iv = setInterval(async () => {
+      const res = await listOrders()
+      const my = res.data.data.find(o => o.tableNumber === Number(tableNumber))
+      if (my) {
+        setOrder(my)
+        if (my.status === 'SERVED') {
+          setDone(true)
+          clearInterval(iv)
+        }
+      }
+    }, 3000)
+    return () => clearInterval(iv)
+  }, [tableNumber])
 
-  if (!orderId) return <p className="p-4">잘못된 접근입니다.</p>
+  if (!order) {
+    return <div className="p-4 text-center">주문 정보를 불러오는 중...</div>
+  }
 
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
-  return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-2xl font-bold">주문 상태</h1>
-      <p className="text-lg">주문 번호: {orderId}</p>
-      <p className="mb-4">현재 상태: <b>{status}</b></p>
-      <ul className="space-y-2">
-        {items.map((i, idx) => (
-          <li key={idx} className="flex justify-between">
-            <span>{i.menuName} x {i.quantity}</span>
-            +    <span>
-                {i.price != null && i.quantity != null
-                    ? (i.price * i.quantity).toLocaleString() + '원'
-                    : '-'}
-                </span>
-          </li>
-        ))}
-      </ul>
-      <div className="text-right font-semibold">
-        합계 {total.toLocaleString()}원
+  if (!done) {
+    // 조리 중 화면
+    return (
+      <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4">
+        <img src="/logo.png" alt="Engine" className="h-12 mb-12" />
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          조리 중...
+        </h1>
+        <ul className="text-center space-y-2 mb-6">
+          {order.items.map((it, i) => (
+            <li key={i}>{it.name} × {it.quantity}</li>
+          ))}
+        </ul>
+        <button
+          onClick={() => nav(`/customer/${tableNumber}/summary`)}
+          className="text-sm text-gray-600 underline"
+        >
+          ← 이전 화면
+        </button>
       </div>
+    )
+  }
+
+  // 조리 완료 화면
+  return (
+    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4">
+      <img src="/logo.png" alt="Engine" className="h-12 mb-12" />
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        조리 완료!
+      </h1>
+      <button
+        onClick={() => nav(`/customer/${tableNumber}/summary`)}
+        className="py-2 px-4 bg-green-600 text-white rounded"
+      >
+        ← 이전 화면
+      </button>
     </div>
   )
 }
