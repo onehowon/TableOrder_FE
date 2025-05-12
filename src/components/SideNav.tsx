@@ -4,7 +4,8 @@ import {
   HiOutlineBell,
   HiOutlineListBullet,
   HiOutlineTableCells,
-  HiOutlineChartBar
+  HiOutlineChartBar,
+  HiOutlineSquares2X2
 } from 'react-icons/hi2'
 
 const menus = [
@@ -12,6 +13,7 @@ const menus = [
   { to: '/admin/orders', icon: <HiOutlineListBullet />, label: '주문 리스트' },
   { to: '/admin/tables', icon: <HiOutlineTableCells />, label: '테이블 번호' },
   { to: '/admin/sales',  icon: <HiOutlineChartBar />,   label: '매출' },
+  { to: '/admin/menus',  icon: <HiOutlineSquares2X2 />, label: '메뉴 관리' },
 ]
 
 export default function SideNav() {
