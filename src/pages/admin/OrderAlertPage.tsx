@@ -1,3 +1,4 @@
+// src/pages/admin/OrderAlertPage.tsx
 import { useEffect, useState } from 'react'
 import { getAlerts } from '@/api'
 import type { OrderAlertDTO } from '@/api'
@@ -53,16 +54,26 @@ export default function OrderAlertPage() {
               const time = new Date(alert.createdAt).toLocaleTimeString('ko-KR', {
                 hour: '2-digit', minute: '2-digit'
               })
-              // ← menuName 이 아닌 name 으로 변경
+
+              // itemsText: quantity>0 → “메뉴명 2개”, quantity===0 → “요청타입”
               const itemsText = alert.items
-                .map(i => `${i.menuName} ${i.quantity}개`)
+                .map(i =>
+                  i.quantity > 0
+                    ? `${i.menuName} ${i.quantity}개`
+                    : `${i.menuName}`
+                )
                 .join(', ')
+
+              // 전체가 quantity===0 이면 “요청”, 아니면 “주문”
+              const isRequest = alert.items.every(i => i.quantity === 0)
+              const verb      = isRequest ? '요청' : '주문'
+
               return (
                 <div key={idx} className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0"></div>
                   <div className="flex-1 bg-white rounded-lg p-4 shadow">
                     <p className="text-gray-800">
-                      {alert.tableNumber}번 테이블에서 {itemsText}를 주문하였습니다.
+                      {alert.tableNumber}번 테이블에서 {itemsText}를 {verb}하였습니다.
                     </p>
                     <span className="text-xs text-gray-500 block text-right mt-2">
                       {time}
