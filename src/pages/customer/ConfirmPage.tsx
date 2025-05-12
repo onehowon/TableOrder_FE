@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { postRequest } from '../../api'
+import { postOrder } from '../../api'    // ← 여기만 변경
+import type { OrderRequestDTO } from '@/api'
 
 interface LocationState {
   cart: Record<number, number>
@@ -14,15 +15,16 @@ export default function ConfirmPage() {
   useEffect(() => {
     async function submitOrder() {
       try {
-        // 백엔드에 주문 요청
-        await postRequest({
+        // 주문 전송은 postOrder 로
+        const payload: OrderRequestDTO = {
           tableNumber: Number(tableNumber),
-          type: 'ORDER',
           items: Object.entries(state.cart).map(([menuId, qty]) => ({
             menuId: Number(menuId),
-            quantity: qty
-          }))
-        })
+            quantity: qty,
+          })),
+        }
+        await postOrder(payload)
+
         // 2초 뒤 주문 현황 페이지로 이동
         setTimeout(() => {
           nav(`/customer/${tableNumber}/orders`, { replace: true })
