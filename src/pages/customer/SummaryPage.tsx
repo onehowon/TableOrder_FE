@@ -1,5 +1,5 @@
 // src/pages/customer/SummaryPage.tsx
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import type { MenuDTO } from '../../api'
 import { listMenus } from '../../api'
