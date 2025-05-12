@@ -14,6 +14,12 @@ export interface MenuDTO {
   imageUrl?: string | null
 }
 
+export interface CustomerRequestDTO {
+  id: number
+  tableNumber: number
+  createdAt: string
+}
+
 export interface RequestDTO {
   tableNumber: number
 
@@ -111,6 +117,9 @@ export const listAdminMenus = () =>
 // 주문 관리
 export const listOrdersAdmin = () =>
   adminApi.get<CommonResp<OrderDetailDTO[]>>('/orders')
+
+export const listRequestsAdmin = () =>
+  adminApi.get<CommonResp<CustomerRequestDTO[]>>('/requests')
 
 export interface StatusUpdateReq {
   status: 'COOKING' | 'SERVED'

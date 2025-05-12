@@ -1,16 +1,49 @@
-// src/pages/admin/OrderAlertPage.tsx
 import { useEffect, useState } from 'react'
-import { getAlerts } from '@/api'
-import type { OrderAlertDTO } from '@/api'
+import { getAlerts, listRequestsAdmin } from '@/api'
+import type { OrderAlertDTO, CustomerRequestDTO } from '@/api'
+
+// 주문 및 요청 알림을 통합 처리하는 공통 인터페이스
+interface Notification {
+  id: string
+  message: string
+  createdAt: string
+}
 
 export default function OrderAlertPage() {
-  const [alerts, setAlerts]   = useState<OrderAlertDTO[]>([])
+  const [alerts, setAlerts] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
 
   const loadAlerts = async () => {
+    setLoading(true)
     try {
-      const res = await getAlerts()
-      setAlerts(res.data.data)
+      // 주문 알림과 직원 호출 알림을 동시에 조회
+      const [orderRes, reqRes] = await Promise.all([
+        getAlerts(),               // CommonResp<OrderAlertDTO[]>
+        listRequestsAdmin(),       // CommonResp<CustomerRequestDTO[]>
+      ])
+
+      // 주문 알림 변환
+      const orders = orderRes.data.data.map((o: OrderAlertDTO) => ({
+        id: `order-${o.createdAt}-${o.tableNumber}`,
+        message:
+          `${o.tableNumber}번 테이블에서 ` +
+          o.items.map(i => `${i.menuName} ${i.quantity}개`).join(', ') +
+          '를 주문했습니다.',
+        createdAt: o.createdAt,
+      }))
+
+      // 직원 호출 알림 변환
+      const reqs = reqRes.data.data.map((r: CustomerRequestDTO) => ({
+        id: `req-${r.id}`,
+        message: `${r.tableNumber}번 테이블에서 직원을 호출했습니다.`,
+        createdAt: r.createdAt,
+      }))
+
+      // 최신 순 정렬 후 상태 업데이트
+      const combined = [...orders, ...reqs].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      setAlerts(combined)
     } catch (err) {
       console.error('알림 조회 실패', err)
     } finally {
@@ -50,31 +83,15 @@ export default function OrderAlertPage() {
           <p>로딩 중…</p>
         ) : (
           <div className="space-y-6">
-            {alerts.map((alert, idx) => {
+            {alerts.map(alert => {
               const time = new Date(alert.createdAt).toLocaleTimeString('ko-KR', {
                 hour: '2-digit', minute: '2-digit'
               })
-
-              // itemsText: quantity>0 → “메뉴명 2개”, quantity===0 → “요청타입”
-              const itemsText = alert.items
-                .map(i =>
-                  i.quantity > 0
-                    ? `${i.menuName} ${i.quantity}개`
-                    : `${i.menuName}`
-                )
-                .join(', ')
-
-              // 전체가 quantity===0 이면 “요청”, 아니면 “주문”
-              const isRequest = alert.items.every(i => i.quantity === 0)
-              const verb      = isRequest ? '요청' : '주문'
-
               return (
-                <div key={idx} className="flex items-start space-x-4">
+                <div key={alert.id} className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0"></div>
                   <div className="flex-1 bg-white rounded-lg p-4 shadow">
-                    <p className="text-gray-800">
-                      {alert.tableNumber}번 테이블에서 {itemsText}를 {verb}하였습니다.
-                    </p>
+                    <p className="text-gray-800">{alert.message}</p>
                     <span className="text-xs text-gray-500 block text-right mt-2">
                       {time}
                     </span>
@@ -82,6 +99,9 @@ export default function OrderAlertPage() {
                 </div>
               )
             })}
+            {alerts.length === 0 && (
+              <p className="text-center text-gray-500">현재 알림이 없습니다.</p>
+            )}
           </div>
         )}
       </main>
