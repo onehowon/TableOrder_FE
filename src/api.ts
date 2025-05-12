@@ -13,6 +13,12 @@ export interface MenuDTO {
   imageUrl?: string | null
 }
 
+export interface RequestDTO{
+  tableNumber: number
+  type: 'ORDER' | 'CALL_STAFF'
+  items: {menuId: number; quantity:number}[]
+}
+
 // 백엔드 enum 그대로
 export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
 
@@ -110,7 +116,7 @@ export const resetTable = (tableNumber: number) =>
   api.delete<CommonResp<null>>(`/tables/${tableNumber}/reset`)
 
 /**── 고객 요청 전송 ───────────────────────────────────────**/
-export const postRequest   = (body: RequestDTO) =>
+export const postRequest = (body: RequestDTO) =>
   api.post<CommonResp<null>>('/requests', body)
 
 /**── 매출 통계 ───────────────────────────────────────────**/

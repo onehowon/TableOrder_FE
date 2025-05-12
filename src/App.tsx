@@ -15,6 +15,7 @@ import ConfirmPage     from './pages/customer/ConfirmPage'
 import OrderStatusPage from './pages/customer/OrderStatusPage'
 import SummaryPage     from './pages/customer/SummaryPage'
 import RequestPage     from './pages/customer/RequestPage'
+import StartPage from './pages/customer/StartPage'
 
 // 새로 추가된 로그인 페이지
 import LoginPage       from './pages/admin/LoginPage'
@@ -36,10 +37,14 @@ export default function App() {
         <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
       </Route>
 
+
+        <Route path="customer/:tableNumber" element={<WelcomePage />} />
+        {/* 시작하기 클릭 시 이동할 페이지 */}
++       <Route path="customer/:tableNumber/start" element={<StartPage />} />
+
       {/* ───────────────── Customer ───────────────── */}
-      <Route path="customer/:tableNumber" element={<CustomerLayout />}>
-        <Route index    element={<WelcomePage />} />
-        <Route path="welcome" element={<WelcomePage />} />
+      <Route path="customer/:tableNumber/*" element={<CustomerLayout />}>
+        {/* 첫 화면 */}
         <Route path="menu"    element={<MenuPage />} />
         <Route path="confirm" element={<ConfirmPage />} />
         <Route path="orders"  element={<OrderStatusPage />} />
