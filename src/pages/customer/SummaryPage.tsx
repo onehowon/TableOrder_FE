@@ -1,15 +1,23 @@
 // src/pages/customer/SummaryPage.tsx
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { listMenus, postOrder } from '../../api'
 import type { MenuDTO, CommonResp } from '../../api'
 import type { AxiosResponse } from 'axios'
 
 type CartState = Record<number, number>
 
+// location.state 타입 정의
+interface LocationState {
+  cart?: CartState
+}
+
 export default function SummaryPage() {
   const { tableNumber } = useParams<{ tableNumber?: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  // nav 에서 넘긴 cart, 없으면 빈 객체
+  const passedCart = (location.state as LocationState)?.cart ?? {}
 
   if (!tableNumber) {
     return (
@@ -22,14 +30,16 @@ export default function SummaryPage() {
   // 뒤로 가기
   const goBack = () => navigate(-1)
 
-  // (예시) 로케이션 스테이트 대신 로컬스토리지에서 꺼내오거나 Context/전역 상태를 써도 됩니다.
-  const [cart, setCart] = useState<CartState>({})
+  // cart: nav 로 받은 것이 있으면 그것, 없으면 localStorage 에서
+  const [cart, setCart] = useState<CartState>(passedCart)
   const [menus, setMenus] = useState<MenuDTO[]>([])
 
   useEffect(() => {
-    const saved = localStorage.getItem(`cart_${tableNumber}`)
-    if (saved) setCart(JSON.parse(saved))
-
+    // nav.state 가 없었다면 localStorage 로 복원
+    if (!Object.keys(passedCart).length) {
+      const saved = localStorage.getItem(`cart_${tableNumber}`)
+      if (saved) setCart(JSON.parse(saved))
+    }
     listMenus()
       .then((res: AxiosResponse<CommonResp<MenuDTO[]>>) => {
         setMenus(res.data.data)
@@ -37,7 +47,7 @@ export default function SummaryPage() {
       .catch(() => {
         alert('메뉴 로딩에 실패했습니다.')
       })
-  }, [tableNumber])
+  }, [tableNumber, passedCart])
 
   // 아이템 목록 준비
   const items = menus
@@ -82,7 +92,7 @@ export default function SummaryPage() {
           장바구니
         </h1>
         <img
-          src="/logo.png"
+          src="/engine.png"
           alt="EngiNE"
           className="w-20 h-auto object-contain"
         />

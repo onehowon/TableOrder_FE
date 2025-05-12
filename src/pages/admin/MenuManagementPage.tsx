@@ -31,13 +31,22 @@ export default function MenuManagementPage() {
 
   async function loadMenus() {
     try {
-        const res = await listAdminMenus()
-        // CommonResp<MenuDTO[]> 의 .data 프로퍼티가 실제 MenuDTO[] 이므로
-        setMenus(res.data.data)
+      const res = await listAdminMenus()
+      setMenus(res.data.data)
     } catch {
       alert('메뉴 목록을 불러오는 데 실패했습니다.')
     }
   }
+
+  // ▶ 수정 모드: selected 가 바뀌면 폼에 기존 값 채워넣기
+  useEffect(() => {
+    if (mode === 'edit' && selected) {
+      setName(selected.name)
+      setDescription(selected.description)
+      setPrice(String(selected.price))
+      setPreview(selected.imageUrl ?? null)
+    }
+  }, [mode, selected])
 
   // 파일 선택 & 프리뷰
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
@@ -106,9 +115,14 @@ export default function MenuManagementPage() {
       {/* ◀ 왼쪽 탭 */}
       <aside className="w-1/4 bg-gray-50 p-6 border-r">
         <button
-          onClick={() => setMode('add')}
-          className={`block mb-4 w-full py-2 rounded-lg text-white 
-            ${mode === 'add' ? 'bg-blue-500' : 'bg-gray-300'}`}
+          onClick={() => {
+            setMode('add')
+            setSelected(null)
+            resetForm()
+          }}
+          className={`block mb-4 w-full py-2 rounded-lg text-white ${
+            mode === 'add' ? 'bg-blue-500' : 'bg-gray-300'
+          }`}
         >
           Menu management
         </button>
@@ -121,8 +135,11 @@ export default function MenuManagementPage() {
                 setSelected(null)
                 resetForm()
               }}
-              className={`flex items-center w-full py-2 px-4 rounded-lg 
-                ${mode === m ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`flex items-center w-full py-2 px-4 rounded-lg ${
+                mode === m
+                  ? 'bg-blue-100 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
             >
               <span className="mr-2">✉️</span>
               {m === 'add' ? '추가' : m === 'delete' ? '삭제' : '수정'}
@@ -135,11 +152,20 @@ export default function MenuManagementPage() {
       <section className="flex-1 p-8 bg-white overflow-auto">
         {/* 뒤로가기 + 제목 */}
         <div className="flex items-center mb-6">
-          <button onClick={() => navigate(-1)} className="mr-4 text-gray-500">
+          <button
+            onClick={() => navigate(-1)}
+            className="mr-4 text-gray-500"
+          >
             ←
           </button>
           <h1 className="text-xl font-medium">
-            메뉴 관리 ({mode === 'add' ? '추가' : mode === 'edit' ? '수정' : '삭제'})
+            메뉴 관리 (
+            {mode === 'add'
+              ? '추가'
+              : mode === 'edit'
+              ? '수정'
+              : '삭제'}
+            )
           </h1>
         </div>
 
@@ -150,7 +176,7 @@ export default function MenuManagementPage() {
               className="w-full p-3 border rounded-lg mb-4"
               value={selected?.id ?? ''}
               onChange={e => {
-                const m = menus.find(x => x.id === Number(e.target.value)) ?? null
+                const m = menus.find(x => x.id === Number(e.target.value)) || null
                 setSelected(m)
               }}
             >
@@ -173,13 +199,38 @@ export default function MenuManagementPage() {
         {/* 추가/수정 모드 */}
         {(mode === 'add' || mode === 'edit') && (
           <div className="space-y-6 max-w-xl">
+            {/* ✏️ 수정 모드일 때만 메뉴 선택 드롭다운 추가 */}
+            {mode === 'edit' && (
+              <select
+                className="w-full p-3 border rounded-lg"
+                value={selected?.id ?? ''}
+                onChange={e => {
+                  const m = menus.find(x => x.id === Number(e.target.value)) || null
+                  setSelected(m)
+                }}
+              >
+                <option value="">수정할 메뉴 선택</option>
+                {menus.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
             {/* 파일 업로드 박스 */}
             <div className="relative">
               <div className="h-40 bg-gray-200 rounded-lg flex items-center justify-center">
                 {preview ? (
-                  <img src={preview} alt="preview" className="h-full object-contain rounded-lg" />
+                  <img
+                    src={preview}
+                    alt="preview"
+                    className="h-full object-contain rounded-lg"
+                  />
                 ) : (
-                  <span className="text-gray-500">📷 이미지 업로드</span>
+                  <span className="text-gray-500">
+                    📷 이미지 업로드
+                  </span>
                 )}
               </div>
               <input
@@ -197,7 +248,7 @@ export default function MenuManagementPage() {
               </label>
               <input
                 className="col-span-3 p-3 border rounded-lg focus:outline-none"
-                value={mode === 'edit' && selected ? selected.name : name}
+                value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="메뉴 이름을 입력하세요"
               />
@@ -210,7 +261,7 @@ export default function MenuManagementPage() {
               </label>
               <input
                 className="col-span-3 p-3 border rounded-lg focus:outline-none"
-                value={mode === 'edit' && selected ? selected.description : description}
+                value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="메뉴 설명을 입력하세요"
               />
@@ -224,7 +275,7 @@ export default function MenuManagementPage() {
               <input
                 type="number"
                 className="col-span-3 p-3 border rounded-lg focus:outline-none"
-                value={mode === 'edit' && selected ? selected.price : price}
+                value={price}
                 onChange={e => setPrice(e.target.value)}
                 placeholder="메뉴 가격을 입력하세요"
               />

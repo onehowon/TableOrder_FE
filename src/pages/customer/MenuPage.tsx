@@ -49,6 +49,7 @@ export default function MenuPage() {
             />
             <div className="flex-1">
               <div className="font-medium">{menu.name}</div>
+              <div className="text-sm text-gray-600 mt-1">{menu.description}</div>
               <div className="text-sm text-gray-600">
                 {menu.price.toLocaleString()}원
               </div>
