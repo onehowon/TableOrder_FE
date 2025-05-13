@@ -1,43 +1,69 @@
-// src/components/layout/AdminLayout.tsx
-import { Outlet, Navigate, useNavigate } from 'react-router-dom'
+import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import SideNav from '../SideNav'
 import api from '@/api'   // default export = adminApi
+import { useEffect, useState, createContext } from 'react'
+import { listRequestsAdmin } from '@/api'
+import type { CustomerRequestDTO } from '@/api'
+
+// 직원 호출 "읽지 않은" 알림 개수를 공급하는 Context
+export const UnreadRequestsContext = createContext<{ unread: number }>({ unread: 0 })
 
 export default function AdminLayout() {
   const nav = useNavigate()
 
-  // 1) 로그인 토큰 확인
+  // 로그인 토큰 확인
   const token = localStorage.getItem('accessToken')
   if (!token) {
-    // 로그인되지 않은 상태면 /admin/login 으로 이동
     return <Navigate to="/admin/login" replace />
   }
 
-  // 2) 로그아웃 핸들러
+  // 로그아웃 핸들러
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
     delete api.defaults.headers.common['Authorization']
     nav('/admin/login', { replace: true })
   }
 
-  return (
-    <div className="flex h-screen bg-gray-50">
-      <SideNav />
+  // 5초마다 관리자용 호출 알림 조회
+  const [requests, setRequests] = useState<CustomerRequestDTO[]>([])
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await listRequestsAdmin()
+        setRequests(res.data.data)
+      } catch (e) {
+        console.error('요청 알림 조회 실패', e)
+      }
+    }
+    fetchRequests()
+    const iv = setInterval(fetchRequests, 5000)
+    return () => clearInterval(iv)
+  }, [])
 
-      <div className="flex-1 flex flex-col">
-        <header className="h-16 flex items-center justify-between px-6 bg-white border-b shadow-sm">
-          <h1 className="text-xl font-bold">admin page</h1>
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded"
-          >
-            로그아웃
-          </button>
-        </header>
-        <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
-        </main>
+  // 현재 읽지 않은 개수
+  const unread = requests.length
+
+  return (
+    <UnreadRequestsContext.Provider value={{ unread }}>
+      <div className="flex h-screen bg-gray-50">
+        <SideNav />
+
+        <div className="flex-1 flex flex-col">
+          <header className="h-16 flex items-center justify-between px-6 bg-white border-b shadow-sm">
+            <h1 className="text-xl font-bold">admin page</h1>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded"
+            >
+              로그아웃
+            </button>
+          </header>
+
+          <main className="flex-1 p-6 overflow-auto">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </UnreadRequestsContext.Provider>
   )
 }
