@@ -1,30 +1,31 @@
-import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom'
+// src/components/layout/AdminLayout.tsx
+import { Outlet, Navigate, useNavigate } from 'react-router-dom'
 import SideNav from '../SideNav'
 import api from '@/api'   // default export = adminApi
 import { useEffect, useState, createContext } from 'react'
 import { listRequestsAdmin } from '@/api'
 import type { CustomerRequestDTO } from '@/api'
 
-// 직원 호출 "읽지 않은" 알림 개수를 공급하는 Context
+/** 읽지 않은 직원 호출 알림 개수를 공급하는 Context **/
 export const UnreadRequestsContext = createContext<{ unread: number }>({ unread: 0 })
 
 export default function AdminLayout() {
   const nav = useNavigate()
 
-  // 로그인 토큰 확인
+  // 1) 로그인 토큰 확인
   const token = localStorage.getItem('accessToken')
   if (!token) {
     return <Navigate to="/admin/login" replace />
   }
 
-  // 로그아웃 핸들러
+  // 2) 로그아웃 핸들러
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
     delete api.defaults.headers.common['Authorization']
     nav('/admin/login', { replace: true })
   }
 
-  // 5초마다 관리자용 호출 알림 조회
+  // 3) 5초마다 직원 호출 리스트 폴링
   const [requests, setRequests] = useState<CustomerRequestDTO[]>([])
   useEffect(() => {
     const fetchRequests = async () => {
@@ -40,7 +41,6 @@ export default function AdminLayout() {
     return () => clearInterval(iv)
   }, [])
 
-  // 현재 읽지 않은 개수
   const unread = requests.length
 
   return (

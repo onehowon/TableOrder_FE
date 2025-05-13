@@ -39,7 +39,7 @@ export default function App() {
       <Route index element={<Navigate to="boards" replace />} />
       <Route path="boards"   element={<OrderBoardPage/>} />
         <Route path="orders" element={<ErrorBoundary><OrderListPage/></ErrorBoundary>} />
-        <Route path="requests" element={<RequestAlertPage/>} />
+        <Route path="alerts" element={<RequestAlertPage/>} />
         <Route path="sales"  element={<ErrorBoundary><StatsPage/></ErrorBoundary>} />
         <Route path="menus"  element={<ErrorBoundary><MenuManagementPage/></ErrorBoundary>} />
       </Route>

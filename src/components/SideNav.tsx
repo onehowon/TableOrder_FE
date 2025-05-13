@@ -1,20 +1,21 @@
+// src/components/SideNav.tsx
 import { NavLink } from 'react-router-dom'
 import {
-  HiOutlineBell,
-  HiOutlineListBullet,
-  HiOutlineChartBar,
   HiOutlineSquares2X2,
+  HiOutlineListBullet,
+  HiOutlineBell,
+  HiOutlineChartBar,
   HiOutlineTableCells
 } from 'react-icons/hi2'
 import { useContext } from 'react'
 import { UnreadRequestsContext } from './layout/AdminLayout'
 
 const menus = [
-  { to: '/admin/boards',   icon: <HiOutlineSquares2X2 />, label: '주문 현황' },
+  { to: '/admin/boards',   icon: <HiOutlineSquares2X2 />, label: '주문 현황'   },
   { to: '/admin/orders',   icon: <HiOutlineListBullet />, label: '주문 리스트' },
-  { to: '/admin/requests', icon: <HiOutlineBell />,        label: '직원 호출' },
-  { to: '/admin/sales',    icon: <HiOutlineChartBar />,    label: '매출' },
-  { to: '/admin/menus',    icon: <HiOutlineTableCells />,  label: '메뉴 관리' },
+  { to: '/admin/alerts', icon: <HiOutlineBell />,       label: '직원 호출'   },
+  { to: '/admin/sales',    icon: <HiOutlineChartBar />,   label: '매출'       },
+  { to: '/admin/menus',    icon: <HiOutlineTableCells />, label: '메뉴 관리'   },
 ]
 
 export default function SideNav() {
@@ -35,7 +36,8 @@ export default function SideNav() {
           >
             <span className="text-lg mr-3">{m.icon}</span>
             <span>{m.label}</span>
-            {m.to === '/admin/requests' && unread > 0 && (
+
+            {m.to === '/admin/alerts' && unread > 0 && (
               <span className="ml-auto inline-block bg-red-500 text-white text-xs font-medium rounded-full px-2 py-0.5">
                 {unread}
               </span>
