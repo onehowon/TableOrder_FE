@@ -38,14 +38,9 @@ export default function OrderBoardPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen flex flex-col">
-      <h2 className="text-2xl font-bold mb-4">주문 현황</h2>
+      <h2 className="text-2xl font-bold mb-6">주문 현황</h2>
 
-      {/* —————————————————————
-          2행×3열 고정 그리드: 
-          flex-1 로 남은 공간 채우고,
-          grid-rows-2 로 두 줄 고정,
-          gap-6 으로 간격 유지
-      ————————————————————— */}
+      {/* 2행×3열 고정 그리드 카드 */}
       <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 grid-rows-2 gap-6">
         {pageOrders.map(o => {
           const isSel = o.orderId === selected
@@ -55,19 +50,25 @@ export default function OrderBoardPage() {
               onClick={() => setSelected(isSel ? null : o.orderId)}
               className={[
                 'bg-white p-6 rounded-xl shadow-lg cursor-pointer relative transition-all',
-                isSel
-                  ? 'border-2 border-blue-500'
-                  : 'border border-gray-200'
+                isSel ? 'border-2 border-blue-500' : 'border border-gray-200'
               ].join(' ')}
             >
               {/* 테이블 번호 */}
-              <div className="text-lg font-semibold mb-3">
+              <div className="text-lg font-semibold mb-4">
                 {o.tableNumber}번 테이블
               </div>
 
-              {/* 메뉴 & 수량 */}
-              <div className="text-base text-gray-700 mb-6">
-                {o.items.map(i => `${i.name} ${i.quantity}개`).join(', ')}
+              {/* 메뉴별 아이템: 좌측 이름, 우측 개수, 개수는 항상 같은 줄 */}
+              <div className="mb-6 space-y-1">
+                {o.items.map(i => (
+                  <div
+                    key={i.name}
+                    className="flex justify-between items-center whitespace-nowrap text-base text-gray-700"
+                  >
+                    <span className="truncate">{i.name}</span>
+                    <span>{i.quantity}개</span>
+                  </div>
+                ))}
               </div>
 
               {/* 주문 시각 (우측 상단) */}
@@ -94,9 +95,7 @@ export default function OrderBoardPage() {
         })}
       </div>
 
-      {/* —————————————————————
-          페이징 & 완료/삭제 버튼
-      ————————————————————— */}
+      {/* 페이징 & 완료/삭제 버튼 */}
       <div className="mt-6 flex items-center justify-between">
         {/* 페이징 */}
         <div className="space-x-2">
