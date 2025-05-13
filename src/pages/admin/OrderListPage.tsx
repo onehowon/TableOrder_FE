@@ -1,3 +1,4 @@
+// src/pages/admin/OrderListPage.tsx
 import { useEffect, useState } from 'react'
 import { listOrdersAdmin, updateOrderStatus } from '@/api'
 import type { OrderDetailDTO } from '@/api'
@@ -6,9 +7,9 @@ type Status = OrderDetailDTO['status']
 
 // 테이블에 뿌려줄 상태 라벨 & 배경색 설정
 const LABEL: Record<Status, { text: string; bg: string }> = {
-  WAITING: { text: '준비 중',    bg: 'bg-yellow-100'  },
-  SERVED:  { text: '제조 완료',  bg: 'bg-green-100'   },
-  DELETED: { text: '삭제 완료',  bg: 'bg-gray-200'    },
+  WAITING: { text: '준비 중',    bg: 'bg-yellow-100' },
+  SERVED:  { text: '제조 완료',  bg: 'bg-green-100'  },
+  DELETED: { text: '삭제 완료',  bg: 'bg-gray-200'   },
 }
 
 export default function OrderListPage() {
@@ -75,22 +76,37 @@ export default function OrderListPage() {
                   </td>
                   <td className="px-6 py-4">{menuText || '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    {/* 현재 상태 레이블 */}
                     <span
                       className={`${lbl.bg} px-2 py-1 rounded-full text-sm font-medium`}
                     >
                       {lbl.text}
                     </span>
-                    <div className="mt-2 space-x-1">
-                      {(['WAITING', 'SERVED', 'DELETED'] as Status[]).map(
-                        status => (
-                          <button
-                            key={status}
-                            onClick={() => onStatus(o.orderId, status)}
-                            className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
-                          >
-                            {LABEL[status].text}
-                          </button>
-                        )
+                    {/* 현재 상태에 따른 단일 액션 버튼 */}
+                    <div className="mt-2">
+                      {o.status === 'WAITING' && (
+                        <button
+                          onClick={() => onStatus(o.orderId, 'SERVED')}
+                          className="text-xs px-2 py-1 bg-green-200 rounded hover:bg-green-300 transition"
+                        >
+                          제조 완료
+                        </button>
+                      )}
+                      {o.status === 'SERVED' && (
+                        <button
+                          onClick={() => onStatus(o.orderId, 'DELETED')}
+                          className="text-xs px-2 py-1 bg-red-200 rounded hover:bg-red-300 transition"
+                        >
+                          삭제
+                        </button>
+                      )}
+                      {o.status === 'DELETED' && (
+                        <button
+                          onClick={() => onStatus(o.orderId, 'WAITING')}
+                          className="text-xs px-2 py-1 bg-blue-200 rounded hover:bg-blue-300 transition"
+                        >
+                          복원
+                        </button>
                       )}
                     </div>
                   </td>
