@@ -109,14 +109,14 @@ export const listOrdersAdmin = () =>
   adminApi.get<CommonResp<OrderDetailDTO[]>>('/orders')
 
 export const listRequestsAdmin = () =>
-  adminApi.get<CommonResp<CustomerRequestDTO[]>>('/alerts')
+  adminApi.get<CommonResp<CustomerRequestDTO[]>>('/requests');
 
 export interface StatusUpdateReq {
   status: 'WAITING' | 'SERVED' | 'DELETED'
   estimatedTime?: number
 }
 
-export const deleteRequest = (id: number) =>
+export const deleteRequest     = (id: number) =>
   adminApi.delete<CommonResp<null>>(`/requests/${id}`);
 
 
