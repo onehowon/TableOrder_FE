@@ -10,7 +10,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="w-full h-screen bg-white flex flex-col items-center pt-12 px-4">
+    <div className="w-full h-screen bg-white flex flex-col items-center pt-12 px-4 font-woowahan">
       {/* 1) 로고 */}
       <img src={logoSrc} alt="Engine Logo" className="h-12 mb-12 object-contain" />
 

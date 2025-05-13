@@ -11,7 +11,7 @@ export default function OrderPlacedPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white p-4 space-y-8">
+    <div className="flex flex-col items-center justify-center h-screen bg-white p-4 space-y-8 font-woowahan">
 
       {/* 로고 */}
       <img src={engineLogo} alt="EngiNE" className="w-32 h-auto" />

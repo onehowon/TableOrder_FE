@@ -35,7 +35,7 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="w-full h-screen bg-white p-4 flex flex-col">
+    <div className="w-full h-screen bg-white p-4 flex flex-col font-woowahan">
       {/* 헤더 */}
       <header className="text-center font-bold mb-4">
         아주대학교 경영인텔리전스학과 주점

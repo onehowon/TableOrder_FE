@@ -27,7 +27,7 @@ export default function RequestPage() {
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 font-woowahan">
       <h1 className="text-2xl font-bold">요청 사항</h1>
       {/* 불필요한 select 는 제거하고, 버튼만 남겼습니다 */}
       <button

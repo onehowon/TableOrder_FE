@@ -59,7 +59,7 @@ export default function OrderStatusPage() {
 
   // 조리 완료 화면
   return (
-    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4">
+    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4 font-woowahan">
       <img src="/logo.png" alt="Engine" className="h-12 mb-12" />
       <h1 className="text-2xl font-bold mb-6 text-center">
         조리 완료!
