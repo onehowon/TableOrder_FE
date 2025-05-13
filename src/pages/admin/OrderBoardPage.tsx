@@ -37,61 +37,66 @@ export default function OrderBoardPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen flex flex-col pb-6">
+    <div className="p-6 bg-gray-50 min-h-screen flex flex-col">
       <h2 className="text-2xl font-bold mb-4">주문 현황</h2>
 
-      {/* 카드 그리드를 스크롤 영역으로 감싸기 */}
-      <div className="flex-1 overflow-auto mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {pageOrders.map(o => {
-            const isSel = o.orderId === selected
-            return (
-              <div
-                key={o.orderId}
-                onClick={() => setSelected(isSel ? null : o.orderId)}
-                className={[
-                  'bg-white p-4 rounded-lg shadow cursor-pointer relative transition',
-                  isSel
-                    ? 'border-2 border-blue-500'
-                    : 'border border-gray-200'
-                ].join(' ')}
-              >
-                {/* 테이블 번호 */}
-                <div className="font-medium mb-2">
-                  {o.tableNumber}번 테이블
-                </div>
-
-                {/* 메뉴 & 수량 */}
-                <div className="text-sm text-gray-600 mb-4">
-                  {o.items.map(i => `${i.name} ${i.quantity}개`).join(', ')}
-                </div>
-
-                {/* 주문 시각 (우측 상단) */}
-                <div className="absolute top-2 right-2 text-xs text-gray-500">
-                  {new Date(o.createdAt).toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-
-                {/* 상태 배지 */}
-                <div className="text-sm">
-                  상태:{' '}
-                  <span
-                    className={`px-2 py-1 rounded-full text-white ${
-                      o.status === 'WAITING' ? 'bg-yellow-400' : 'bg-green-400'
-                    }`}
-                  >
-                    {o.status === 'WAITING' ? '준비 중' : '완료'}
-                  </span>
-                </div>
+      {/* —————————————————————
+          2행×3열 고정 그리드: 
+          flex-1 로 남은 공간 채우고,
+          grid-rows-2 로 두 줄 고정,
+          gap-6 으로 간격 유지
+      ————————————————————— */}
+      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 grid-rows-2 gap-6">
+        {pageOrders.map(o => {
+          const isSel = o.orderId === selected
+          return (
+            <div
+              key={o.orderId}
+              onClick={() => setSelected(isSel ? null : o.orderId)}
+              className={[
+                'bg-white p-6 rounded-xl shadow-lg cursor-pointer relative transition-all',
+                isSel
+                  ? 'border-2 border-blue-500'
+                  : 'border border-gray-200'
+              ].join(' ')}
+            >
+              {/* 테이블 번호 */}
+              <div className="text-lg font-semibold mb-3">
+                {o.tableNumber}번 테이블
               </div>
-            )
-          })}
-        </div>
+
+              {/* 메뉴 & 수량 */}
+              <div className="text-base text-gray-700 mb-6">
+                {o.items.map(i => `${i.name} ${i.quantity}개`).join(', ')}
+              </div>
+
+              {/* 주문 시각 (우측 상단) */}
+              <div className="absolute top-4 right-4 text-sm text-gray-500">
+                {new Date(o.createdAt).toLocaleTimeString('ko-KR', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+
+              {/* 상태 배지 */}
+              <div className="text-base">
+                상태:{' '}
+                <span
+                  className={`px-3 py-1 rounded-full text-white ${
+                    o.status === 'WAITING' ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}
+                >
+                  {o.status === 'WAITING' ? '준비 중' : '완료'}
+                </span>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
-      {/* 페이징 & 완료/삭제 버튼 (항상 하단에 고정) */}
+      {/* —————————————————————
+          페이징 & 완료/삭제 버튼
+      ————————————————————— */}
       <div className="mt-6 flex items-center justify-between">
         {/* 페이징 */}
         <div className="space-x-2">
