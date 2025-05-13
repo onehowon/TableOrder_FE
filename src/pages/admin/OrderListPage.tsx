@@ -51,6 +51,7 @@ export default function OrderListPage() {
               <th className="px-6 py-3">테이블 번호</th>
               <th className="px-6 py-3">메뉴 & 수량</th>
               <th className="px-6 py-3">상태</th>
+              <th className="px-6 py-3">삭제 시각</th>
             </tr>
           </thead>
           <tbody>
@@ -65,24 +66,26 @@ export default function OrderListPage() {
                   key={o.orderId}
                   className="border-b last:border-none hover:bg-gray-50"
                 >
+                  {/* 주문 생성 시각 */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     {new Date(o.createdAt).toLocaleTimeString('ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
                   </td>
+                  {/* 테이블 번호 */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     {o.tableNumber}
                   </td>
+                  {/* 메뉴 & 수량 */}
                   <td className="px-6 py-4">{menuText || '-'}</td>
+                  {/* 상태 레이블 + 액션 버튼 */}
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {/* 현재 상태 레이블 */}
                     <span
                       className={`${lbl.bg} px-2 py-1 rounded-full text-sm font-medium`}
                     >
                       {lbl.text}
                     </span>
-                    {/* 현재 상태에 따른 단일 액션 버튼 */}
                     <div className="mt-2">
                       {o.status === 'WAITING' && (
                         <button
@@ -109,6 +112,15 @@ export default function OrderListPage() {
                         </button>
                       )}
                     </div>
+                  </td>
+                  {/* 삭제 시각 */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {o.deletedAt
+                      ? new Date(o.deletedAt).toLocaleTimeString('ko-KR', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      : '-'}
                   </td>
                 </tr>
               )

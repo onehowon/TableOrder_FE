@@ -47,7 +47,7 @@ export interface OrderDetailDTO {
   items: OrderItemDTO[]
   status: OrderStatus
   createdAt: string
-  estimatedTime?: number
+  deletedAt?: string
 }
 
 export interface TableSummaryResponse {
