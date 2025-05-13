@@ -11,7 +11,10 @@ export default function MenuPage() {
 
   useEffect(() => {
     listMenus()
-      .then(res => setMenus(res.data.data))
+     .then(res =>
+       // 품절된(isAvailable === false) 메뉴는 제외
+       setMenus(res.data.data.filter(menu => menu.isAvailable))
+     )
       .catch(() => {
         alert('메뉴 정보를 불러오는 데 실패했습니다.')
       })
@@ -40,7 +43,9 @@ export default function MenuPage() {
 
       {/* 메뉴 리스트 */}
       <div className="flex-1 overflow-auto space-y-4">
-        {menus.map(menu => (
+        {menus
+        .filter(menu => menu.isAvailable)
+        .map(menu => (
           <div key={menu.id} className="flex items-center">
             <img
               src={menu.imageUrl ?? ''}
