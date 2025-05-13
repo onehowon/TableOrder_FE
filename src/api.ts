@@ -115,18 +115,17 @@ export interface StatusUpdateReq {
   status: 'WAITING' | 'SERVED' | 'DELETED'
   estimatedTime?: number
 }
+
+export const deleteRequest = (id: number) =>
+  adminApi.delete<CommonResp<null>>(`/requests/${id}`);
+
+
 export const updateOrderStatus = (
   orderId: number,
   body: StatusUpdateReq
 ) => adminApi.put<CommonResp<OrderDetailDTO>>(
   `/orders/${orderId}/status`, body
 )
-
-export const deleteRequest = (id: number) =>
-  adminApi.put<CommonResp<null>>(
-    `/requests/${id}/status`,
-    { status: 'DELETED' }
-  )
 
 // 알림
 export const getAlertsAdmin = () =>

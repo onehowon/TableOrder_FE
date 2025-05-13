@@ -1,7 +1,7 @@
 // src/pages/admin/RequestAlertPage.tsx
 import { useEffect, useState } from 'react'
 import type { CustomerRequestDTO } from '@/api'
-import { listRequestsAdmin } from '@/api'
+import { listRequestsAdmin, deleteRequest} from '@/api'
 
 export default function RequestAlertPage() {
   const [reqs, setReqs]     = useState<CustomerRequestDTO[]>([])
@@ -25,16 +25,16 @@ export default function RequestAlertPage() {
     return () => clearInterval(iv)
   }, [])
 
-  const handleProcess = (id: number) => {
-    // 1) 로컬에 읽음 처리
-    setReadIds(prev => {
-      const next = [...prev, id]
-      localStorage.setItem('readRequests', JSON.stringify(next))
-      return next
-    })
-    // 2) UI 에서만 사라지도록 필터링
-    setReqs(prev => prev.filter(r => r.id !== id))
-  }
+  const handleProcess = async (id: number) => {
+    try {
+      await deleteRequest(id);
+      // 실제 삭제가 성공했을 때만 화면에서 제거
+      setReqs(prev => prev.filter(r => r.id !== id));
+    } catch (err) {
+      console.error('직원 호출 처리 실패', err);
+      alert('처리 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <div className="p-6">
