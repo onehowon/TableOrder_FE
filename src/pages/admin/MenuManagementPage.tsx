@@ -6,8 +6,8 @@ import {
   createMenu,
   updateMenu,
   deleteMenu,
-} from '../../api'
-import type { MenuDTO } from '../../api'
+} from '@/api'
+import type { MenuDTO } from '@/api'
 
 type Mode = 'add' | 'delete' | 'edit'
 
@@ -23,6 +23,7 @@ export default function MenuManagementPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
+  const [isAvailable, setIsAvailable] = useState(true)  // ← 품절(판매가능) 토글
 
   // 메뉴 리스트 로드
   useEffect(() => {
@@ -40,11 +41,14 @@ export default function MenuManagementPage() {
 
   // ▶ 수정 모드: selected 가 바뀌면 폼에 기존 값 채워넣기
   useEffect(() => {
-    if (mode === 'edit' && selected) {
+    if ((mode === 'edit' || mode === 'delete') && selected) {
       setName(selected.name)
       setDescription(selected.description)
       setPrice(String(selected.price))
       setPreview(selected.imageUrl ?? null)
+      setIsAvailable(selected.isAvailable)  // ← 기존 판매 가능 여부 반영
+    } else if (mode === 'add') {
+      resetForm()
     }
   }, [mode, selected])
 
@@ -68,6 +72,7 @@ export default function MenuManagementPage() {
     fd.append('name', name)
     fd.append('description', description)
     fd.append('price', price)
+    fd.append('isAvailable', String(isAvailable))    // ← 판매 가능 여부 전송
     if (file) fd.append('file', file)
 
     try {
@@ -108,6 +113,7 @@ export default function MenuManagementPage() {
     setName('')
     setDescription('')
     setPrice('')
+    setIsAvailable(true)
   }
 
   return (
@@ -115,11 +121,7 @@ export default function MenuManagementPage() {
       {/* ◀ 왼쪽 탭 */}
       <aside className="w-1/4 bg-gray-50 p-6 border-r">
         <button
-          onClick={() => {
-            setMode('add')
-            setSelected(null)
-            resetForm()
-          }}
+          onClick={() => { setMode('add'); setSelected(null); resetForm() }}
           className={`block mb-4 w-full py-2 rounded-lg text-white ${
             mode === 'add' ? 'bg-blue-500' : 'bg-gray-300'
           }`}
@@ -127,14 +129,10 @@ export default function MenuManagementPage() {
           Menu management
         </button>
         <nav className="space-y-2">
-          {(['add', 'delete', 'edit'] as Mode[]).map(m => (
+          {(['add','delete','edit'] as Mode[]).map(m => (
             <button
               key={m}
-              onClick={() => {
-                setMode(m)
-                setSelected(null)
-                resetForm()
-              }}
+              onClick={() => { setMode(m); setSelected(null); resetForm() }}
               className={`flex items-center w-full py-2 px-4 rounded-lg ${
                 mode === m
                   ? 'bg-blue-100 text-blue-600'
@@ -152,20 +150,11 @@ export default function MenuManagementPage() {
       <section className="flex-1 p-8 bg-white overflow-auto">
         {/* 뒤로가기 + 제목 */}
         <div className="flex items-center mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-4 text-gray-500"
-          >
+          <button onClick={() => navigate(-1)} className="mr-4 text-gray-500">
             ←
           </button>
           <h1 className="text-xl font-medium">
-            메뉴 관리 (
-            {mode === 'add'
-              ? '추가'
-              : mode === 'edit'
-              ? '수정'
-              : '삭제'}
-            )
+            메뉴 관리 ({mode === 'add' ? '추가' : mode === 'edit' ? '수정' : '삭제'})
           </h1>
         </div>
 
@@ -176,15 +165,13 @@ export default function MenuManagementPage() {
               className="w-full p-3 border rounded-lg mb-4"
               value={selected?.id ?? ''}
               onChange={e => {
-                const m = menus.find(x => x.id === Number(e.target.value)) || null
+                const m = menus.find(x => x.id === +e.target.value) || null
                 setSelected(m)
               }}
             >
               <option value="">삭제할 메뉴 선택</option>
               {menus.map(m => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
             <button
@@ -199,21 +186,19 @@ export default function MenuManagementPage() {
         {/* 추가/수정 모드 */}
         {(mode === 'add' || mode === 'edit') && (
           <div className="space-y-6 max-w-xl">
-            {/* ✏️ 수정 모드일 때만 메뉴 선택 드롭다운 추가 */}
+            {/* 수정 모드일 때만 메뉴 선택 드롭다운 추가 */}
             {mode === 'edit' && (
               <select
                 className="w-full p-3 border rounded-lg"
                 value={selected?.id ?? ''}
                 onChange={e => {
-                  const m = menus.find(x => x.id === Number(e.target.value)) || null
+                  const m = menus.find(x => x.id === +e.target.value) || null
                   setSelected(m)
                 }}
               >
                 <option value="">수정할 메뉴 선택</option>
                 {menus.map(m => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
+                  <option key={m.id} value={m.id}>{m.name}</option>
                 ))}
               </select>
             )}
@@ -222,20 +207,14 @@ export default function MenuManagementPage() {
             <div className="relative">
               <div className="h-40 bg-gray-200 rounded-lg flex items-center justify-center">
                 {preview ? (
-                  <img
-                    src={preview}
-                    alt="preview"
-                    className="h-full object-contain rounded-lg"
-                  />
+                  <img src={preview} alt="preview"
+                       className="h-full object-contain rounded-lg" />
                 ) : (
-                  <span className="text-gray-500">
-                    📷 이미지 업로드
-                  </span>
+                  <span className="text-gray-500">📷 이미지 업로드</span>
                 )}
               </div>
               <input
-                type="file"
-                accept="image/*"
+                type="file" accept="image/*"
                 onChange={onFileChange}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
@@ -279,6 +258,23 @@ export default function MenuManagementPage() {
                 onChange={e => setPrice(e.target.value)}
                 placeholder="메뉴 가격을 입력하세요"
               />
+            </div>
+
+            {/* 품절 토글 */}
+            <div className="grid grid-cols-4 gap-4">
+              <label className="col-span-1 flex items-center justify-center border rounded-lg">
+                품절 여부 ▼
+              </label>
+              <div className="col-span-3 flex items-center space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={!isAvailable}
+                    onChange={() => setIsAvailable(prev => !prev)}
+                  />
+                  <span>{isAvailable ? '판매 중' : '품절'}</span>
+                </label>
+              </div>
             </div>
 
             {/* 버튼 */}
