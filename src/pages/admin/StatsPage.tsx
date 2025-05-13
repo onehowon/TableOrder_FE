@@ -1,94 +1,31 @@
-// src/pages/admin/StatsPage.tsx
 import { useEffect, useState } from 'react'
-import { getSalesStats } from '@/api'
+import { getSalesStatsAdmin } from '@/api'
 import type { SalesStatsDTO } from '@/api'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts'
 
 export default function StatsPage() {
-  const [stats, setStats] = useState<SalesStatsDTO | null>(null)
+  const [stats, setStats] = useState<SalesStatsDTO|null>(null)
+  useEffect(() => { getSalesStatsAdmin().then(r => setStats(r.data.data)) }, [])
+  if (!stats) return <p>Loading…</p>
 
-  useEffect(() => {
-    getSalesStats()
-      .then(res => setStats(res.data.data))
-      .catch(err => {
-        console.error('매출 통계 조회 실패', err)
-        setStats(null)
-      })
-  }, [])
-
-  if (!stats) {
-    return <p className="p-4">로딩 중…</p>
-  }
-
-  // 차트용 데이터 변환
-// src/pages/admin/StatsPage.tsx
-// …
-const data = Array.from({ length: 24 }, (_, hour) => {
-  const point = stats.salesByHour.find(dp => dp.hour === hour);
-  return {
-    hour:   `${hour}시`,
-    amount: point?.revenue ?? 0,
-  };
-});
-// …
-
+  const data = Array.from({length:24},(_,h)=>({
+    hour:`${h}시`, revenue: stats.salesByHour.find(p=>p.hour===h)?.revenue||0
+  }))
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">매출</h2>
-
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-white rounded shadow">
-          <p className="text-gray-500">총 고객수</p>
-          <p className="text-2xl font-semibold">
-            {(stats.totalCustomers ?? 0).toLocaleString()}명
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded shadow">
-          <p className="text-gray-500">총 주문수</p>
-          <p className="text-2xl font-semibold">
-            {(stats.totalOrders ?? 0).toLocaleString()}건
-          </p>
-        </div>
-        <div className="p-4 bg-white rounded shadow">
-          <p className="text-gray-500">총 매출 금액</p>
-          <p className="text-2xl font-semibold">
-            {(stats.totalRevenue ?? 0).toLocaleString()}원
-          </p>
-        </div>
+    <div className="p-6 space-y-6">
+      <div className="flex space-x-4">
+        <div className="p-4 bg-white rounded shadow"><p>총 주문수</p><p className="text-xl">{stats.totalOrders}</p></div>
+        <div className="p-4 bg-white rounded shadow"><p>매출</p><p className="text-xl">{stats.totalRevenue.toLocaleString()}원</p></div>
+        <div className="p-4 bg-white rounded shadow"><p>이윤</p><p className="text-xl">{(stats.totalRevenue - stats.totalCustomers*0 /* replace cost */).toLocaleString()}원</p></div>
       </div>
-
-      <div className="bg-white rounded shadow p-4">
-        <p className="text-gray-500 mb-2">시간대별 매출</p>
+      <div className="bg-white p-4 rounded shadow">
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <XAxis dataKey="hour" />
-            <YAxis tickFormatter={val => `${Math.round(Number(val) / 10000)}만`} />
-            <Tooltip 
-              formatter={(
-                value: number | string,
-                name: string,
-                props: any
-              ) => {
-                const num = typeof value === 'number'
-                  ? value
-                  : parseFloat(String(value)) || 0
-                return `${num.toLocaleString()}원`
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="amount"
-              stroke="#3B82F6"
-              dot={{ r: 4 }}
-            />
+            <YAxis />
+            <Tooltip formatter={(v)=>`${v.toLocaleString()}원`} />
+            <Line type="monotone" dataKey="revenue" dot={false}/>
           </LineChart>
         </ResponsiveContainer>
       </div>

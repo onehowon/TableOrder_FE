@@ -24,7 +24,7 @@ export interface RequestDTO {
   tableNumber: number
 }
 
-export type OrderStatus = 'WAITING' | 'COOKING' | 'SERVED'
+export type OrderStatus = 'WAITING' | 'DELETED' | 'SERVED'
 
 export interface OrderItemDTO {
   name: string
@@ -112,7 +112,7 @@ export const listRequestsAdmin = () =>
   adminApi.get<CommonResp<CustomerRequestDTO[]>>('/requests')
 
 export interface StatusUpdateReq {
-  status: 'COOKING' | 'SERVED'
+  status: 'WAITING' | 'SERVED' | 'DELETED'
   estimatedTime?: number
 }
 export const updateOrderStatus = (
@@ -121,6 +121,12 @@ export const updateOrderStatus = (
 ) => adminApi.put<CommonResp<OrderDetailDTO>>(
   `/orders/${orderId}/status`, body
 )
+
+export const deleteRequest = (id: number) =>
+  adminApi.put<CommonResp<null>>(
+    `/requests/${id}/status`,
+    { status: 'DELETED' }
+  )
 
 // 알림
 export const getAlertsAdmin = () =>
