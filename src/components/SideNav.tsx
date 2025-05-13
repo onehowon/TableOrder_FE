@@ -9,11 +9,11 @@ import {
 } from 'react-icons/hi2'
 
 const menus = [
-  { to: '/admin/alerts', icon: <HiOutlineBell />,       label: '주문 알림' },
-  { to: '/admin/orders', icon: <HiOutlineListBullet />, label: '주문 리스트' },
-  { to: '/admin/tables', icon: <HiOutlineTableCells />, label: '테이블 번호' },
-  { to: '/admin/sales',  icon: <HiOutlineChartBar />,   label: '매출' },
-  { to: '/admin/menus',  icon: <HiOutlineSquares2X2 />, label: '메뉴 관리' },
+  { to: '/admin/boards',   icon: <HiOutlineTableCells />,  label: '주문 현황'   },
+  { to: '/admin/orders',   icon: <HiOutlineListBullet />, label: '주문 리스트' },
+  { to: '/admin/requests', icon: <HiOutlineSquares2X2 />, label: '직원 호출'   },
+  { to: '/admin/sales',    icon: <HiOutlineChartBar />,    label: '매출'       },
+  { to: '/admin/menus',    icon: <HiOutlineSquares2X2 />, label: '메뉴 관리'   },
 ]
 
 export default function SideNav() {
