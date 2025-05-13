@@ -109,7 +109,7 @@ export const listOrdersAdmin = () =>
   adminApi.get<CommonResp<OrderDetailDTO[]>>('/orders')
 
 export const listRequestsAdmin = () =>
-  adminApi.get<CommonResp<CustomerRequestDTO[]>>('/requests')
+  adminApi.get<CommonResp<CustomerRequestDTO[]>>('/alerts')
 
 export interface StatusUpdateReq {
   status: 'WAITING' | 'SERVED' | 'DELETED'
