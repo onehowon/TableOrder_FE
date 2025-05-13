@@ -23,7 +23,7 @@ export default function MenuManagementPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
-  const [isAvailable, setIsAvailable] = useState(true)  // ← 품절(판매가능) 토글
+  const [isAvailable, setIsAvailable] = useState(true)
 
   // 메뉴 리스트 로드
   useEffect(() => {
@@ -39,30 +39,31 @@ export default function MenuManagementPage() {
     }
   }
 
-  // ▶ 수정 모드: selected 가 바뀌면 폼에 기존 값 채워넣기
+  // 수정·삭제 모드에서 selected 변경 시 폼 초기화
   useEffect(() => {
     if ((mode === 'edit' || mode === 'delete') && selected) {
       setName(selected.name)
       setDescription(selected.description)
       setPrice(String(selected.price))
       setPreview(selected.imageUrl ?? null)
-      setIsAvailable(selected.isAvailable)  // ← 기존 판매 가능 여부 반영
+      setIsAvailable(selected.isAvailable)
     } else if (mode === 'add') {
       resetForm()
     }
   }, [mode, selected])
 
-  // 파일 선택 & 프리뷰
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null
     setFile(f)
-    if (!f) return setPreview(null)
+    if (!f) {
+      setPreview(null)
+      return
+    }
     const reader = new FileReader()
     reader.onload = () => setPreview(reader.result as string)
     reader.readAsDataURL(f)
   }
 
-  // 추가, 수정 공통 submit
   async function handleSubmit() {
     if (!name || !description || !price) {
       alert('모든 필드를 입력해주세요.')
@@ -72,7 +73,7 @@ export default function MenuManagementPage() {
     fd.append('name', name)
     fd.append('description', description)
     fd.append('price', price)
-    fd.append('isAvailable', String(isAvailable))    // ← 판매 가능 여부 전송
+    fd.append('isAvailable', String(isAvailable))
     if (file) fd.append('file', file)
 
     try {
@@ -90,7 +91,6 @@ export default function MenuManagementPage() {
     }
   }
 
-  // 삭제
   async function handleDelete() {
     if (!selected) {
       alert('삭제할 메뉴를 선택해주세요.')
@@ -118,7 +118,7 @@ export default function MenuManagementPage() {
 
   return (
     <div className="flex h-full">
-      {/* ◀ 왼쪽 탭 */}
+      {/* 왼쪽 탭 */}
       <aside className="w-1/4 bg-gray-50 p-6 border-r">
         <button
           onClick={() => { setMode('add'); setSelected(null); resetForm() }}
@@ -146,9 +146,9 @@ export default function MenuManagementPage() {
         </nav>
       </aside>
 
-      {/* ▶ 오른쪽 컨텐츠 */}
+      {/* 오른쪽 컨텐츠 */}
       <section className="flex-1 p-8 bg-white overflow-auto">
-        {/* 뒤로가기 + 제목 */}
+        {/* 헤더 */}
         <div className="flex items-center mb-6">
           <button onClick={() => navigate(-1)} className="mr-4 text-gray-500">
             ←
@@ -186,7 +186,7 @@ export default function MenuManagementPage() {
         {/* 추가/수정 모드 */}
         {(mode === 'add' || mode === 'edit') && (
           <div className="space-y-6 max-w-xl">
-            {/* 수정 모드일 때만 메뉴 선택 드롭다운 추가 */}
+            {/* 수정 모드일 때만 선택 드롭다운 */}
             {mode === 'edit' && (
               <select
                 className="w-full p-3 border rounded-lg"
@@ -203,18 +203,18 @@ export default function MenuManagementPage() {
               </select>
             )}
 
-            {/* 파일 업로드 박스 */}
+            {/* 파일 업로드 */}
             <div className="relative">
               <div className="h-40 bg-gray-200 rounded-lg flex items-center justify-center">
                 {preview ? (
-                  <img src={preview} alt="preview"
-                       className="h-full object-contain rounded-lg" />
+                  <img src={preview} alt="preview" className="h-full object-contain rounded-lg" />
                 ) : (
                   <span className="text-gray-500">📷 이미지 업로드</span>
                 )}
               </div>
               <input
-                type="file" accept="image/*"
+                type="file"
+                accept="image/*"
                 onChange={onFileChange}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
@@ -260,24 +260,22 @@ export default function MenuManagementPage() {
               />
             </div>
 
-            {/* 품절 토글 */}
+            {/* 품절 여부 드롭다운 */}
             <div className="grid grid-cols-4 gap-4">
               <label className="col-span-1 flex items-center justify-center border rounded-lg">
                 품절 여부 ▼
               </label>
-              <div className="col-span-3 flex items-center space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={!isAvailable}
-                    onChange={() => setIsAvailable(prev => !prev)}
-                  />
-                  <span>{isAvailable ? '판매 중' : '품절'}</span>
-                </label>
-              </div>
+              <select
+                className="col-span-3 p-3 border rounded-lg focus:outline-none"
+                value={isAvailable ? 'available' : 'soldout'}
+                onChange={e => setIsAvailable(e.target.value === 'available')}
+              >
+                <option value="available">판매 중</option>
+                <option value="soldout">품절</option>
+              </select>
             </div>
 
-            {/* 버튼 */}
+            {/* 제출 버튼 */}
             <button
               onClick={handleSubmit}
               className="px-6 py-2 border rounded-lg hover:bg-gray-50"
@@ -288,5 +286,5 @@ export default function MenuManagementPage() {
         )}
       </section>
     </div>
-  )
+)
 }
