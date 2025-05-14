@@ -68,35 +68,35 @@ export default function OrderListPage() {
                   className="border-b last:border-none hover:bg-gray-50"
                 >
                   {/* 주문 생성 시각 */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-base">
                     {new Date(o.createdAt).toLocaleTimeString('ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
                   </td>
                   {/* 주문 번호 */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-base">
                     {String(o.orderId).padStart(5, '0')}
                   </td>
                   {/* 테이블 번호 */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-base">
                     {o.tableNumber}
                   </td>
                   {/* 메뉴 & 수량 */}
-                  <td className="px-6 py-4">{menuText || '-'}</td>
+                  <td className="px-6 py-4 text-base">{menuText || '-'}</td>
                   {/* 상태 레이블 + 액션 버튼 (가로 아닌 세로로, 가운데 정렬) */}
                   <td className="px-6 py-4">
-                    <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-start space-y-2"> 
                       <span
-                        className={`${lbl.bg} px-2 py-1 rounded-full text-sm font-medium`}
+                        className={`${lbl.bg} px-3 py-1 rounded-full text-base font-medium`}
                       >
                         {lbl.text}
                       </span>
-                      <div className="mt-2 flex justify-center">
+                      <div className="flex space-x-2">
                         {o.status === 'WAITING' && (
                           <button
                             onClick={() => onStatus(o.orderId, 'SERVED')}
-                            className="text-xs px-2 py-1 bg-green-200 rounded hover:bg-green-300 transition"
+                            className="text-sm px-3 py-1 bg-green-200 rounded hover:bg-green-300 transition"
                           >
                             제조 완료
                           </button>
@@ -104,7 +104,7 @@ export default function OrderListPage() {
                         {o.status === 'SERVED' && (
                           <button
                             onClick={() => onStatus(o.orderId, 'DELETED')}
-                            className="text-xs px-2 py-1 bg-red-200 rounded hover:bg-red-300 transition"
+                            className="text-xs px-3 py-1 bg-red-200 rounded hover:bg-red-300 transition"
                           >
                             삭제
                           </button>
@@ -112,7 +112,7 @@ export default function OrderListPage() {
                         {o.status === 'DELETED' && (
                           <button
                             onClick={() => onStatus(o.orderId, 'WAITING')}
-                            className="text-xs px-2 py-1 bg-blue-200 rounded hover:bg-blue-300 transition"
+                            className="text-xs px-3 py-1 bg-blue-200 rounded hover:bg-blue-300 transition"
                           >
                             복원
                           </button>

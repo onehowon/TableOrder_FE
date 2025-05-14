@@ -54,20 +54,20 @@ export default function OrderBoardPage() {
               ].join(' ')}
             >
               {/* 주문번호 뱃지 */}
-              <div className="absolute top-4 left-4 text-xs text-red-600 font-bold">
+              <div className="absolute top-4 left-4 text-base text-red-600 font-bold">
                 주문번호 {String(o.orderId).padStart(3, '0')}
               </div>
               {/* 테이블 번호 */}
-              <div className="text-lg font-semibold mb-4">
+              <div className="text-xl font-semibold mb-4">
                 {o.tableNumber}번 테이블
               </div>
 
               {/* 메뉴별 아이템: 좌측 이름, 우측 개수, 개수는 항상 같은 줄 */}
-              <div className="mb-6 space-y-1">
+              <div className="mb-6 space-y-2">
                 {o.items.map(i => (
                   <div
                     key={i.name}
-                    className="flex justify-between items-center whitespace-nowrap text-base text-gray-700"
+                    className="flex justify-between items-center whitespace-nowrap text-lg text-gray-700"
                   >
                     <span className="truncate">{i.name}</span>
                     <span>{i.quantity}개</span>
@@ -76,7 +76,7 @@ export default function OrderBoardPage() {
               </div>
 
               {/* 주문 시각 (우측 상단) */}
-              <div className="absolute top-4 right-4 text-sm text-gray-500">
+              <div className="absolute top-4 right-4 text-base text-gray-500">
                 {new Date(o.createdAt).toLocaleTimeString('ko-KR', {
                   hour: '2-digit',
                   minute: '2-digit'
@@ -84,7 +84,7 @@ export default function OrderBoardPage() {
               </div>
 
               {/* 상태 배지 */}
-              <div className="text-base">
+              <div className="text-lg">
                 상태:{' '}
                 <span
                   className={`px-3 py-1 rounded-full text-white ${
