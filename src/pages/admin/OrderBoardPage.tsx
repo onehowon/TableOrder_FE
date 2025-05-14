@@ -49,12 +49,12 @@ export default function OrderBoardPage() {
               key={o.orderId}
               onClick={() => setSelected(isSel ? null : o.orderId)}
               className={[
-                'bg-white p-6 rounded-xl shadow-lg cursor-pointer relative transition-all',
-                isSel ? 'border-2 border-blue-500' : 'border border-gray-200'
+                'bg-white pt-12 px-6 pb-6 rounded-xl shadow-lg cursor-pointer relative transition-all',
++                isSel ? 'border-2 border-blue-500' : 'border border-gray-200'
               ].join(' ')}
             >
               {/* 주문번호 뱃지 */}
-              <div className="absolute top-4 left-4 text-base text-red-600 font-bold">
+              <div className="absolute top-2 left-4 text-base text-red-600 font-bold">
                 주문번호 {String(o.orderId).padStart(3, '0')}
               </div>
               {/* 테이블 번호 */}
