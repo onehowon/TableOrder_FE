@@ -73,6 +73,10 @@ export default function OrderListPage() {
                       minute: '2-digit'
                     })}
                   </td>
+                  {/* 주문 번호 */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {String(o.orderId).padStart(5, '0')}
+                  </td>
                   {/* 테이블 번호 */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     {o.tableNumber}

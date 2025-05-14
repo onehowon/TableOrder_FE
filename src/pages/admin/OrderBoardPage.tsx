@@ -53,6 +53,10 @@ export default function OrderBoardPage() {
                 isSel ? 'border-2 border-blue-500' : 'border border-gray-200'
               ].join(' ')}
             >
+              {/* 주문번호 뱃지 */}
+              <div className="absolute top-3 left-3 text-xs text-red-500 font-semibold">
+                주문번호 {String(o.orderId).padStart(3, '0')}
+              </div>
               {/* 테이블 번호 */}
               <div className="text-lg font-semibold mb-4">
                 {o.tableNumber}번 테이블
