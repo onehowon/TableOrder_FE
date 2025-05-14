@@ -7,10 +7,7 @@ export default function StartPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const nav = useNavigate()
 
-  const goOrder = () => {
-    nav(`/customer/${tableNumber}/menu`)
-  }
-
+  const goOrder = () => nav(`/customer/${tableNumber}/menu`)
   const callStaff = async () => {
     try {
       await postRequest({ tableNumber: Number(tableNumber) })
@@ -29,11 +26,26 @@ export default function StartPage() {
         className="absolute top-4 right-4 h-12 object-contain"
       />
 
-      {/* 2) 카드 컨테이너 */}
+      {/* 2) 카드 & 헤더를 한 번의 relative 컨테이너에 */}
       <div className="relative w-full max-w-md mt-8">
-        {/* 그레이 배경 박스 */}
+        {/* 2-1) 캡슐 헤더 (회색 박스 위에 반만 겹치기) */}
+        <div
+          className="
+            absolute top-0 left-1/2 
+            -translate-x-1/2 -translate-y-1/2 
+            bg-green-600 text-white 
+            rounded-full px-6 py-2 
+            flex items-center space-x-2 
+            text-lg font-semibold 
+            shadow-md z-10
+          "
+        >
+          <span>📄</span>
+          <span>주문방법</span>
+        </div>
+
+        {/* 2-2) 회색 박스 */}
         <div className="bg-gray-100 rounded-2xl pt-8 pb-6 px-6">
-          {/* 커스텀 숫자 리스트 */}
           <ul className="space-y-3">
             {[
               '메뉴에서 음식을 고른다!',
@@ -52,23 +64,6 @@ export default function StartPage() {
               </li>
             ))}
           </ul>
-        </div>
-
-        {/* 그린 캡슐 헤더: 회색 박스 위에 절반 오버랩 */}
-        <div
-          className="
-            absolute top-0 left-1/2 
-            transform -translate-x-1/2 -translate-y-1/2 
-            bg-green-600 text-white 
-            rounded-full px-6 py-2 
-            flex items-center space-x-2 
-            text-lg font-semibold 
-            shadow-md
-            z-10
-          "
-        >
-          <span>📄</span>
-          <span>주문방법</span>
         </div>
       </div>
 
