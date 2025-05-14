@@ -48,6 +48,7 @@ export default function OrderListPage() {
           <thead className="bg-gray-100 text-left text-gray-600 uppercase text-sm">
             <tr>
               <th className="px-6 py-3">시간</th>
+              <th className="px-6 py-3">주문 번호</th>
               <th className="px-6 py-3">테이블 번호</th>
               <th className="px-6 py-3">메뉴 & 수량</th>
               <th className="px-6 py-3">상태</th>

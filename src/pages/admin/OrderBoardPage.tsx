@@ -54,7 +54,7 @@ export default function OrderBoardPage() {
               ].join(' ')}
             >
               {/* 주문번호 뱃지 */}
-              <div className="absolute top-3 left-3 text-xs text-red-500 font-semibold">
+              <div className="absolute top-4 left-4 text-xs text-red-600 font-bold">
                 주문번호 {String(o.orderId).padStart(3, '0')}
               </div>
               {/* 테이블 번호 */}
