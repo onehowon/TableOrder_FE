@@ -150,7 +150,13 @@ export const getSalesStatsAdmin = () =>
 
 /**── 고객용 API ───────────────────────────────────────────**/
 // 메뉴 조회
-export const listMenus = () =>
+export const listMenus = (tableNumber: number, category: MenuDTO['category']) =>
+  customerApi.get<CommonResp<MenuDTO[]>>(
+    `/customer/${tableNumber}/menus`,
+    { params: { category } }
+  )
+
+export const listAllMenus = () =>
   customerApi.get<CommonResp<MenuDTO[]>>('/customer/menus')
 
 export const postOrder = (body: OrderRequestDTO) =>

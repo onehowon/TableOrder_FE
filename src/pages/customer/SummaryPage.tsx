@@ -1,7 +1,7 @@
 // src/pages/customer/SummaryPage.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { listMenus, postOrder } from '../../api'
+import { listAllMenus, postOrder } from '../../api'
 import type { MenuDTO } from '../../api'
 
 type CartState = Record<number, number>
@@ -27,7 +27,7 @@ export default function SummaryPage() {
       if (saved) setCart(JSON.parse(saved))
     }
     // 메뉴 전체 로드 (품절 제외)
-    listMenus()
+    listAllMenus()
       .then(res =>
         setMenus(res.data.data.filter(m => m.isAvailable))
       )
