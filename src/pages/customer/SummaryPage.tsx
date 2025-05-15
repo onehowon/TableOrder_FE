@@ -48,20 +48,11 @@ export default function SummaryPage() {
   const totalAmount = items.reduce((sum, it) => sum + it.subtotal, 0)
 
   // 주문 API 호출
-  const handleOrder = async () => {
-    try {
-      await postOrder({
-        tableNumber: Number(tableNumber),
-        items: items.map(it => ({
-          menuId: it.menuId,
-          quantity: it.quantity,
-        })),
-      })
-      navigate(`/customer/${tableNumber}/placed`, { replace: true })
-    } catch {
-      alert('주문 중 오류가 발생했습니다.')
-    }
-  }
+  const handleOrder = () => {
+        navigate(`/customer/${tableNumber}/verify`, {
+          state: { cart }
+        })
+      }
 
   return (
     <div className="relative w-full min-h-screen bg-green-50 flex flex-col font-woowahan">
