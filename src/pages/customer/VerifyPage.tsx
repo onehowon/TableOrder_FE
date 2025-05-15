@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { listAllMenus, postOrder } from '@/api'
 import type { MenuDTO } from '@/api'
+import logoSrc from '@/assets/engine.png'
 
 type CartState = Record<number, number>
 interface LocationState { cart?: CartState }
@@ -77,7 +78,7 @@ export default function VerifyPage() {
     <div className="w-full h-screen bg-white flex flex-col items-center p-4 font-woowahan">
       {/* 로고 */}
       <img
-        src="/assets/engine.png"
+        src={logoSrc}
         alt="EngiNE"
         className="h-12 object-contain mb-6"
       />

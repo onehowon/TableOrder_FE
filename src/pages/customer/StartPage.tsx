@@ -26,8 +26,8 @@ export default function StartPage() {
         className="absolute top-4 right-4 h-12 object-contain"
       />
 
-      {/* 2) 카드 & 헤더를 한 번의 relative 컨테이너에 */}
-      <div className="relative w-full max-w-md mt-8">
+      {/* 2) 카드 & 캡슐 헤더를 한 번의 relative 컨테이너에 */}
+      <div className="relative w-full max-w-md mx-auto mt-8">
         {/* 2-1) 캡슐 헤더 (회색 박스 위에 반만 겹치기) */}
         <div
           className="
@@ -68,7 +68,7 @@ export default function StartPage() {
       </div>
 
       {/* 3) 버튼 그룹 */}
-      <div className="w-full max-w-md mt-8 space-y-4">
+      <div className="w-full max-w-md mx-auto mt-8 space-y-4">
         <button
           onClick={goOrder}
           className="w-full h-14 bg-green-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-green-700 transition-colors"
