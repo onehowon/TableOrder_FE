@@ -11,6 +11,14 @@ import type { MenuDTO } from '@/api'
 
 type Mode = 'add' | 'delete' | 'edit'
 
+// ★ 카테고리 타입 & 라벨 추가 ★
+type Category = 'MAIN' | 'SIDE' | 'BEVERAGE'
+const CATEGORY_LABEL: Record<Category, string> = {
+  MAIN: '메인',
+  SIDE: '사이드',
+  BEVERAGE: '주류',
+}
+
 export default function MenuManagementPage() {
   const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('add')
@@ -24,6 +32,8 @@ export default function MenuManagementPage() {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [isAvailable, setIsAvailable] = useState(true)
+  // ★ 카테고리 state 추가 ★
+  const [category, setCategory] = useState<Category>('MAIN')
 
   // 메뉴 리스트 로드
   useEffect(() => {
@@ -47,6 +57,8 @@ export default function MenuManagementPage() {
       setPrice(String(selected.price))
       setPreview(selected.imageUrl ?? null)
       setIsAvailable(selected.isAvailable)
+      // ★ selected 에서 카테고리 동기화 ★
+      setCategory((selected.category ?? 'MAIN') as Category)
     } else if (mode === 'add') {
       resetForm()
     }
@@ -74,6 +86,8 @@ export default function MenuManagementPage() {
     fd.append('description', description)
     fd.append('price', price)
     fd.append('isAvailable', String(isAvailable))
+    // ★ 카테고리도 FormData 에 추가 ★
+    fd.append('category', category)
     if (file) fd.append('file', file)
 
     try {
@@ -114,6 +128,8 @@ export default function MenuManagementPage() {
     setDescription('')
     setPrice('')
     setIsAvailable(true)
+    // ★ 카테고리도 초기화 ★
+    setCategory('MAIN')
   }
 
   return (
@@ -207,7 +223,11 @@ export default function MenuManagementPage() {
             <div className="relative">
               <div className="h-40 bg-gray-200 rounded-lg flex items-center justify-center">
                 {preview ? (
-                  <img src={preview} alt="preview" className="h-full object-contain rounded-lg" />
+                  <img
+                    src={preview}
+                    alt="preview"
+                    className="h-full object-contain rounded-lg"
+                  />
                 ) : (
                   <span className="text-gray-500">📷 이미지 업로드</span>
                 )}
@@ -275,6 +295,24 @@ export default function MenuManagementPage() {
               </select>
             </div>
 
+            {/* ★ 카테고리 드롭다운 추가 ★ */}
+            <div className="grid grid-cols-4 gap-4">
+              <label className="col-span-1 flex items-center justify-center border rounded-lg">
+                카테고리 ▼
+              </label>
+              <select
+                className="col-span-3 p-3 border rounded-lg focus:outline-none"
+                value={category}
+                onChange={e => setCategory(e.target.value as Category)}
+              >
+                {(['MAIN','SIDE','BEVERAGE'] as Category[]).map(c => (
+                  <option key={c} value={c}>
+                    {CATEGORY_LABEL[c]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* 제출 버튼 */}
             <button
               onClick={handleSubmit}
@@ -286,5 +324,5 @@ export default function MenuManagementPage() {
         )}
       </section>
     </div>
-)
+  )
 }
