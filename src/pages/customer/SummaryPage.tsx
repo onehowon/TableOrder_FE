@@ -1,51 +1,40 @@
+// src/pages/customer/SummaryPage.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { listMenus, postOrder } from '../../api'
-import type { MenuDTO, CommonResp } from '../../api'
-import type { AxiosResponse } from 'axios'
-import engineLogo from '../../assets/engine.png'
+import type { MenuDTO } from '../../api'
 
 type CartState = Record<number, number>
-
-interface LocationState {
-  cart?: CartState
-}
+interface LocationState { cart?: CartState }
 
 export default function SummaryPage() {
-  const { tableNumber } = useParams<{ tableNumber?: string }>()
+  const { tableNumber } = useParams<{ tableNumber: string }>()
   const navigate = useNavigate()
   const location = useLocation()
   const passedCart = (location.state as LocationState)?.cart ?? {}
 
-  if (!tableNumber) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">테이블 번호가 없습니다.</p>
-      </div>
-    )
-  }
-
-  // 뒤로 가기
+  // 1) 뒤로 가기
   const goBack = () => navigate(-1)
 
-  // cart 초기값: nav.state 우선, 없으면 localStorage
+  // 2) 상태
   const [cart, setCart] = useState<CartState>(passedCart)
   const [menus, setMenus] = useState<MenuDTO[]>([])
 
   useEffect(() => {
+    // 로컬스토리지에서 복원
     if (!Object.keys(passedCart).length) {
       const saved = localStorage.getItem(`cart_${tableNumber}`)
       if (saved) setCart(JSON.parse(saved))
     }
+    // 메뉴 전체 로드 (품절 제외)
     listMenus()
-      .then((res: AxiosResponse<CommonResp<MenuDTO[]>>) => {
-        setMenus(res.data.data)
-      })
-      .catch(() => {
-        alert('메뉴 로딩에 실패했습니다.')
-      })
+      .then(res =>
+        setMenus(res.data.data.filter(m => m.isAvailable))
+      )
+      .catch(() => alert('메뉴 로딩에 실패했습니다.'))
   }, [tableNumber, passedCart])
 
+  // 장바구니에 담긴 아이템만
   const items = menus
     .filter(m => cart[m.id] != null)
     .map(m => ({
@@ -58,6 +47,7 @@ export default function SummaryPage() {
 
   const totalAmount = items.reduce((sum, it) => sum + it.subtotal, 0)
 
+  // 주문 API 호출
   const handleOrder = async () => {
     try {
       await postOrder({
@@ -67,7 +57,6 @@ export default function SummaryPage() {
           quantity: it.quantity,
         })),
       })
-      // 주문 성공 → 주문 완료 페이지로 이동
       navigate(`/customer/${tableNumber}/placed`, { replace: true })
     } catch {
       alert('주문 중 오류가 발생했습니다.')
@@ -75,72 +64,75 @@ export default function SummaryPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* 헤더 */}
-      <header className="flex items-center px-4 py-3 bg-white shadow-md">
-        <button
-          onClick={goBack}
-          className="text-gray-700 text-lg hover:text-gray-900 transition"
-        >
-          ← 이전 화면
-        </button>
-        <h1 className="flex-1 text-center text-xl font-semibold text-gray-800">
-          장바구니
+    <div className="relative w-full min-h-screen bg-green-50 flex flex-col font-woowahan">
+      {/* 1) 헤더 타이틀 */}
+      <div className="px-4 pt-4">
+        <h1 className="text-2xl font-bold leading-tight">
+          <span className="text-green-600">아이비즈</span>의<br/>
+          폭싹 속았슈퍼
         </h1>
-        <img
-          src={engineLogo}
-          alt="EngiNE"
-          className="w-20 h-auto object-contain"
-        />
-      </header>
+      </div>
 
-      {/* 아이템 리스트 */}
-      <main className="flex-1 p-4 space-y-3 overflow-auto">
+      {/* 2) 카테고리 탭 (장바구니) */}
+      <div className="px-4 flex border-b border-gray-200 mt-4">
+        <div className="pb-2 flex items-center space-x-2 text-base font-medium text-green-600 border-b-2 border-green-600">
+          <span>🛒</span>
+          <span>장바구니</span>
+        </div>
+      </div>
+
+      {/* 3) 아이템 리스트 */}
+      <div className="flex-1 overflow-auto px-4 py-2 space-y-4">
         {items.length === 0 ? (
           <p className="text-center text-gray-500">장바구니가 비어 있습니다.</p>
         ) : (
           items.map(it => (
             <div
               key={it.menuId}
-              className="flex items-center bg-white p-3 rounded-lg shadow-sm"
+              className="flex items-center bg-white p-4 rounded-lg shadow-sm"
             >
               <img
                 src={it.imageUrl}
                 alt={it.name}
-                className="w-12 h-12 rounded mr-4 object-cover"
+                className="w-12 h-12 rounded object-cover mr-4"
               />
               <div className="flex-1">
-                <p className="font-medium text-gray-800">
+                <p className="text-gray-800 font-medium">
                   {it.name} × {it.quantity}개
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-gray-600 text-sm">
                   {it.subtotal.toLocaleString()}원
                 </p>
               </div>
             </div>
           ))
         )}
-      </main>
+      </div>
 
-      {/* 합계 & 주문 버튼 */}
-      <footer className="bg-white p-4 border-t">
-        <div className="flex justify-between mb-2">
+      {/* 4) 합계 & 주문 버튼 */}
+      <div className="px-4 mb-8">
+        <div className="flex justify-between items-center mb-4">
           <span className="text-lg text-gray-700">총 금액</span>
           <span className="text-lg font-bold text-gray-900">
             {totalAmount.toLocaleString()}원
           </span>
         </div>
-        <div className="mb-4 text-sm text-gray-600">
-          <p>계좌번호</p>
-          <p>한원보 신한 123-4567-8910-11</p>
+
+        <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4 text-center">
+          계좌번호: 신한 123-4567-8910-11 (한원보)
         </div>
+
+        <p className="text-center text-sm text-gray-600 mb-4">
+          🚨 주문 전 입금 잊지 말아 주세요!
+        </p>
+
         <button
           onClick={handleOrder}
-          className="w-full py-3 bg-green-600 text-white rounded-lg text-base font-medium hover:bg-green-700 transition"
+          className="w-full py-4 bg-green-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-green-700 transition-colors"
         >
           주문하기
         </button>
-      </footer>
+      </div>
     </div>
   )
 }

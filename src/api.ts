@@ -12,6 +12,7 @@ export interface MenuDTO {
   price: number
   isAvailable: boolean
   imageUrl?: string | null
+  category: 'MAIN' | 'SIDE' | 'BEVERAGE'
 }
 
 export interface CustomerRequestDTO {
