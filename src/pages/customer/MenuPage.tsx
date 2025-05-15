@@ -1,7 +1,7 @@
 // src/pages/customer/MenuPage.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { listAllMenus } from '@/api'        // ← 여기로 바꿔주세요
+import { listAllMenus } from '@/api'
 import type { MenuDTO } from '@/api'
 
 const CATEGORIES: { key: MenuDTO['category']; label: string }[] = [
@@ -13,11 +13,11 @@ const CATEGORIES: { key: MenuDTO['category']; label: string }[] = [
 export default function MenuPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const nav = useNavigate()
-  const [tab, setTab]     = useState<MenuDTO['category']>('MAIN')
-  const [menus, setMenus] = useState<MenuDTO[]>([])
-  const [cart, setCart]   = useState<Record<number, number>>({})
 
-  // 1) 전체 메뉴 불러오기 (isAvailable 필터 포함)
+  const [tab, setTab]       = useState<MenuDTO['category']>('MAIN')
+  const [menus, setMenus]   = useState<MenuDTO[]>([])
+  const [cart, setCart]     = useState<Record<number, number>>({})
+
   useEffect(() => {
     listAllMenus()
       .then(res => {
@@ -29,10 +29,10 @@ export default function MenuPage() {
       })
   }, [])
 
-  // 2) 탭별 필터링
+  // 탭별 필터링
   const filtered = menus.filter(m => m.category === tab)
 
-  // 3) 수량 증감
+  // 수량 증감
   const add = (id: number) =>
     setCart(c => ({ ...c, [id]: (c[id] || 0) + 1 }))
   const remove = (id: number) =>
@@ -45,13 +45,13 @@ export default function MenuPage() {
       return { ...c, [id]: next }
     })
 
-  // 4) 장바구니 페이지로 이동
+  // 장바구니 페이지로
   const goCart = () =>
     nav(`/customer/${tableNumber}/summary`, { state: { cart } })
 
   return (
     <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan">
-      {/* 1) 헤더 */}
+      {/* 헤더 */}
       <div className="px-4 pt-4">
         <h1 className="text-2xl font-bold leading-tight">
           <span className="text-green-600">아이비즈</span>의<br/>
@@ -59,14 +59,14 @@ export default function MenuPage() {
         </h1>
       </div>
 
-      {/* 2) 카테고리 탭 */}
-      <div className="px-4 mt-4 border-b border-gray-200 flex space-x-6">
+      {/* 카테고리 탭 (flex-1 배분) */}
+      <div className="mt-4 border-b border-gray-200 flex">
         {CATEGORIES.map(cat => (
           <button
             key={cat.key}
             onClick={() => setTab(cat.key)}
             className={`
-              pb-2 text-base font-medium
+              flex-1 text-center pb-2 text-base font-medium
               ${tab === cat.key
                 ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-600 hover:text-green-600'}
@@ -77,30 +77,37 @@ export default function MenuPage() {
         ))}
       </div>
 
-      {/* 3) 메뉴 리스트 */}
+      {/* 메뉴 리스트 */}
       <div className="flex-1 overflow-auto px-4 py-2 space-y-4">
         {filtered.length === 0 ? (
-          <p className="text-center text-gray-500">해당 카테고리에 메뉴가 없습니다.</p>
+          <p className="text-center text-gray-500">
+            해당 카테고리에 메뉴가 없습니다.
+          </p>
         ) : (
           filtered.map(menu => (
             <div
               key={menu.id}
-              className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+              className="bg-white rounded-xl shadow p-4 flex items-center"
             >
-              <div className="flex items-center space-x-4">
-                <img
-                  src={menu.imageUrl ?? '/placeholder.png'}
-                  alt={menu.name}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-                <div>
-                  <p className="text-lg font-medium">{menu.name}</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {menu.price.toLocaleString()}원
-                  </p>
-                </div>
+              {/* 이미지 */}
+              <img
+                src={menu.imageUrl ?? '/placeholder.png'}
+                alt={menu.name}
+                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+              />
+
+              {/* 이름/가격 */}
+              <div className="flex-1 min-w-0 ml-4">
+                <p className="text-lg font-medium truncate">
+                  {menu.name}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {menu.price.toLocaleString()}원
+                </p>
               </div>
-              <div className="flex items-center space-x-2">
+
+              {/* 수량 컨트롤 + 담기 버튼 */}
+              <div className="flex-shrink-0 flex items-center space-x-2 ml-4">
                 <button
                   onClick={() => remove(menu.id)}
                   className="w-8 h-8 flex items-center justify-center border rounded-full text-gray-800"
@@ -126,19 +133,19 @@ export default function MenuPage() {
         )}
       </div>
 
-      {/* 4) 하단 내비게이션 */}
+      {/* 하단 내비게이션 (화살표 제거) */}
       <div className="flex justify-between px-4 pb-6 bg-green-50">
         <button
           onClick={() => nav(-1)}
-          className="bg-red-400 text-white px-4 py-3 rounded-full shadow-md hover:bg-red-500 transition-colors"
+          className="bg-red-400 text-white px-5 py-3 rounded-full shadow-md hover:bg-red-500 transition-colors"
         >
-          ← 이전화면 가기
+          이전화면 가기
         </button>
         <button
           onClick={goCart}
-          className="bg-green-600 text-white px-4 py-3 rounded-full shadow-md hover:bg-green-700 transition-colors"
+          className="bg-green-600 text-white px-5 py-3 rounded-full shadow-md hover:bg-green-700 transition-colors"
         >
-          장바구니 가기 →
+          장바구니 가기
         </button>
       </div>
     </div>
