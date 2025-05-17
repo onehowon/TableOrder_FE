@@ -19,7 +19,7 @@ export default function MenuDetailPage() {
   const navigate = useNavigate()
   const [menu, setMenu] = useState<MenuDTO | null>(null)
   const [quantity, setQuantity] = useState(1)
-  const [toast, setToast] = useState<string | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   // 메뉴 로드
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function MenuDetailPage() {
   const add = () => setQuantity(q => q + 1)
   const remove = () => setQuantity(q => Math.max(1, q - 1))
 
-  // 장바구니에 저장 + 토스트 + 뒤로 가기
+  // 장바구니 담기 → 모달 띄우기
   const onAddToCart = () => {
     const key = `cart_${tableNumber}`
     const saved = localStorage.getItem(key)
@@ -53,12 +53,13 @@ export default function MenuDetailPage() {
     cart[menu.id] = (cart[menu.id] || 0) + quantity
     localStorage.setItem(key, JSON.stringify(cart))
 
-    setToast(`${menu.name} ${quantity}개가 장바구니에 추가되었습니다.`)
-    // 2초 뒤 토스트 없애고 뒤로
-    setTimeout(() => {
-      setToast(null)
-      navigate(-1)
-    }, 2000)
+    setShowConfirm(true)
+  }
+
+  // 모달 확인 클릭
+  const onConfirm = () => {
+    setShowConfirm(false)
+    navigate(-1)
   }
 
   return (
@@ -115,10 +116,18 @@ export default function MenuDetailPage() {
         </button>
       </div>
 
-      {/* 토스트 메시지 (카드 바로 위에) */}
-      {toast && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full">
-          {toast}
+      {/* 확인 모달 */}
+      {showConfirm && (
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 mx-4 max-w-xs text-center">
+            <p className="mb-4">{menu.name} {quantity}개가 장바구니에 추가되었습니다.</p>
+            <button
+              onClick={onConfirm}
+              className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition"
+            >
+              확인
+            </button>
+          </div>
         </div>
       )}
     </div>
