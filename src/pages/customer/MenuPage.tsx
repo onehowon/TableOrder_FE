@@ -69,7 +69,7 @@ export default function MenuPage() {
       </div>
 
       {/* 메뉴 리스트 */}
-      <div className="flex-1 overflow-auto px-4 py-2 space-y-4">
+      <div className="flex-1 overflow-auto px-4 py-2 pb-24 space-y-4">
         {filtered.length === 0 ? (
           <p className="text-center text-gray-500">
             해당 카테고리에 메뉴가 없습니다.
@@ -120,7 +120,7 @@ export default function MenuPage() {
       </div>
 
       {/* 하단 내비 (항상 보이도록) */}
-      <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex justify-between">
+      <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex justify-between z-10">
         <button
           onClick={() => nav(-1)}
           className="bg-red-400 text-white px-5 py-3 rounded-full font-bold"

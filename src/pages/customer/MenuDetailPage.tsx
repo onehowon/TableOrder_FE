@@ -45,9 +45,18 @@ export default function MenuDetailPage() {
 
   // 장바구니로 이동
   const goSummary = () => {
-    const cart: CartState = { [menu.id]: quantity }
-    navigate(`/customer/${tableNumber}/summary`, { state: { cart } })
-  }
+       const key = `cart_${tableNumber}`
+       // 기존 cart 가져오기
+       const saved = localStorage.getItem(key)
+       const cart: CartState = saved ? JSON.parse(saved) : {}
+       // 현재 메뉴 수량 누적
+       cart[menu.id] = (cart[menu.id] || 0) + quantity
+       localStorage.setItem(key, JSON.stringify(cart))
+       // 알림 (선택)
+       alert(`${menu.name} ${quantity}개가 장바구니에 추가되었습니다.`)
+       // 메뉴 리스트로 돌아가기
+       navigate(-1)
+     }
 
   return (
     <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan">
