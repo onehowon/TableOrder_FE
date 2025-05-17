@@ -14,29 +14,61 @@ export default function MenuPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const nav = useNavigate()
 
-  const [tab, setTab]     = useState<typeof CATEGORIES[number]['key']>('MAIN')
+  type CategoryKey = typeof CATEGORIES[number]['key']
+
+  const [tab, setTab]     = useState<CategoryKey>('MAIN')
   const [menus, setMenus] = useState<MenuDTO[]>([])
   const [cart, setCart]   = useState<Record<number, number>>({})
+  const [toast, setToast] = useState(false)
 
+  // 로컬스토리지 키
+  const CART_KEY = `cart_${tableNumber}`
+
+  // 초기 로드: 메뉴 + 기존 카트
   useEffect(() => {
     listAllMenus()
       .then(res => setMenus(res.data.data.filter(m => m.isAvailable)))
       .catch(() => alert('메뉴 정보를 불러오는 데 실패했습니다.'))
+
+    const saved = localStorage.getItem(CART_KEY)
+    if (saved) {
+      try {
+        setCart(JSON.parse(saved))
+      } catch {}
+    }
   }, [])
 
+  // 토스트 자동 닫기
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(false), 2000)
+      return () => clearTimeout(t)
+    }
+  }, [toast])
+
+  // 현재 탭의 메뉴
   const filtered = menus.filter(m => m.category === tab)
 
-  const add = (id: number) =>
-    setCart(c => ({ ...c, [id]: (c[id] || 0) + 1 }))
-  const remove = (id: number) =>
-    setCart(c => {
-      const next = (c[id] || 0) - 1
-      if (next <= 0) {
-        const { [id]: _, ...rest } = c
-        return rest
-      }
-      return { ...c, [id]: next }
-    })
+  // 배지에 표시할 총 개수
+  const totalCount = Object.values(cart).reduce((sum, v) => sum + v, 0)
+
+  // localStorage에 저장 & state 갱신 & 토스트
+  const addToCart = (menuId: number) => {
+    const next = { ...cart, [menuId]: (cart[menuId] || 0) + 1 }
+    setCart(next)
+    localStorage.setItem(CART_KEY, JSON.stringify(next))
+    setToast(true)
+  }
+
+  const removeFromCart = (menuId: number) => {
+    const curr = cart[menuId] || 0
+    const next =
+      curr > 1
+        ? { ...cart, [menuId]: curr - 1 }
+        : Object.fromEntries(Object.entries(cart).filter(([k]) => +k !== menuId))
+    setCart(next)
+    localStorage.setItem(CART_KEY, JSON.stringify(next))
+  }
 
   const goCart = () =>
     nav(`/customer/${tableNumber}/summary`, { state: { cart } })
@@ -80,7 +112,7 @@ export default function MenuPage() {
               key={menu.id}
               className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
             >
-              {/* —————— 상세 이동 구역 —————— */}
+              {/* 상세 이동 */}
               <div
                 className="flex items-center cursor-pointer"
                 onClick={() => nav(`/customer/${tableNumber}/menu/${menu.id}`)}
@@ -98,19 +130,19 @@ export default function MenuPage() {
                 </div>
               </div>
 
-              {/* —————— 수량/담기 버튼 —————— */}
+              {/* 수량/담기 */}
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={e => { e.stopPropagation(); remove(menu.id) }}
+                  onClick={e => { e.stopPropagation(); removeFromCart(menu.id) }}
                   className="w-8 h-8 border rounded-full text-lg hover:bg-gray-100"
                 >－</button>
                 <span>{cart[menu.id] || 0}</span>
                 <button
-                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  onClick={e => { e.stopPropagation(); addToCart(menu.id) }}
                   className="w-8 h-8 border rounded-full text-lg hover:bg-gray-100"
                 >＋</button>
                 <button
-                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  onClick={e => { e.stopPropagation(); addToCart(menu.id) }}
                   className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
                 >담기</button>
               </div>
@@ -119,7 +151,7 @@ export default function MenuPage() {
         )}
       </div>
 
-      {/* 하단 내비 (항상 보이도록) */}
+      {/* 하단 내비 + 배지 */}
       <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex justify-between z-10">
         <button
           onClick={() => nav(-1)}
@@ -127,13 +159,35 @@ export default function MenuPage() {
         >
           이전화면 가기
         </button>
-        <button
-          onClick={goCart}
-          className="bg-green-600 text-white px-5 py-3 rounded-full font-bold"
-        >
-          장바구니 보기
-        </button>
+        <div className="relative">
+          <button
+            onClick={goCart}
+            className="bg-green-600 text-white px-5 py-3 rounded-full font-bold"
+          >
+            장바구니 보기
+          </button>
+          {totalCount > 0 && (
+            <span className="
+              absolute -top-2 -right-2
+              bg-red-500 text-white text-xs font-bold
+              w-5 h-5 rounded-full flex items-center justify-center
+            ">
+              {totalCount}
+            </span>
+          )}
+        </div>
       </div>
+
+      {/* 토스트 메시지 */}
+      {toast && (
+        <div className="
+          fixed bottom-20 left-1/2 transform -translate-x-1/2
+          bg-black bg-opacity-70 text-white px-4 py-2 rounded-full
+          transition-opacity
+        ">
+          장바구니에 저장되었습니다.
+        </div>
+      )}
     </div>
   )
 }
