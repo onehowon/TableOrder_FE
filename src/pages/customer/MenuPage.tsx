@@ -93,8 +93,8 @@ export default function MenuPage() {
         ))}
       </div>
 
-      {/* 리스트 (grid 적용) */}
-      <div className="flex-1 overflow-auto px-4 py-2 pb-32 grid grid-cols-1 gap-4">
+      {/* 리스트: 카드 대신 border-b + flex-row */}
+      <div className="flex-1 overflow-auto px-4 py-2 pb-32 space-y-4">
         {filtered.length === 0 ? (
           <p className="text-center text-gray-500">
             해당 카테고리에 메뉴가 없습니다.
@@ -103,20 +103,19 @@ export default function MenuPage() {
           filtered.map(menu => (
             <div
               key={menu.id}
-              className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+              className="flex items-center justify-between pb-4 border-b border-gray-200"
             >
+              {/* 이미지 + 텍스트 영역 */}
               <div
-                className="flex items-center cursor-pointer"
-                onClick={() =>
-                  nav(`/customer/${tableNumber}/menu/${menu.id}`)
-                }
+                className="flex items-center cursor-pointer space-x-4 min-w-0"
+                onClick={() => nav(`/customer/${tableNumber}/menu/${menu.id}`)}
               >
                 <img
                   src={menu.imageUrl || '/placeholder.png'}
                   alt={menu.name}
-                  className="w-16 h-16 rounded-lg object-cover"
+                  className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                 />
-                <div className="ml-4 min-w-0">
+                <div className="min-w-0">
                   <p className="text-base font-medium whitespace-normal">
                     {menu.name}
                   </p>
@@ -126,36 +125,21 @@ export default function MenuPage() {
                 </div>
               </div>
 
-              {/* 수량 + 담기 박스 */}
-              <div className="flex items-center space-x-2 bg-gray-50 rounded-full px-3 py-1">
+              {/* 컨트롤 영역: 한 줄에 딱 */}
+              <div className="flex items-center space-x-3 flex-shrink-0">
                 <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    remove(menu.id)
-                  }}
-                  className="w-8 h-8 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
-                >
-                  －
-                </button>
-                <span className="w-6 text-center">{cart[menu.id] || 0}</span>
+                  onClick={e => { e.stopPropagation(); remove(menu.id) }}
+                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
+                >－</button>
+                <span className="w-5 text-center">{cart[menu.id] || 0}</span>
                 <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    add(menu.id)
-                  }}
-                  className="w-8 h-8 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
-                >
-                  ＋
-                </button>
+                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
+                >＋</button>
                 <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    add(menu.id)
-                  }}
-                  className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition"
-                >
-                  담기
-                </button>
+                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition"
+                >담기</button>
               </div>
             </div>
           ))
@@ -167,17 +151,15 @@ export default function MenuPage() {
         <button
           onClick={() => nav(-1)}
           className="bg-red-400 text-white px-5 py-3 rounded-full font-bold"
-        >
-          이전화면 가기
-        </button>
+        >이전화면 가기</button>
+
         <div className="flex items-center space-x-4">
           <button
             onClick={clearCart}
             className="w-12 h-12 flex items-center justify-center text-gray-600 hover:text-red-500"
             title="장바구니 초기화"
-          >
-            🗑️
-          </button>
+          >🗑️</button>
+
           <button
             onClick={goCart}
             className="bg-green-600 text-white px-5 py-3 rounded-full font-bold relative"
