@@ -116,6 +116,7 @@ export default function MenuPage() {
                 onClick={e => { e.stopPropagation(); add(menu.id) }}
                 className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
               >＋</button>
+              {/* absolute 속성 제거 */}
               <button
                 onClick={e => { e.stopPropagation(); add(menu.id) }}
                 className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
@@ -136,13 +137,6 @@ export default function MenuPage() {
           이전화면 가기
         </button>
 
-        {/* 토스트 메시지 */}
-        {toast && (
-          <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg">
-            {toast}
-          </div>
-        )}
-
         <button
           onClick={goCart}
           className="bg-green-600 text-white px-5 py-3 rounded-full font-bold relative"
@@ -155,6 +149,20 @@ export default function MenuPage() {
           )}
         </button>
       </div>
+
+      {/* 토스트 메시지: 화면 중앙 */}
+      {toast && (
+        <div className="
+          fixed
+          inset-0
+          flex items-center justify-center
+          pointer-events-none
+        ">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-full">
+            {toast}
+          </div>
+        </div>
+      )}
     </div>
-)
+  )
 }
