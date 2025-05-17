@@ -111,8 +111,8 @@ export default function VerifyPage() {
             className={`
               w-12 h-12 mx-1 text-center text-2xl rounded-md focus:outline-none transition-colors
               ${d
-                ? 'bg-green-600 text-transparent border-transparent'
-                : 'bg-white text-gray-800 border-gray-300'
+                ? 'bg-green-600 text-transparent border border-transparent'
+                : 'bg-white text-gray-800 border border-gray-300'
               }
             `}
           />

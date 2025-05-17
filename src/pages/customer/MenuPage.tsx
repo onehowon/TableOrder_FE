@@ -99,9 +99,7 @@ export default function MenuPage() {
                 긴 텍스트가 flex 컨테이너에서 줄바꿈 됩니다.
               */}
               <div className="flex-1 min-w-0 ml-4">
-                <p
-                  className="text-lg font-medium leading-snug break-words"
-                >
+              <p className="text-lg font-medium truncate">
                   {menu.name}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
@@ -113,20 +111,25 @@ export default function MenuPage() {
               <div className="flex-shrink-0 flex items-center space-x-2 ml-4">
                 <button
                   onClick={() => remove(menu.id)}
-                  className="w-8 h-8 flex items-center justify-center border rounded-full text-gray-800"
+                  className="w-8 h-8 flex items-center justify-center 
+                  border border-gray-300 rounded-full text-gray-800 text-lg 
+                  hover:bg-gray-100 transition"
                 >
                   －
                 </button>
                 <span className="w-6 text-center">{cart[menu.id] || 0}</span>
                 <button
                   onClick={() => add(menu.id)}
-                  className="w-8 h-8 flex items-center justify-center border rounded-full text-gray-800"
+                  className="w-8 h-8 flex items-center justify-center 
+                  border border-gray-300 rounded-full text-gray-800 text-lg 
+                  hover:bg-gray-100 transition"
                 >
                   ＋
                 </button>
                 <button
                   onClick={() => add(menu.id)}
-                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full shadow-md hover:bg-green-700 transition-colors font-bold"
+                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full 
+                  text-sm font-semibold shadow hover:bg-green-700 transition"
                 >
                   담기
                 </button>
