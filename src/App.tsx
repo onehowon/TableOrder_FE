@@ -9,6 +9,7 @@ import OrderListPage         from './pages/admin/OrderListPage'
 import MenuManagementPage from './pages/admin/MenuManagementPage'
 
 // Customer
+import { CartProvider } from './contexts/CartContext'
 import WelcomePage     from './pages/customer/WelcomePage'
 import MenuPage        from './pages/customer/MenuPage'
 import ConfirmPage     from './pages/customer/ConfirmPage'
