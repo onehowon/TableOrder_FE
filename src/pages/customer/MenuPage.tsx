@@ -85,7 +85,8 @@ export default function MenuPage() {
           : filtered.map(menu => (
             <div
               key={menu.id}
-              className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+              className="bg-white rounded-xl shadow p-4 flex items-center justify-between cursor-pointer"
+              onClick={() => nav(`/customer/${tableNumber}/menu/${menu.id}`)}
             >
               {/* 상품 이미지 */}
               <img
