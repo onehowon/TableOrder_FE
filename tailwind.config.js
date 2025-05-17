@@ -1,9 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}'
   ],
+  
   safelist: ['font-woowahan'],
   theme: {
     extend: {
@@ -12,5 +14,5 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 }

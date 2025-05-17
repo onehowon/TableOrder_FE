@@ -99,7 +99,7 @@ export default function MenuPage() {
                 긴 텍스트가 flex 컨테이너에서 줄바꿈 됩니다.
               */}
               <div className="flex-1 min-w-0 ml-4">
-              <p className="text-lg font-medium truncate">
+              <p className="text-base font-medium leading-snug line-clamp-2">
                   {menu.name}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
