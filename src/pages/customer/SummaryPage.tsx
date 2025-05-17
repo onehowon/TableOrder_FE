@@ -66,7 +66,7 @@ export default function SummaryPage() {
 
       {/* 2) 카테고리 탭 (장바구니) */}
       <div className="px-4 flex border-b border-gray-200 mt-4">
-        <div className="pb-2 flex items-center space-x-2 text-base font-medium text-green-600 border-b-2 border-green-600">
+        <div className="pb-2 flex items-center space-x-2 text-base font-medium text-green-600 border-b-2 border-green-600 font-bold">
           <span>🛒</span>
           <span>장바구니</span>
         </div>
@@ -103,7 +103,7 @@ export default function SummaryPage() {
       {/* 4) 합계 & 주문 버튼 */}
       <div className="px-4 mb-8">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-lg text-gray-700">총 금액</span>
+          <span className="text-lg text-gray-700 font-bold">총 금액</span>
           <span className="text-lg font-bold text-gray-900">
             {totalAmount.toLocaleString()}원
           </span>
@@ -113,13 +113,13 @@ export default function SummaryPage() {
           계좌번호: 신한 123-4567-8910-11 (한원보)
         </div>
 
-        <p className="text-center text-sm text-gray-600 mb-4">
+        <p className="text-center text-sm text-gray-600 mb-4 font-bold">
           🚨 주문 전 입금 잊지 말아 주세요!
         </p>
 
         <button
           onClick={handleOrder}
-          className="w-full py-4 bg-green-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-green-700 transition-colors"
+          className="w-full py-4 bg-green-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-green-700 transition-colors font-bold"
         >
           주문하기
         </button>

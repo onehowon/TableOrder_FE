@@ -92,7 +92,7 @@ export default function VerifyPage() {
       </div>
 
       {/* 안내 문구 */}
-      <p className="text-center text-xl font-bold mb-8">
+      <p className="text-center text-2xl md:text-3xl font-bold mb-8 leading-snug">
         이체 후 직원에게<br/> 보여주세요.
       </p>
 
@@ -102,11 +102,19 @@ export default function VerifyPage() {
           <input
             key={i}
             ref={el => { if (el) inputsRef.current[i] = el }}
-            type="text"
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
             maxLength={1}
             value={d}
             onChange={e => onDigitChange(i, e.target.value)}
-            className="w-12 h-12 mx-1 text-center border rounded-md text-2xl focus:outline-none"
+            className={`
+              w-12 h-12 mx-1 text-center text-2xl rounded-md focus:outline-none transition-colors
+              ${d
+                ? 'bg-green-600 text-transparent border-transparent'
+                : 'bg-white text-gray-800 border-gray-300'
+              }
+            `}
           />
         ))}
         <button
