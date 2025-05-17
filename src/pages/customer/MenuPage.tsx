@@ -1,4 +1,3 @@
-// src/pages/customer/MenuPage.tsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { listAllMenus } from '@/api'
@@ -14,56 +13,67 @@ export default function MenuPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const nav = useNavigate()
 
-  const CART_KEY = `cart_${tableNumber}`
-
-  const [tab, setTab]     = useState<typeof CATEGORIES[number]['key']>('MAIN')
+  type C = typeof CATEGORIES[number]['key']
+  const [tab, setTab]     = useState<C>('MAIN')
   const [menus, setMenus] = useState<MenuDTO[]>([])
   const [cart, setCart]   = useState<Record<number, number>>({})
   const [toast, setToast] = useState<string>('')
 
-  // 1) 메뉴 로드 + 로컬스토리지에서 cart 복원
+  const CART_KEY = `cart_${tableNumber}`
+
   useEffect(() => {
+    // 메뉴 불러오기
     listAllMenus()
       .then(res => setMenus(res.data.data.filter(m => m.isAvailable)))
       .catch(() => alert('메뉴 정보를 불러오는 데 실패했습니다.'))
 
+    // 로컬스토리지에서 복원
     const saved = localStorage.getItem(CART_KEY)
     if (saved) {
       try { setCart(JSON.parse(saved)) }
-      catch (e) { /* parsing 실패 시 무시 */ }
+      catch {}
     }
-  }, [CART_KEY])
+  }, [])
 
+  // 탭에 맞춰 필터
   const filtered = menus.filter(m => m.category === tab)
 
-  // 2) 수량 증가
+  // Toast 자동 닫기
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(''), 2000)
+      return () => clearTimeout(t)
+    }
+  }, [toast])
+
   const add = (id: number) => {
-    setCart(prev => {
-      const next = { ...prev, [id]: (prev[id] || 0) + 1 }
+    setCart(c => {
+      const next = { ...c, [id]: (c[id] || 0) + 1 }
       localStorage.setItem(CART_KEY, JSON.stringify(next))
       setToast('장바구니에 저장되었습니다.')
-      setTimeout(() => setToast(''), 2000)
       return next
     })
   }
-  // 3) 수량 감소
   const remove = (id: number) =>
-    setCart(prev => {
-      const curr = prev[id] || 0
-      let next: Record<number, number>
-      if (curr <= 1) {
-        next = Object.fromEntries(
-          Object.entries(prev).filter(([k]) => +k !== id)
-        )
-      } else {
-        next = { ...prev, [id]: curr - 1 }
-      }
+    setCart(c => {
+      const cnt = (c[id] || 0) - 1
+      const next = cnt > 0
+        ? { ...c, [id]: cnt }
+        : Object.fromEntries(Object.entries(c).filter(([k]) => +k !== id))
       localStorage.setItem(CART_KEY, JSON.stringify(next))
       return next
     })
 
+  const clearCart = () => {
+    if (!confirm('장바구니를 비우시겠습니까?')) return
+    localStorage.removeItem(CART_KEY)
+    setCart({})
+  }
+
   const goCart = () =>
     nav(`/customer/${tableNumber}/summary`, { state: { cart } })
+
+  const totalCount = Object.values(cart).reduce((a, b) => a + b, 0)
 
   return (
     <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan">
@@ -77,29 +87,24 @@ export default function MenuPage() {
 
       {/* 탭 */}
       <div className="mt-4 flex border-b border-gray-200">
-        {CATEGORIES.map(cat => (
+        {CATEGORIES.map(c => (
           <button
-            key={cat.key}
-            onClick={() => setTab(cat.key)}
+            key={c.key}
+            onClick={() => setTab(c.key)}
             className={`flex-1 text-center pb-2 font-bold ${
-              tab === cat.key
+              tab === c.key
                 ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-600 hover:text-green-600'
             }`}
-          >
-            {cat.label}
-          </button>
+          >{c.label}</button>
         ))}
       </div>
 
-      {/* 메뉴 리스트 */}
+      {/* 리스트 */}
       <div className="flex-1 overflow-auto px-4 py-2 pb-32 space-y-4">
-        {filtered.length === 0 ? (
-          <p className="text-center text-gray-500">
-            해당 카테고리에 메뉴가 없습니다.
-          </p>
-        ) : (
-          filtered.map(menu => (
+        {filtered.length === 0
+          ? <p className="text-center text-gray-500">해당 카테고리에 메뉴가 없습니다.</p>
+          : filtered.map(menu => (
             <div
               key={menu.id}
               className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
@@ -116,68 +121,63 @@ export default function MenuPage() {
                 />
                 <div className="ml-4 min-w-0">
                   <p className="text-base font-medium truncate">{menu.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {menu.price.toLocaleString()}원
-                  </p>
+                  <p className="text-sm text-gray-600">{menu.price.toLocaleString()}원</p>
                 </div>
               </div>
 
-              {/* 수량 & 담기 */}
+              {/* 수량/담기 */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={e => { e.stopPropagation(); remove(menu.id) }}
                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
-                >
-                  －
-                </button>
+                >－</button>
                 <span className="w-6 text-center">{cart[menu.id] || 0}</span>
                 <button
                   onClick={e => { e.stopPropagation(); add(menu.id) }}
                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
-                >
-                  ＋
-                </button>
+                >＋</button>
                 <button
                   onClick={e => { e.stopPropagation(); add(menu.id) }}
-                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition"
-                >
-                  담기
-                </button>
+                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition"
+                >담기</button>
               </div>
             </div>
           ))
-        )}
+        }
       </div>
 
-      {/* 하단 내비 */}
+      {/* 하단 내비 + 초기화 + 배지 */}
       <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex items-center justify-between z-10">
         <button
           onClick={() => nav(-1)}
           className="bg-red-400 text-white px-5 py-3 rounded-full font-bold"
-        >
-          이전화면 가기
-        </button>
+        >이전화면 가기</button>
 
-        <button
-          onClick={goCart}
-          className="bg-green-600 text-white px-5 py-3 rounded-full font-bold relative"
-        >
-          장바구니 보기
-          {Object.values(cart).reduce((a, b) => a + b, 0) > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
-              {Object.values(cart).reduce((a, b) => a + b, 0)}
-            </span>
-          )}
-        </button>
+        <div className="flex items-center space-x-2">
+          {/* 🗑️ 초기화 */}
+          <button
+            onClick={clearCart}
+            className="text-gray-600 hover:text-red-500 text-xl"
+            title="장바구니 초기화"
+          >🗑️</button>
+
+          <button
+            onClick={goCart}
+            className="bg-green-600 text-white px-5 py-3 rounded-full font-bold relative"
+          >
+            장바구니 보기
+            {totalCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 text-center rounded-full text-sm">
+                {totalCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* 토스트 메시지 (화면 중앙) */}
+      {/* 토스트 (화면 중앙) */}
       {toast && (
-        <div className="
-          fixed inset-0
-          flex items-center justify-center
-          pointer-events-none
-        ">
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-gray-800 text-white px-6 py-3 rounded-full">
             {toast}
           </div>
