@@ -1,4 +1,18 @@
-/* src/index.css */
+@font-face {
+    font-family: 'Woowahan';
+    src: url('/fonts/BMHANNAir_ttf.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+@font-face {
+    font-family: 'Woowahan';
+    src: url('/fonts/BMHANNAir_ttf.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  /* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,21 +21,7 @@
 
 @layer base {
     body {
-      font-family: 'Woowahan', sans-serif;
+      font-family: 'Woowahan';
     }
   }
 
-
-@font-face {
-    font-family: 'Woowahan';
-    src: url('/fonts/BMHANNAir_otf.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  @font-face {
-    font-family: 'Woowahan';
-    src: url('/fonts/BMHANNAir_otf.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-  }
