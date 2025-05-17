@@ -14,36 +14,52 @@ export default function MenuPage() {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const nav = useNavigate()
 
+  const CART_KEY = `cart_${tableNumber}`
+
   const [tab, setTab]     = useState<typeof CATEGORIES[number]['key']>('MAIN')
   const [menus, setMenus] = useState<MenuDTO[]>([])
   const [cart, setCart]   = useState<Record<number, number>>({})
   const [toast, setToast] = useState<string>('')
 
+  // 1) 메뉴 로드 + 로컬스토리지에서 cart 복원
   useEffect(() => {
     listAllMenus()
       .then(res => setMenus(res.data.data.filter(m => m.isAvailable)))
       .catch(() => alert('메뉴 정보를 불러오는 데 실패했습니다.'))
-  }, [])
+
+    const saved = localStorage.getItem(CART_KEY)
+    if (saved) {
+      try { setCart(JSON.parse(saved)) }
+      catch (e) { /* parsing 실패 시 무시 */ }
+    }
+  }, [CART_KEY])
 
   const filtered = menus.filter(m => m.category === tab)
 
+  // 2) 수량 증가
   const add = (id: number) => {
-    setCart(c => {
-      const next = { ...c, [id]: (c[id] || 0) + 1 }
-      // show toast
+    setCart(prev => {
+      const next = { ...prev, [id]: (prev[id] || 0) + 1 }
+      localStorage.setItem(CART_KEY, JSON.stringify(next))
       setToast('장바구니에 저장되었습니다.')
       setTimeout(() => setToast(''), 2000)
       return next
     })
   }
+  // 3) 수량 감소
   const remove = (id: number) =>
-    setCart(c => {
-      const nextCount = (c[id] || 0) - 1
-      if (nextCount <= 0) {
-        const { [id]:_, ...rest } = c
-        return rest
+    setCart(prev => {
+      const curr = prev[id] || 0
+      let next: Record<number, number>
+      if (curr <= 1) {
+        next = Object.fromEntries(
+          Object.entries(prev).filter(([k]) => +k !== id)
+        )
+      } else {
+        next = { ...prev, [id]: curr - 1 }
       }
-      return { ...c, [id]: nextCount }
+      localStorage.setItem(CART_KEY, JSON.stringify(next))
+      return next
     })
 
   const goCart = () =>
@@ -76,56 +92,61 @@ export default function MenuPage() {
         ))}
       </div>
 
-      {/* 리스트 */}
+      {/* 메뉴 리스트 */}
       <div className="flex-1 overflow-auto px-4 py-2 pb-32 space-y-4">
         {filtered.length === 0 ? (
           <p className="text-center text-gray-500">
             해당 카테고리에 메뉴가 없습니다.
           </p>
-        ) : filtered.map(menu => (
-          <div
-            key={menu.id}
-            className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
-          >
-            {/* 상세로 이동 */}
+        ) : (
+          filtered.map(menu => (
             <div
-              className="flex items-center cursor-pointer"
-              onClick={() => nav(`/customer/${tableNumber}/menu/${menu.id}`)}
+              key={menu.id}
+              className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
             >
-              <img
-                src={menu.imageUrl ?? '/placeholder.png'}
-                alt={menu.name}
-                className="w-16 h-16 rounded-lg object-cover"
-              />
-              <div className="ml-4 min-w-0">
-                <p className="text-base font-medium truncate">{menu.name}</p>
-                <p className="text-sm text-gray-600">
-                  {menu.price.toLocaleString()}원
-                </p>
+              {/* 상세로 이동 */}
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => nav(`/customer/${tableNumber}/menu/${menu.id}`)}
+              >
+                <img
+                  src={menu.imageUrl ?? '/placeholder.png'}
+                  alt={menu.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+                <div className="ml-4 min-w-0">
+                  <p className="text-base font-medium truncate">{menu.name}</p>
+                  <p className="text-sm text-gray-600">
+                    {menu.price.toLocaleString()}원
+                  </p>
+                </div>
+              </div>
+
+              {/* 수량 & 담기 */}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={e => { e.stopPropagation(); remove(menu.id) }}
+                  className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
+                >
+                  －
+                </button>
+                <span className="w-6 text-center">{cart[menu.id] || 0}</span>
+                <button
+                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
+                >
+                  ＋
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); add(menu.id) }}
+                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition"
+                >
+                  담기
+                </button>
               </div>
             </div>
-
-            {/* 수량 & 담기 */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={e => { e.stopPropagation(); remove(menu.id) }}
-                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
-              >－</button>
-              <span className="w-6 text-center">{cart[menu.id] || 0}</span>
-              <button
-                onClick={e => { e.stopPropagation(); add(menu.id) }}
-                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-lg hover:bg-gray-100 transition"
-              >＋</button>
-              {/* absolute 속성 제거 */}
-              <button
-                onClick={e => { e.stopPropagation(); add(menu.id) }}
-                className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
-              >
-                담기
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* 하단 내비 */}
@@ -143,18 +164,17 @@ export default function MenuPage() {
         >
           장바구니 보기
           {Object.values(cart).reduce((a, b) => a + b, 0) > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 text-center rounded-full text-sm">
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-sm">
               {Object.values(cart).reduce((a, b) => a + b, 0)}
             </span>
           )}
         </button>
       </div>
 
-      {/* 토스트 메시지: 화면 중앙 */}
+      {/* 토스트 메시지 (화면 중앙) */}
       {toast && (
         <div className="
-          fixed
-          inset-0
+          fixed inset-0
           flex items-center justify-center
           pointer-events-none
         ">
