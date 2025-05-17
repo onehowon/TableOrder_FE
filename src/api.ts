@@ -66,7 +66,9 @@ export interface SalesStatsDTO {
   totalCustomers: number
   totalOrders: number
   totalRevenue: number
+  totalProfit: number
   salesByHour: { hour: number; revenue: number }[]
+  salesByMenu: { menuName: string; profit: number }[]
 }
 
 /**── 환경 변수에서 API 베이스 URL 하나만 읽습니다 ───────────────────**/
