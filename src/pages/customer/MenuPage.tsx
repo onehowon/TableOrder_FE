@@ -47,7 +47,7 @@ export default function MenuPage() {
     nav(`/customer/${tableNumber}/summary`, { state: { cart } })
 
   return (
-    <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan">
+    <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan ">
       {/* 헤더 제목 */}
       <div className="px-4 pt-4">
         <h1 className="text-2xl font-bold leading-tight">
@@ -63,7 +63,7 @@ export default function MenuPage() {
             key={cat.key}
             onClick={() => setTab(cat.key)}
             className={`
-              flex-1 text-center pb-2 text-base font-medium
+              flex-1 text-center pb-2 text-base font-woowahan font-bold
               ${tab === cat.key
                 ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-600 hover:text-green-600'}
@@ -126,7 +126,7 @@ export default function MenuPage() {
                 </button>
                 <button
                   onClick={() => add(menu.id)}
-                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full shadow-md hover:bg-green-700 transition-colors"
+                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full shadow-md hover:bg-green-700 transition-colors font-bold"
                 >
                   담기
                 </button>
@@ -140,13 +140,13 @@ export default function MenuPage() {
       <div className="flex justify-between px-4 pb-6 bg-green-50">
         <button
           onClick={() => nav(-1)}
-          className="bg-red-400 text-white px-5 py-3 rounded-full shadow-md hover:bg-red-500 transition-colors"
+          className="bg-red-400 text-white px-5 py-3 rounded-full shadow-md hover:bg-red-500 transition-colors font-bold"
         >
           이전화면 가기
         </button>
         <button
           onClick={goCart}
-          className="bg-green-600 text-white px-5 py-3 rounded-full shadow-md hover:bg-green-700 transition-colors"
+          className="bg-green-600 text-white px-5 py-3 rounded-full shadow-md hover:bg-green-700 transition-colors font-bold"
         >
           장바구니 가기
         </button>
