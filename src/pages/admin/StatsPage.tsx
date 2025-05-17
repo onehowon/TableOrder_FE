@@ -30,8 +30,8 @@ export default function StatsPage() {
     revenue: stats.salesByHour.find(p => p.hour === h)?.revenue || 0,
   }))
 
-  // 메뉴별 이윤 데이터
-  const menuData = stats.salesByMenu.map(m => ({
+  // 메뉴별 이윤 데이터 (salesByMenu가 undefined여도 안전하게 빈 배열 처리)
+  const menuData = (stats.salesByMenu ?? []).map(m => ({
     name: m.menuName,
     profit: m.profit,
   }))
@@ -69,7 +69,7 @@ export default function StatsPage() {
             <Line
               type="monotone"
               dataKey="revenue"
-              stroke="#4ade80"    /* Tailwind green-300 */
+              stroke="#4ade80"
               strokeWidth={3}
               dot={false}
             />
@@ -81,7 +81,10 @@ export default function StatsPage() {
       <div className="bg-white p-4 rounded shadow">
         <h2 className="mb-2 text-lg font-semibold">메뉴별 이윤</h2>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={menuData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+          <BarChart
+            data={menuData}
+            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis />
