@@ -110,7 +110,7 @@ export default function MenuPage() {
           filtered.map(menu => (
             <div
               key={menu.id}
-              className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+              className="bg-white rounded-xl shadow p-4 flex items-center justify-between relative"
             >
               {/* 상세 이동 */}
               <div
@@ -143,7 +143,7 @@ export default function MenuPage() {
                 >＋</button>
                 <button
                   onClick={e => { e.stopPropagation(); addToCart(menu.id) }}
-                  className="ml-2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
                 >담기</button>
               </div>
             </div>
@@ -181,7 +181,8 @@ export default function MenuPage() {
       {/* 토스트 메시지 */}
       {toast && (
         <div className="
-          fixed bottom-20 left-1/2 transform -translate-x-1/2
+          absolute
+          bottom-32 left-1/2 transform -translate-x-1/2
           bg-black bg-opacity-70 text-white px-4 py-2 rounded-full
           transition-opacity
         ">

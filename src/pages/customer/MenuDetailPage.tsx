@@ -1,3 +1,4 @@
+// src/pages/customer/MenuDetailPage.tsx
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { listAllMenus } from '@/api'
@@ -18,8 +19,9 @@ export default function MenuDetailPage() {
   const navigate = useNavigate()
   const [menu, setMenu] = useState<MenuDTO | null>(null)
   const [quantity, setQuantity] = useState(1)
+  const [toast, setToast] = useState<string | null>(null)
 
-  // 메뉴 로드 및 선택
+  // 메뉴 로드
   useEffect(() => {
     listAllMenus()
       .then(res => {
@@ -43,23 +45,24 @@ export default function MenuDetailPage() {
   const add = () => setQuantity(q => q + 1)
   const remove = () => setQuantity(q => Math.max(1, q - 1))
 
-  // 장바구니로 이동
-  const goSummary = () => {
-       const key = `cart_${tableNumber}`
-       // 기존 cart 가져오기
-       const saved = localStorage.getItem(key)
-       const cart: CartState = saved ? JSON.parse(saved) : {}
-       // 현재 메뉴 수량 누적
-       cart[menu.id] = (cart[menu.id] || 0) + quantity
-       localStorage.setItem(key, JSON.stringify(cart))
-       // 알림 (선택)
-       alert(`${menu.name} ${quantity}개가 장바구니에 추가되었습니다.`)
-       // 메뉴 리스트로 돌아가기
-       navigate(-1)
-     }
+  // 장바구니에 저장 + 토스트 + 뒤로 가기
+  const onAddToCart = () => {
+    const key = `cart_${tableNumber}`
+    const saved = localStorage.getItem(key)
+    const cart: CartState = saved ? JSON.parse(saved) : {}
+    cart[menu.id] = (cart[menu.id] || 0) + quantity
+    localStorage.setItem(key, JSON.stringify(cart))
+
+    setToast(`${menu.name} ${quantity}개가 장바구니에 추가되었습니다.`)
+    // 2초 뒤 토스트 없애고 뒤로
+    setTimeout(() => {
+      setToast(null)
+      navigate(-1)
+    }, 2000)
+  }
 
   return (
-    <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan">
+    <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan relative">
       {/* 로고 */}
       <div className="px-4 pt-4">
         <img src={logoSrc} alt="EngiNE" className="h-12 object-contain mx-auto" />
@@ -87,8 +90,8 @@ export default function MenuDetailPage() {
         </p>
       </div>
 
-      {/* 수량 및 담기 */}
-      <div className="px-4 pb-6 flex items-center justify-between">
+      {/* 수량 및 담기 버튼 (고정) */}
+      <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex items-center justify-between shadow-t">
         <div className="flex items-center space-x-2">
           <button
             onClick={remove}
@@ -105,12 +108,19 @@ export default function MenuDetailPage() {
           </button>
         </div>
         <button
-          onClick={goSummary}
-          className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition"
+          onClick={onAddToCart}
+          className="bg-green-600 text-white px-5 py-3 rounded-full font-semibold hover:bg-green-700 transition"
         >
           장바구니 담기
         </button>
       </div>
+
+      {/* 토스트 메시지 (카드 바로 위에) */}
+      {toast && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full">
+          {toast}
+        </div>
+      )}
     </div>
   )
 }
