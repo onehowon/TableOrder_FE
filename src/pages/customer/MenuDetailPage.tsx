@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { listAllMenus } from '@/api'
 import type { MenuDTO } from '@/api'
-import logoSrc from '@/assets/engine.png'
 
 interface CartState {
   [menuId: number]: number
@@ -17,6 +16,7 @@ type Params = {
 export default function MenuDetailPage() {
   const { tableNumber, id } = useParams<Params>()
   const navigate = useNavigate()
+
   const [menu, setMenu] = useState<MenuDTO | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -41,89 +41,82 @@ export default function MenuDetailPage() {
 
   if (!menu) return null
 
-  // 수량 조절
-  const add = () => setQuantity(q => q + 1)
-  const remove = () => setQuantity(q => Math.max(1, q - 1))
-
-  // 장바구니 담기 → 모달 띄우기
+  // 장바구니 담기
   const onAddToCart = () => {
     const key = `cart_${tableNumber}`
     const saved = localStorage.getItem(key)
     const cart: CartState = saved ? JSON.parse(saved) : {}
     cart[menu.id] = (cart[menu.id] || 0) + quantity
     localStorage.setItem(key, JSON.stringify(cart))
-
     setShowConfirm(true)
   }
 
-  // 모달 확인 클릭
+  // 모달 확인
   const onConfirm = () => {
     setShowConfirm(false)
     navigate(-1)
   }
 
   return (
-    <div className="w-full h-screen bg-green-50 flex flex-col font-woowahan relative">
-      {/* 로고 */}
-      <div className="px-4 pt-4">
-        <img src={logoSrc} alt="EngiNE" className="h-12 object-contain mx-auto" />
-      </div>
-
-      {/* 상세 이미지 */}
-      <img
-        src={menu.imageUrl ?? '/placeholder.png'}
-        alt={menu.name}
-        className="w-full h-48 object-cover mt-4"
-      />
-
-      {/* 제목 & 가격 */}
-      <div className="px-4 mt-4 text-center">
-        <h2 className="text-2xl font-bold">{menu.name}</h2>
-        <p className="text-lg text-gray-700 mt-1">
-          {menu.price.toLocaleString()}원
-        </p>
-      </div>
-
-      {/* 설명 */}
-      <div className="px-4 py-3 text-gray-600 flex-1 overflow-auto">
-        <p className="leading-relaxed">
-          {menu.description ?? '상세 설명이 없습니다.'}
-        </p>
-      </div>
-
-      {/* 수량 및 담기 버튼 (고정) */}
-      <div className="fixed bottom-0 left-0 w-full bg-green-50 px-4 py-4 flex items-center justify-between shadow-t">
-        <div className="flex items-center space-x-2">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      {/* 카드 컨테이너 */}
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* 헤더 */}
+        <header className="px-6 py-4 border-b border-gray-200">
+          <h1 className="text-xl font-bold text-green-700">{menu.name}</h1>
           <button
-            onClick={remove}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-800 hover:bg-gray-100 transition"
+            onClick={() => {}}
+            className="mt-1 text-sm font-medium text-green-700 underline"
           >
-            –
+            상세설명
           </button>
-          <span className="w-6 text-center text-lg">{quantity}</span>
+        </header>
+
+        {/* 메뉴 이미지 */}
+        <img
+          src={menu.imageUrl ?? '/placeholder.png'}
+          alt={menu.name}
+          className="w-full h-48 object-cover"
+        />
+
+        {/* 스티키 노트 스타일 패널 */}
+        <section className="p-6 bg-yellow-100 relative">
+          {/* 포스트잇 테이프 */}
+          <div className="absolute top-0 left-1/2 w-12 h-4 bg-yellow-200 transform -translate-x-1/2 -translate-y-1/2 rotate-2 rounded-sm"></div>
+          <h2 className="text-lg font-semibold">{menu.name}</h2>
+          <p className="text-2xl font-bold mt-1">{menu.price.toLocaleString()}원</p>
+          <p className="mt-3 text-gray-700 whitespace-pre-wrap">
+            {menu.description ?? '상세 설명이 없습니다.'}
+          </p>
+        </section>
+
+        {/* 버튼 그룹 */}
+        <div className="px-6 py-4 flex space-x-4">
           <button
-            onClick={add}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-800 hover:bg-gray-100 transition"
+            onClick={() => navigate(-1)}
+            className="flex-1 py-2 bg-pink-400 text-white rounded-full hover:bg-pink-500 transition"
           >
-            ＋
+            이전화면 가기
+          </button>
+          <button
+            onClick={onAddToCart}
+            className="flex-1 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 transition"
+          >
+            장바구니 가기
           </button>
         </div>
-        <button
-          onClick={onAddToCart}
-          className="bg-green-600 text-white px-5 py-3 rounded-full font-semibold hover:bg-green-700 transition"
-        >
-          장바구니 담기
-        </button>
       </div>
 
       {/* 확인 모달 */}
       {showConfirm && (
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 mx-4 max-w-xs text-center">
-            <p className="mb-4">{menu.name} {quantity}개가 장바구니에 추가되었습니다.</p>
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 mx-4 max-w-xs text-center">
+            <p className="mb-4">
+              {menu.name} {quantity}개가 장바구니에 추가되었습니다.
+            </p>
             <button
               onClick={onConfirm}
-              className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition"
+              className="px-6 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 transition"
             >
               확인
             </button>
