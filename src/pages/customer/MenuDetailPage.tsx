@@ -81,13 +81,13 @@ export default function MenuDetailPage() {
       <div className="w-full max-w-xs bg-white rounded-xl shadow-md overflow-hidden">
         {/* ───────── 헤더 ───────── */}
         <div className="px-4 pt-6 text-left">
-          <div className="text-green-600 font-medium">아이비즈의</div>
+          <div className="text-green-600 font-bold">아이비즈의</div>
           <div className="text-lg font-bold text-gray-900 mt-1">폭싹 속았슈퍼</div>
           {/* 상세설명 */}
           <h1 className="mt-3 text-2xl font-extrabold text-green-600">
             상세설명
           </h1>
-          <div className="mt-2 w-16 h-1 bg-green-600 rounded"></div>
+          <div className="mt-2 w-20 h-1 bg-green-600 rounded"></div>
         </div>
 
         {/* ───────── 메뉴 이미지 ───────── */}
