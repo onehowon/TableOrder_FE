@@ -25,7 +25,7 @@ export default function VerifyPage() {
   const [error, setError] = useState('')
   const inputsRef = useRef<HTMLInputElement[]>([])
 
-  const ADMIN_CODE = '1234'  // 하드코딩 검증 코드
+  const ADMIN_CODE = '5132'
 
   // 메뉴 불러와서 subtotal 계산용
   useEffect(() => {
