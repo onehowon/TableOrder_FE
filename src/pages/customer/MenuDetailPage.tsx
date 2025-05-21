@@ -44,6 +44,7 @@ export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [showConfirm, setShowConfirm] = useState(false)
 
+  // 메뉴 로드
   useEffect(() => {
     listAllMenus()
       .then(res => {
@@ -66,9 +67,7 @@ export default function MenuDetailPage() {
   // post-it 이미지 선택
   const postitImg = postitMap[menu.id] ?? '/placeholder.png'
 
-  const add    = () => setQuantity(q => q + 1)
-  const remove = () => setQuantity(q => Math.max(1, q - 1))
-
+  // 수량은 기본 1개, 그대로 유지
   const onAddToCart = () => {
     const key = `cart_${tableNumber}`
     const saved = localStorage.getItem(key)
@@ -113,26 +112,21 @@ export default function MenuDetailPage() {
           />
         </div>
 
-        {/* 수량 조절 + 장바구니 담기 */}
-        <div className="flex items-center px-4 pb-4 space-x-2">
+        {/* ↓ 여기를 두 버튼으로 교체! ↓ */}
+        <div className="flex px-4 pb-4 space-x-2">
           <button
-            onClick={remove}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition"
+            onClick={() => navigate(-1)}
+            className="flex-1 py-2 bg-pink-300 text-white rounded-full text-sm
+                       hover:bg-pink-400 transition"
           >
-            −
-          </button>
-          <span className="w-6 text-center text-lg">{quantity}</span>
-          <button
-            onClick={add}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition"
-          >
-            ＋
+            이전화면 가기
           </button>
           <button
             onClick={onAddToCart}
-            className="flex-1 py-2 bg-green-700 text-white rounded-full text-sm hover:bg-green-800 transition"
+            className="flex-1 py-2 bg-green-700 text-white rounded-full text-sm
+                       hover:bg-green-800 transition"
           >
-            장바구니 담기
+            장바구니 가기
           </button>
         </div>
       </div>
@@ -146,7 +140,8 @@ export default function MenuDetailPage() {
             </p>
             <button
               onClick={onConfirm}
-              className="px-6 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 transition"
+              className="px-6 py-2 bg-green-700 text-white rounded-full
+                         hover:bg-green-800 transition"
             >
               확인
             </button>
