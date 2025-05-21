@@ -59,7 +59,7 @@ export default function VerifyPage() {
 
   // 검증 후 주문 API 호출
   const handleVerify = async () => {
-    if (code.join('') === ADMIN_CODE) {
+    if (code.join('') !== ADMIN_CODE) {
       setError('코드가 틀렸습니다. 다시 입력해 주세요.')
       // 입력란 초기화
       setCode(['', '', '', ''])
