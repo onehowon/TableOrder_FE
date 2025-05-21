@@ -4,13 +4,37 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { listAllMenus } from '@/api'
 import type { MenuDTO } from '@/api'
 
+// 디자인용 포스트잇 PNG
+import postitSrc from '@/assets/포스트잇.png'
+
+// 메뉴별 사진 PNG
+import boksooniTteokImg      from '@/assets/복순이 떡볶이.png'
+import fryRiceImg             from '@/assets/신라면 볶음밥.png'
+import odengTangImg           from '@/assets/오뎅탕.png'
+import bibimSamgImg           from '@/assets/비빔삼겹.png'
+import lemonSojuImg           from '@/assets/레몬소주.png'
+import misugaruImg            from '@/assets/미숫가루.png'
+import tonkatsuImg            from '@/assets/피카츄 돈까스.png'
+import sooyoungSnackImg       from '@/assets/수영이의 첫사랑 간식.png'
+import bulDakImg              from '@/assets/엄마의 속앓이 불닭.png'
+
 interface CartState {
   [menuId: number]: number
 }
+type Params = { tableNumber: string; id: string }
 
-type Params = {
-  tableNumber: string
-  id: string
+// DB의 id에 맞춰 자산을 매핑
+const imageById: Record<number, string> = {
+  18: boksooniTteokImg,    // 복순이 떡볶이 - 살민 살아진다
+  19: fryRiceImg,          // 아재의 놀린 속 볶음밥 - 신라면 볶음밥
+  20: odengTangImg,        // 춘자 이모네 해장 오뎅탕
+  21: bibimSamgImg,        // 민석이의 관심법 비빔삼겹
+  23: lemonSojuImg,        // 민석이의 눈물 레몬소주
+  24: misugaruImg,         // 춘자 이모표 구수한 한 잔
+  25: tonkatsuImg,         // 복순이의 도시락 속 추억 돈까스
+  26: sooyoungSnackImg,    // 수영이 첫사랑 간식
+  27: misugaruImg,         // (중복) 춘자 이모표 구수한 한 잔
+  28: bulDakImg,           // 엄마의 속앓이 불닭
 }
 
 export default function MenuDetailPage() {
@@ -21,7 +45,7 @@ export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [showConfirm, setShowConfirm] = useState(false)
 
-  // 1) 메뉴 로드
+  // 메뉴 정보 로드
   useEffect(() => {
     listAllMenus()
       .then(res => {
@@ -41,7 +65,14 @@ export default function MenuDetailPage() {
 
   if (!menu) return null
 
-  // 2) 장바구니 담기
+  // id 기반으로 자산 선택, 없으면 placeholder
+  const menuImg = imageById[menu.id] ?? '/placeholder.png'
+
+  // 수량 조절
+  const add    = () => setQuantity(q => q + 1)
+  const remove = () => setQuantity(q => Math.max(1, q - 1))
+
+  // 장바구니 담기
   const onAddToCart = () => {
     const key = `cart_${tableNumber}`
     const saved = localStorage.getItem(key)
@@ -51,7 +82,7 @@ export default function MenuDetailPage() {
     setShowConfirm(true)
   }
 
-  // 3) 모달 확인
+  // 모달 확인
   const onConfirm = () => {
     setShowConfirm(false)
     navigate(-1)
@@ -59,48 +90,50 @@ export default function MenuDetailPage() {
 
   return (
     <div className="min-h-screen bg-white flex justify-center py-6 px-4">
-      {/* ▽ 카드 컨테이너 ▽ */}
       <div className="w-full max-w-xs bg-white rounded-xl overflow-hidden shadow-md">
-        {/* — 헤더 — */}
+        {/* 헤더 */}
         <div className="px-4 pt-4">
-          {/* 브랜드 텍스트 */}
           <div className="text-green-600 font-medium">아이비즈의</div>
-          {/* 메뉴명 */}
           <div className="text-xl font-bold text-gray-900">{menu.name}</div>
-          {/* 언더라인 */}
           <div className="mt-1 w-12 border-b-2 border-green-600"></div>
-          {/* 상세설명 탭 */}
-          <div className="mt-2 text-green-600 font-medium underline">상세설명</div>
+          <div className="mt-2 text-green-600 font-medium underline">
+            상세설명
+          </div>
         </div>
 
-        {/* — 이미지 — */}
+        {/* 동적 메뉴 이미지 */}
         <img
-          src={menu.imageUrl ?? '/placeholder.png'}
+          src={menuImg}
           alt={menu.name}
           className="w-full h-48 object-cover mt-2"
         />
 
-        {/* — 포스트잇 패널 — */}
-        <div className="relative m-4 p-4 bg-yellow-100 rounded-lg shadow-inner">
-          {/* 테이프 */}
+        {/* 포스트잇 패널 */}
+        <div className="relative m-4">
+          <div
+            className="w-full bg-no-repeat bg-center bg-cover rounded-lg overflow-hidden"
+            style={{ backgroundImage: `url(${postitSrc})` }}
+          >
+            <div className="p-4">
+              <h3 className="text-green-700 font-semibold text-center">
+                {menu.name}
+              </h3>
+              <p className="text-gray-900 font-bold text-center mt-1">
+                {menu.price.toLocaleString()}원
+              </p>
+              <p className="mt-3 text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                {menu.description ?? '상세 설명이 없습니다.'}
+              </p>
+            </div>
+          </div>
+          {/* 테이프 느낌 CSS */}
           <div className="absolute top-0 left-1/2 w-16 h-2 bg-yellow-200
-                          transform -translate-x-1/2 -translate-y-2 rotate-3 rounded-sm" />
-          {/* 메뉴명(스티커 타이틀) */}
-          <h3 className="text-green-700 font-semibold text-center">
-            {menu.name}
-          </h3>
-          {/* 가격 */}
-          <p className="text-gray-900 font-bold text-center mt-1">
-            {menu.price.toLocaleString()}원
-          </p>
-          {/* 설명 */}
-          <p className="mt-3 text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-            {menu.description ?? '상세 설명이 없습니다.'}
-          </p>
+                          transform -translate-x-1/2 -translate-y-2 rotate-3
+                          rounded-sm" />
         </div>
 
-        {/* — 버튼 그룹 — */}
-        <div className="flex px-4 pb-4 space-x-2">
+        {/* 수량 + 버튼 그룹 */}
+        <div className="flex items-center px-4 pb-4 space-x-2">
           <button
             onClick={() => navigate(-1)}
             className="flex-1 py-2 bg-pink-300 text-white rounded-full text-sm
@@ -108,17 +141,38 @@ export default function MenuDetailPage() {
           >
             이전화면 가기
           </button>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={remove}
+              className="w-8 h-8 flex items-center justify-center border
+                         border-gray-300 rounded-full text-gray-800
+                         hover:bg-gray-100 transition"
+            >
+              −
+            </button>
+            <span className="w-6 text-center text-lg">{quantity}</span>
+            <button
+              onClick={add}
+              className="w-8 h-8 flex items-center justify-center border
+                         border-gray-300 rounded-full text-gray-800
+                         hover:bg-gray-100 transition"
+            >
+              ＋
+            </button>
+          </div>
+
           <button
             onClick={onAddToCart}
             className="flex-1 py-2 bg-green-700 text-white rounded-full text-sm
                        hover:bg-green-800 transition"
           >
-            장바구니 가기
+            장바구니 담기
           </button>
         </div>
       </div>
 
-      {/* — 확인 모달 — */}
+      {/* 확인 모달 */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 mx-4 max-w-xs text-center">
