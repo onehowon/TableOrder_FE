@@ -87,8 +87,10 @@ export default function MenuDetailPage() {
           <h1 className="mt-3 text-2xl font-extrabold text-green-600">
             상세설명
           </h1>
-          <div className="mt-2 w-24 h-1 bg-green-600 rounded"></div>
+          <div className="mt-2 w-22 h-1 bg-green-600 rounded"></div>
         </div>
+
+        <hr className="border-t border-gray-200 mx-4 my-2" />
 
         {/* ───────── 메뉴 이미지 ───────── */}
         <img
@@ -96,6 +98,8 @@ export default function MenuDetailPage() {
           alt={menu.name}
           className="w-full h-56 object-cover mt-4"
         />
+
+        <hr className="border-t border-gray-200 mx-4 my-2" />
 
         {/* ───────── post-it PNG ───────── */}
         <div className="p-4">
