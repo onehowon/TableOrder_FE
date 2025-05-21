@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { listAllMenus } from '@/api'
 import type { MenuDTO } from '@/api'
-import logoSrc from '@/assets/engine.png'
 
 // 메뉴별 post-it PNG import
 import tteokPostit     from '@/assets/복순이 떡볶이.png'
@@ -17,7 +16,9 @@ import snackPostit     from '@/assets/수영이의 첫사랑 간식.png'
 import grapePostit     from '@/assets/포도소주.png'
 import buldakPostit    from '@/assets/엄마의 속앓이 불닭.png'
 
-interface CartState { [menuId: number]: number }
+interface CartState {
+  [menuId: number]: number
+}
 type Params = { tableNumber: string; id: string }
 
 // DB id → post-it PNG 매핑
@@ -60,6 +61,7 @@ export default function MenuDetailPage() {
   }, [id, navigate])
 
   if (!menu) return null
+
   const postitImg = postitMap[menu.id] ?? '/placeholder.png'
 
   const onAddToCart = () => {
@@ -76,28 +78,23 @@ export default function MenuDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center py-6 px-4">
+    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4 font-woowahan">
       <div className="w-full max-w-xs bg-white rounded-xl shadow-md overflow-hidden">
-        {/* — 헤더 (언더라인 제거) — */}
-        <div className="px-4 pt-4 text-center">
-          <img src={logoSrc} alt="EngiNE" className="h-8 mx-auto" />
-          <div className="mt-2 text-green-600 font-medium">아이비즈의</div>
-          <div className="mt-1 text-2xl font-bold text-gray-900">
-            {menu.name}
-          </div>
-          <a className="mt-2 block text-green-600 font-medium underline">
-            상세설명
-          </a>
+        {/* 헤더 */}
+        <div className="px-4 pt-6 text-center">
+          <div className="text-green-600 font-medium">아이비즈의</div>
+          <div className="text-lg font-bold text-gray-900 mt-1">폭싹 속았슈퍼</div>
+          <h1 className="mt-3 text-2xl font-bold text-green-600">상세설명</h1>
         </div>
 
-        {/* — 메뉴 이미지 (높이 h-56로 늘림) — */}
+        {/* 실제 메뉴 사진 */}
         <img
           src={menu.imageUrl ?? '/placeholder.png'}
           alt={menu.name}
           className="w-full h-56 object-cover mt-2"
         />
 
-        {/* — post-it PNG — */}
+        {/* post-it 이미지 */}
         <div className="p-4">
           <img
             src={postitImg}
@@ -106,26 +103,24 @@ export default function MenuDetailPage() {
           />
         </div>
 
-        {/* — 두 버튼 — */}
+        {/* 버튼 두 개 */}
         <div className="flex px-4 pb-4 space-x-2">
           <button
             onClick={() => navigate(-1)}
-            className="flex-1 py-2 bg-pink-300 text-white rounded-full text-sm
-                       hover:bg-pink-400 transition"
+            className="flex-1 py-2 bg-pink-300 text-white rounded-full text-sm hover:bg-pink-400 transition"
           >
             이전화면 가기
           </button>
           <button
             onClick={onAddToCart}
-            className="flex-1 py-2 bg-green-700 text-white rounded-full text-sm
-                       hover:bg-green-800 transition"
+            className="flex-1 py-2 bg-green-700 text-white rounded-full text-sm hover:bg-green-800 transition"
           >
             장바구니 가기
           </button>
         </div>
       </div>
 
-      {/* — 확인 모달 (변경 없음) — */}
+      {/* 확인 모달 */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 mx-4 max-w-xs text-center">
@@ -134,8 +129,7 @@ export default function MenuDetailPage() {
             </p>
             <button
               onClick={onConfirm}
-              className="px-6 py-2 bg-green-700 text-white rounded-full
-                         hover:bg-green-800 transition"
+              className="px-6 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 transition"
             >
               확인
             </button>
