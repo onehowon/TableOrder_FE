@@ -87,7 +87,7 @@ export default function MenuDetailPage() {
           <h1 className="mt-3 text-2xl font-extrabold text-green-600">
             상세설명
           </h1>
-          <div className="mt-2 w-22 h-1 bg-green-600 rounded"></div>
+          <div className="mt-2 w-24 h-1 bg-green-600 rounded"></div>
         </div>
 
         <hr className="border-t border-gray-200 mx-4 my-2" />
