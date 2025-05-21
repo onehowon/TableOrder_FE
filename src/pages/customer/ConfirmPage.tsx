@@ -38,7 +38,7 @@ export default function ConfirmPage() {
   }, [tableNumber, state.cart, nav])
 
   return (
-    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4">
+    <div className="w-full h-screen bg-white flex flex-col items-center justify-center p-4 font-woowahan">
       <img src="/logo.png" alt="Engine" className="h-12 mb-12" />
       <h1 className="text-2xl font-bold mb-6 text-center">
         주문이 정상<br/>접수되었습니다!
