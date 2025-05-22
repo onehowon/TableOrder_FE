@@ -7,6 +7,7 @@ import StatsPage             from './pages/admin/StatsPage'
 import ErrorBoundary         from './components/ErrorBoundary'
 import OrderListPage         from './pages/admin/OrderListPage'
 import MenuManagementPage from './pages/admin/MenuManagementPage'
+import MenuIntroPage   from './pages/customer/MenuIntroPage'
 
 // Customer
 import { CartProvider } from './contexts/CartContext'
@@ -59,6 +60,7 @@ export default function App() {
       <Route path="/customer/:tableNumber/request" element={<RequestPage />} />
       <Route path="/customer/:tableNumber/placed"  element={<OrderPlacedPage />} />
       <Route path="/customer/:tableNumber/menu/:id" element={<MenuDetailPage />}/>
+      <Route path="/customer/:tableNumber/menuintro" element={<MenuIntroPage />} />
 
       {/* 잘못된 /customer/:tableNumber/* 경로는 인덱스로 돌려보냄 */}
       <Route
