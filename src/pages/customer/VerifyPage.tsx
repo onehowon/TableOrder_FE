@@ -23,6 +23,7 @@ export default function VerifyPage() {
   const [menus, setMenus] = useState<MenuDTO[]>([])
   const [code, setCode] = useState(['', '', '', ''])
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const inputsRef = useRef<HTMLInputElement[]>([])
 
   const ADMIN_CODE = '5132'
@@ -59,14 +60,18 @@ export default function VerifyPage() {
 
   // 검증 후 주문 API 호출
   const handleVerify = async () => {
+    if (isSubmitting) return
+
     if (code.join('') !== ADMIN_CODE) {
       setError('코드가 틀렸습니다. 다시 입력해 주세요.')
       // 입력란 초기화
       setCode(['', '', '', ''])
       // 첫번째 칸에 포커스
-      inputsRef.current[0].focus()
+      inputsRef.current[0]?.focus()
       return
     }
+
+    setIsSubmitting(true)
     try {
       await postOrder({
         tableNumber: Number(tableNumber),
@@ -75,6 +80,7 @@ export default function VerifyPage() {
       navigate(`/customer/${tableNumber}/placed`, { replace: true })
     } catch {
       alert('주문 중 오류가 발생했습니다.')
+      setIsSubmitting(false)
     }
   }
 
@@ -123,7 +129,11 @@ export default function VerifyPage() {
         ))}
         <button
           onClick={handleVerify}
-          className="ml-4 text-3xl font-bold text-green-600 hover:text-green-800 transition"
+          disabled={isSubmitting}
+          className={`
+            ml-4 text-3xl font-bold text-green-600 hover:text-green-800 transition
+            ${isSubmitting ? 'opacity-50 cursor-not-allowed hover:text-green-600' : ''}
+          `}
         >
           →
         </button>
