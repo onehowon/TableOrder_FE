@@ -60,7 +60,7 @@ export default function App() {
       <Route path="/customer/:tableNumber/request" element={<RequestPage />} />
       <Route path="/customer/:tableNumber/placed"  element={<OrderPlacedPage />} />
       <Route path="/customer/:tableNumber/menu/:id" element={<MenuDetailPage />}/>
-      <Route path="/customer/:tableNumber/menuintro" element={<MenuIntroPage />} />
+      <Route path="/customer/menuintro" element={<MenuIntroPage />} />
 
       {/* 잘못된 /customer/:tableNumber/* 경로는 인덱스로 돌려보냄 */}
       <Route
