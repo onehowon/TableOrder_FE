@@ -85,22 +85,27 @@ export default function StatsPage() {
     const wsMenu = XLSX.utils.json_to_sheet(menuData)
     XLSX.utils.book_append_sheet(wb, wsMenu, '메뉴별 이윤')
 
-    // 시트2: 주문 상세
-    const orderRows = filteredOrders.map(o => {
-      const itemsStr = o.items.map(i => `${i.name}×${i.quantity}`).join(', ')
-      const totalAmt = o.items.reduce(
-        (sum, i) => sum + ((priceMap[i.name] || 0) * i.quantity),
-        0
-      )
-      return {
-        주문번호: o.orderId,
-        테이블: o.tableNumber,
-        시각: new Date(o.createdAt).toLocaleString('ko-KR'),
-        항목: itemsStr,
-        총금액: totalAmt,
-      }
+    // 시트2: 주문 상세 (아이템별로 분리)
+    const orderRows: Record<string, string|number>[] = []
+    filteredOrders.forEach(o => {
+      const timestamp = new Date(o.createdAt).toLocaleString('ko-KR', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      })
+      o.items.forEach(i => {
+        const unitPrice = priceMap[i.name] || 0
+        orderRows.push({
+          시각: timestamp,
+          테이블: o.tableNumber,
+          메뉴명: i.name,
+          수량: i.quantity,
+          단가: unitPrice,
+          금액: unitPrice * i.quantity,
+        })
+      })
     })
-    const wsOrder = XLSX.utils.json_to_sheet(orderRows)
+    const wsOrder = XLSX.utils.json_to_sheet(orderRows, {
+      header: ['시각','테이블','메뉴명','수량','단가','금액']
+    })
     XLSX.utils.book_append_sheet(wb, wsOrder, '주문 상세')
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
