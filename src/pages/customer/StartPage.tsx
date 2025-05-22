@@ -26,22 +26,19 @@ export default function StatsPage() {
 
   if (!stats) return <p>Loading…</p>
 
-  // 1) 매출
-  const totalRevenue = stats.totalRevenue ?? 0
-
-  // 2) 메뉴별 이윤 데이터
+  // ─── 메뉴별 이윤 데이터 ─────────────────────────
   const menuData = (stats.salesByMenu ?? []).map(m => ({
     name: m.menuName,
-    profit: m.profit ?? 0,
+    profit: m.profit ?? 0,  // profit 필드가 없으면 0으로 처리
   }))
 
-  // 3) 이윤: 백엔드 totalProfit 이 있으면 쓰고, 없으면 menuData 합계
-  const totalProfit = 
-    stats.totalProfit != null
-      ? stats.totalProfit
-      : menuData.reduce((sum, m) => sum + m.profit, 0)
+  // ─── 총 이윤: 프론트에서 메뉴별 이윤 합산 ────────────
+  const totalProfit = menuData.reduce((sum, m) => sum + m.profit, 0)
 
-  // 시간대별 매출
+  // ─── 총 매출 ───────────────────────────────────────
+  const totalRevenue = stats.totalRevenue ?? 0
+
+  // ─── 시간대별 매출 (0시~23시) ───────────────────────
   const hourlyData = Array.from({ length: 24 }, (_, h) => ({
     hour: `${h}시`,
     revenue: stats.salesByHour.find(p => p.hour === h)?.revenue || 0,
