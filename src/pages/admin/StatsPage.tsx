@@ -14,12 +14,16 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 
 export default function StatsPage() {
   const [stats, setStats] = useState<SalesStatsDTO | null>(null)
 
   useEffect(() => {
-    getSalesStatsAdmin().then(r => setStats(r.data.data))
+    getSalesStatsAdmin()
+      .then(r => setStats(r.data.data))
+      .catch(() => alert('통계 정보를 불러오는 데 실패했습니다.'))
   }, [])
 
   if (!stats) return <p>Loading…</p>
@@ -37,11 +41,43 @@ export default function StatsPage() {
   // 메뉴별 이윤 데이터
   const menuData = (stats.salesByMenu ?? []).map(m => ({
     name: m.menuName,
-    profit: m.profit,
+    profit: m.profit ?? 0,
   }))
+
+  // 엑셀 다운로드 핸들러
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new()
+
+    // 시트1: 시간대별 매출
+    const wsHour = XLSX.utils.json_to_sheet(hourlyData)
+    XLSX.utils.book_append_sheet(wb, wsHour, '시간대별 매출')
+
+    // 시트2: 메뉴별 이윤
+    const wsMenu = XLSX.utils.json_to_sheet(menuData)
+    XLSX.utils.book_append_sheet(wb, wsMenu, '메뉴별 이윤')
+
+    // 워크북을 바이너리 배열로 변환
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+
+    // 파일 저장
+    saveAs(
+      new Blob([wbout], { type: 'application/octet-stream' }),
+      `sales_report_${new Date().toISOString().slice(0,10)}.xlsx`
+    )
+  }
 
   return (
     <div className="p-6 space-y-6">
+      {/* 보고서 다운로드 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={exportToExcel}
+          className="px-4 py-2 bg-green-500 text-white rounded shadow"
+        >
+          보고서 다운로드
+        </button>
+      </div>
+
       {/* 상단 카드 */}
       <div className="flex space-x-4">
         <div className="p-4 bg-white rounded shadow">
