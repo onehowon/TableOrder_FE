@@ -1,9 +1,10 @@
 // src/pages/admin/OrderBoardPage.tsx
-import { useEffect, useState, ChangeEvent, MouseEvent } from 'react'
+import { useEffect, useState, ChangeEvent, useRef } from 'react'
 import { listOrdersAdmin, updateOrderStatus } from '@/api'
 import type { OrderDetailDTO } from '@/api'
 
 const PAGE_SIZE = 6
+const NEW_ORDER_SOUND = '/sounds/baedalyi-minjog.mp3'
 
 // ─────────── OrderCard 컴포넌트 ───────────
 interface OrderCardProps {
@@ -13,12 +14,9 @@ interface OrderCardProps {
 }
 
 function OrderCard({ order: o, selected, onSelect }: OrderCardProps) {
-  // 체크된 아이템 인덱스 집합
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set())
-
   const isSel = o.orderId === selected
 
-  // 아이템 토글 (ChangeEvent로 타입 맞춤)
   const toggleItem = (idx: number, e: ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation()
     setCheckedItems(prev => {
@@ -53,7 +51,7 @@ function OrderCard({ order: o, selected, onSelect }: OrderCardProps) {
             <div
               key={i.name + idx}
               className="flex justify-between items-center whitespace-nowrap text-lg text-gray-700"
-              onClick={e => e.stopPropagation()} // 카드 선택 방지
+              onClick={e => e.stopPropagation()}
             >
               <label className="flex items-center flex-1">
                 <input
@@ -103,15 +101,32 @@ export default function OrderBoardPage() {
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
 
-  // 1) 서버에서 주문 불러오기
-  const fetch = async () => {
+  // 사운드 재생용 Audio 객체와 이전 주문 ID 저장용 ref
+  const audioRef = useRef<HTMLAudioElement>(new Audio(NEW_ORDER_SOUND))
+  const prevOrderIdsRef = useRef<Set<number>>(new Set())
+
+  // 주문 불러오고, 새 주문 감지 시 사운드 재생
+  const fetchAndNotify = async () => {
     const res = await listOrdersAdmin()
-    setOrders(res.data.data.filter(o => o.status !== 'DELETED'))
+    const newList = res.data.data.filter(o => o.status !== 'DELETED')
+
+    // 새 주문 감지 로직
+    const prevIds = prevOrderIdsRef.current
+    const newIds = new Set(newList.map(o => o.orderId))
+    const hasNewOrder = [...newIds].some(id => !prevIds.has(id))
+    if (hasNewOrder) {
+      audioRef.current.play().catch(() => {
+        // 자동 재생이 막힐 경우, 별도 UI로 알림하거나 첫 클릭 이후에만 재생 보장
+      })
+    }
+
+    setOrders(newList)
+    prevOrderIdsRef.current = newIds
   }
 
   useEffect(() => {
-    fetch()
-    const iv = setInterval(fetch, 5000)
+    fetchAndNotify()
+    const iv = setInterval(fetchAndNotify, 5000)
     return () => clearInterval(iv)
   }, [])
 
@@ -126,7 +141,7 @@ export default function OrderBoardPage() {
     if (selected == null) return
     await updateOrderStatus(selected, { status: newStatus })
     setSelected(null)
-    fetch()
+    fetchAndNotify()
   }
 
   return (
@@ -140,7 +155,7 @@ export default function OrderBoardPage() {
             key={o.orderId}
             order={o}
             selected={selected}
-            onSelect={setSelected} // number|null 모두 허용
+            onSelect={setSelected}
           />
         ))}
       </div>
