@@ -50,21 +50,23 @@ function OrderCard({ order: o, selected, onSelect }: OrderCardProps) {
           return (
             <div
               key={i.name + idx}
-              className="flex justify-between items-center whitespace-nowrap text-lg text-gray-700"
+              className="flex justify-between items-start text-lg text-gray-700"
               onClick={e => e.stopPropagation()}
             >
-              <label className="flex items-center flex-1">
+              <label className="flex items-start flex-1 space-x-2">
                 <input
                   type="checkbox"
                   checked={done}
                   onChange={e => toggleItem(idx, e)}
-                  className="mr-2"
+                  className="mr-2 mt-1"
                 />
-                <span className={done ? 'line-through text-gray-400' : ''}>
+                <span
+                  className={`break-words ${done ? 'line-through text-gray-400' : ''}`}
+                >
                   {i.name}
                 </span>
               </label>
-              <span className={done ? 'line-through text-gray-400' : ''}>
+              <span className={`${done ? 'line-through text-gray-400' : ''} whitespace-nowrap`}>
                 {i.quantity}개
               </span>
             </div>
@@ -101,23 +103,18 @@ export default function OrderBoardPage() {
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
 
-  // 사운드 재생용 Audio 객체와 이전 주문 ID 저장용 ref
   const audioRef = useRef<HTMLAudioElement>(new Audio(NEW_ORDER_SOUND))
   const prevOrderIdsRef = useRef<Set<number>>(new Set())
 
-  // 주문 불러오고, 새 주문 감지 시 사운드 재생
   const fetchAndNotify = async () => {
     const res = await listOrdersAdmin()
     const newList = res.data.data.filter(o => o.status !== 'DELETED')
 
-    // 새 주문 감지 로직
     const prevIds = prevOrderIdsRef.current
     const newIds = new Set(newList.map(o => o.orderId))
     const hasNewOrder = [...newIds].some(id => !prevIds.has(id))
     if (hasNewOrder) {
-      audioRef.current.play().catch(() => {
-        // 자동 재생이 막힐 경우, 별도 UI로 알림하거나 첫 클릭 이후에만 재생 보장
-      })
+      audioRef.current.play().catch(() => {})
     }
 
     setOrders(newList)
@@ -130,13 +127,11 @@ export default function OrderBoardPage() {
     return () => clearInterval(iv)
   }, [])
 
-  // 페이징 처리
   const pageOrders = orders.slice(
     page * PAGE_SIZE,
     (page + 1) * PAGE_SIZE
   )
 
-  // 주문 전체 완료/삭제
   const handleAction = async (newStatus: 'SERVED' | 'DELETED') => {
     if (selected == null) return
     await updateOrderStatus(selected, { status: newStatus })

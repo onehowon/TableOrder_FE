@@ -42,18 +42,10 @@ export default function App() {
         {/* 기본 페이지 */}
         <Route index element={<Navigate to="boards" replace />} />
 
-        {/* 주문 리스트 (boards) */}
-        <Route
-          path="boards"
-          element={
-            <ErrorBoundary>
-              <OrderListPage />
-            </ErrorBoundary>
-          }
-        />
+        <Route path="boards" element={<OrderBoardPage />} />
 
-        {/* 주문 현황 (orders) */}
-        <Route path="orders" element={<OrderBoardPage />} />
+        {/* 주문 리스트 (orders) */}
+        <Route path="orders" element={<OrderListPage />} />
 
         {/* 직원 호출 (requests) */}
         <Route path="requests" element={<RequestAlertPage />} />
