@@ -133,6 +133,7 @@ export default function VerifyPage() {
           className={`
             ml-4 text-3xl font-bold text-green-600 hover:text-green-800 transition
             ${isSubmitting ? 'opacity-50 cursor-not-allowed hover:text-green-600' : ''}
+            font-sans 
           `}
         >
           →
