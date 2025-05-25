@@ -32,23 +32,33 @@ function RedirectToCustomerIndex() {
 export default function App() {
   return (
     <Routes>
-      {/* ───────────────── Login ───────────────── */}
+      {/* 로그인 */}
       <Route path="/admin/login" element={<LoginPage />} />
 
-      {/* ───────────────── Admin ───────────────── */}
-      <Route path="/" element={<Navigate to="/admin/requests" replace />} />
-      <Route path="/admin" element={<Navigate to="/admin/requests" replace />} />
+      {/* 루트 접속 시 /admin/alerts 로 보내기 */}
+      <Route path="/" element={<Navigate to="/admin/alerts" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin/alerts" replace />} />
+
+      {/* ───────────────── Admin 영역 ───────────────── */}
       <Route path="/admin/*" element={<AdminLayout />}>
-        {/* 기본 페이지 */}
-        <Route index element={<Navigate to="boards" replace />} />
+        {/* /admin → /admin/alerts */}
+        <Route index element={<Navigate to="alerts" replace />} />
 
-        <Route path="boards" element={<OrderBoardPage />} />
+        {/* 주문 리스트 (boards) */}
+        <Route
+          path="boards"
+          element={
+            <ErrorBoundary>
+              <OrderListPage />
+            </ErrorBoundary>
+          }
+        />
 
-        {/* 주문 리스트 (orders) */}
-        <Route path="orders" element={<OrderListPage />} />
+        {/* 주문 현황 (orders) */}
+        <Route path="orders" element={<OrderBoardPage />} />
 
-        {/* 직원 호출 (requests) */}
-        <Route path="requests" element={<RequestAlertPage />} />
+        {/* 직원 호출 (alerts) */}
+        <Route path="alerts" element={<RequestAlertPage />} />
 
         {/* 매출 통계 (sales) */}
         <Route
@@ -71,7 +81,7 @@ export default function App() {
         />
       </Route>
 
-      {/* ───────────────── Customer ───────────────── */}
+      {/* ───────────────── Customer 영역 ───────────────── */}
       <Route path="/customer/:tableNumber"         element={<WelcomePage />} />
       <Route path="/customer/:tableNumber/start"   element={<StartPage />} />
       <Route path="/customer/:tableNumber/menu"    element={<MenuPage />} />
@@ -90,8 +100,8 @@ export default function App() {
         element={<RedirectToCustomerIndex />}
       />
 
-      {/* ───────────────── Catch-all ───────────────── */}
-      <Route path="*" element={<Navigate to="/admin/requests" replace />} />
+      {/* 그 외 경로는 관리자 호출 알림으로 */}
+      <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
     </Routes>
   )
 }
