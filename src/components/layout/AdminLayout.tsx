@@ -6,6 +6,9 @@ import { useEffect, useState, createContext } from 'react'
 import { listRequestsAdmin } from '@/api'
 import type { CustomerRequestDTO } from '@/api'
 
+// 사운드 알림 전역 컴포넌트
+import GlobalNotifier from '@/components/GlobalNotifier'
+
 /** 읽지 않은 직원 호출 알림 개수를 공급하는 Context **/
 export const UnreadRequestsContext = createContext<{ unread: number }>({ unread: 0 })
 
@@ -44,26 +47,31 @@ export default function AdminLayout() {
   const unread = requests.length
 
   return (
-    <UnreadRequestsContext.Provider value={{ unread }}>
-      <div className="flex h-screen bg-gray-50">
-        <SideNav />
+    <>
+      {/* ─── Admin 전용 알림(주문 + 호출) 폴링/사운드 컴포넌트 ─── */}
+      <GlobalNotifier />
 
-        <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between px-6 bg-white border-b shadow-sm">
-            <h1 className="text-xl font-bold">admin page</h1>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded"
-            >
-              로그아웃
-            </button>
-          </header>
+      <UnreadRequestsContext.Provider value={{ unread }}>
+        <div className="flex h-screen bg-gray-50">
+          <SideNav />
 
-          <main className="flex-1 p-6 overflow-auto">
-            <Outlet />
-          </main>
+          <div className="flex-1 flex flex-col">
+            <header className="h-16 flex items-center justify-between px-6 bg-white border-b shadow-sm">
+              <h1 className="text-xl font-bold">admin page</h1>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded"
+              >
+                로그아웃
+              </button>
+            </header>
+
+            <main className="flex-1 p-6 overflow-auto">
+              <Outlet />
+            </main>
+          </div>
         </div>
-      </div>
-    </UnreadRequestsContext.Provider>
+      </UnreadRequestsContext.Provider>
+    </>
   )
 }
