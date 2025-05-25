@@ -2,11 +2,11 @@
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 
 import AdminLayout         from './components/layout/AdminLayout'
-import OrderBoardPage      from './pages/admin/OrderBoardPage'
-import RequestAlertPage    from './pages/admin/RequestAlertPage'
+import OrderBoardPage      from './pages/admin/OrderBoardPage'    // boards
+import RequestAlertPage    from './pages/admin/RequestAlertPage'  // alerts
 import StatsPage           from './pages/admin/StatsPage'
 import ErrorBoundary       from './components/ErrorBoundary'
-import OrderListPage       from './pages/admin/OrderListPage'
+import OrderListPage       from './pages/admin/OrderListPage'     // orders
 import MenuManagementPage  from './pages/admin/MenuManagementPage'
 
 // Customer
@@ -35,18 +35,21 @@ export default function App() {
       {/* 로그인 */}
       <Route path="/admin/login" element={<LoginPage />} />
 
-      {/* 루트 접속 시 /admin/alerts 로 보내기 */}
+      {/* 기본 리다이렉트 */}
       <Route path="/" element={<Navigate to="/admin/alerts" replace />} />
       <Route path="/admin" element={<Navigate to="/admin/alerts" replace />} />
 
-      {/* ───────────────── Admin 영역 ───────────────── */}
+      {/* Admin 영역 */}
       <Route path="/admin/*" element={<AdminLayout />}>
         {/* /admin → /admin/alerts */}
         <Route index element={<Navigate to="alerts" replace />} />
 
-        {/* 주문 리스트 (boards) */}
+        {/* boards → 주문 현황( OrderBoardPage ) */}
+        <Route path="boards" element={<OrderBoardPage />} />
+
+        {/* orders → 주문 리스트( OrderListPage ) */}
         <Route
-          path="boards"
+          path="orders"
           element={
             <ErrorBoundary>
               <OrderListPage />
@@ -54,13 +57,10 @@ export default function App() {
           }
         />
 
-        {/* 주문 현황 (orders) */}
-        <Route path="orders" element={<OrderBoardPage />} />
-
-        {/* 직원 호출 (alerts) */}
+        {/* alerts → 직원 호출 */}
         <Route path="alerts" element={<RequestAlertPage />} />
 
-        {/* 매출 통계 (sales) */}
+        {/* sales → 매출 통계 */}
         <Route
           path="sales"
           element={
@@ -70,7 +70,7 @@ export default function App() {
           }
         />
 
-        {/* 메뉴 관리 (menus) */}
+        {/* menus → 메뉴 관리 */}
         <Route
           path="menus"
           element={
@@ -81,7 +81,7 @@ export default function App() {
         />
       </Route>
 
-      {/* ───────────────── Customer 영역 ───────────────── */}
+      {/* Customer 영역 */}
       <Route path="/customer/:tableNumber"         element={<WelcomePage />} />
       <Route path="/customer/:tableNumber/start"   element={<StartPage />} />
       <Route path="/customer/:tableNumber/menu"    element={<MenuPage />} />
@@ -100,7 +100,7 @@ export default function App() {
         element={<RedirectToCustomerIndex />}
       />
 
-      {/* 그 외 경로는 관리자 호출 알림으로 */}
+      {/* 그 외 모두 /admin/alerts 로 */}
       <Route path="*" element={<Navigate to="/admin/alerts" replace />} />
     </Routes>
   )
