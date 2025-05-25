@@ -11,14 +11,14 @@ import MenuManagementPage  from './pages/admin/MenuManagementPage'
 
 // Customer
 import WelcomePage         from './pages/customer/WelcomePage'
+import StartPage           from './pages/customer/StartPage'
 import MenuPage            from './pages/customer/MenuPage'
 import ConfirmPage         from './pages/customer/ConfirmPage'
 import OrderStatusPage     from './pages/customer/OrderStatusPage'
 import SummaryPage         from './pages/customer/SummaryPage'
-import RequestPage         from './pages/customer/RequestPage'
-import StartPage           from './pages/customer/StartPage'
-import OrderPlacedPage     from './pages/customer/OrderPlacedPage'
 import VerifyPage          from './pages/customer/VerifyPage'
+import RequestPage         from './pages/customer/RequestPage'
+import OrderPlacedPage     from './pages/customer/OrderPlacedPage'
 import MenuDetailPage      from './pages/customer/MenuDetailPage'
 
 // Admin 로그인 페이지
@@ -32,17 +32,17 @@ function RedirectToCustomerIndex() {
 export default function App() {
   return (
     <Routes>
-      {/* Login */}
+      {/* ───────────────── Login ───────────────── */}
       <Route path="/admin/login" element={<LoginPage />} />
 
-      {/* Admin 영역 */}
+      {/* ───────────────── Admin ───────────────── */}
       <Route path="/" element={<Navigate to="/admin/requests" replace />} />
       <Route path="/admin" element={<Navigate to="/admin/requests" replace />} />
       <Route path="/admin/*" element={<AdminLayout />}>
-        {/* /admin → /admin/boards */}
+        {/* 기본 페이지 */}
         <Route index element={<Navigate to="boards" replace />} />
 
-        {/* 주문 리스트 */}
+        {/* 주문 리스트 (boards) */}
         <Route
           path="boards"
           element={
@@ -52,13 +52,13 @@ export default function App() {
           }
         />
 
-        {/* 주문 현황 (사운드 알림 포함) */}
+        {/* 주문 현황 (orders) */}
         <Route path="orders" element={<OrderBoardPage />} />
 
-        {/* 직원 호출 알림 */}
+        {/* 직원 호출 (requests) */}
         <Route path="requests" element={<RequestAlertPage />} />
 
-        {/* 매출 통계 */}
+        {/* 매출 통계 (sales) */}
         <Route
           path="sales"
           element={
@@ -68,7 +68,7 @@ export default function App() {
           }
         />
 
-        {/* 메뉴 관리 */}
+        {/* 메뉴 관리 (menus) */}
         <Route
           path="menus"
           element={
@@ -79,7 +79,7 @@ export default function App() {
         />
       </Route>
 
-      {/* Customer 영역 */}
+      {/* ───────────────── Customer ───────────────── */}
       <Route path="/customer/:tableNumber"         element={<WelcomePage />} />
       <Route path="/customer/:tableNumber/start"   element={<StartPage />} />
       <Route path="/customer/:tableNumber/menu"    element={<MenuPage />} />
@@ -89,15 +89,16 @@ export default function App() {
       <Route path="/customer/:tableNumber/verify"  element={<VerifyPage />} />
       <Route path="/customer/:tableNumber/request" element={<RequestPage />} />
       <Route path="/customer/:tableNumber/placed"  element={<OrderPlacedPage />} />
-      <Route path="/customer/:tableNumber/menu/:id" element={<MenuDetailPage />} />
-
-      {/* 잘못된 /customer/:tableNumber/* 은 인덱스로 */}
+      <Route
+        path="/customer/:tableNumber/menu/:id"
+        element={<MenuDetailPage />}
+      />
       <Route
         path="/customer/:tableNumber/*"
         element={<RedirectToCustomerIndex />}
       />
 
-      {/* 나머지 경로 모두 Admin 호출 알림으로 */}
+      {/* ───────────────── Catch-all ───────────────── */}
       <Route path="*" element={<Navigate to="/admin/requests" replace />} />
     </Routes>
   )
