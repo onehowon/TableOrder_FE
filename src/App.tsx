@@ -8,6 +8,7 @@ import StatsPage           from './pages/admin/StatsPage'
 import ErrorBoundary       from './components/ErrorBoundary'
 import OrderListPage       from './pages/admin/OrderListPage'     // orders
 import MenuManagementPage  from './pages/admin/MenuManagementPage'
+import MenuIntroPage       from './pages/customer/MenuIntroPage'
 
 // Customer
 import WelcomePage         from './pages/customer/WelcomePage'
@@ -80,6 +81,8 @@ export default function App() {
           }
         />
       </Route>
+
+      <Route path="/customer/menuintro" element={<MenuIntroPage />} />
 
       {/* Customer 영역 */}
       <Route path="/customer/:tableNumber"         element={<WelcomePage />} />
