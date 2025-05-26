@@ -134,7 +134,7 @@ export default function MenuPage() {
                 <span className="w-5 text-center">{cart[menu.id] || 0}</span>
                 <button
                   onClick={e => { e.stopPropagation(); add(menu.id) }}
-                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
+                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition font-sans"
                 >＋</button>
                 <button
                   onClick={e => { e.stopPropagation(); add(menu.id) }}
