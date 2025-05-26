@@ -129,7 +129,7 @@ export default function MenuPage() {
               <div className="flex items-center space-x-3 flex-shrink-0">
                 <button
                   onClick={e => { e.stopPropagation(); remove(menu.id) }}
-                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition"
+                  className="w-7 h-7 flex items-center justify-center border rounded-full hover:bg-gray-100 transition font-sans"
                 >－</button>
                 <span className="w-5 text-center">{cart[menu.id] || 0}</span>
                 <button
@@ -138,7 +138,7 @@ export default function MenuPage() {
                 >＋</button>
                 <button
                   onClick={e => { e.stopPropagation(); add(menu.id) }}
-                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition"
+                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-green-700 transition font-sans"
                 >담기</button>
               </div>
             </div>
