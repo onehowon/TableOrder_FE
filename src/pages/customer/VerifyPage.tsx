@@ -98,7 +98,7 @@ export default function VerifyPage() {
         총 금액 : {totalAmount.toLocaleString()}원
       </div>
       <div className="bg-red-100 text-red-800 p-3 rounded-lg mb-8 text-center">
-        계좌번호: 신한 123-4567-8910-11 (한원보)
+        계좌번호: 카카오뱅크 3333-27-0930198 (한원보)
       </div>
 
       {/* 안내 문구 */}
