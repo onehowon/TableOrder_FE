@@ -122,7 +122,7 @@ export default function SummaryPage() {
           </span>
         </div>
         <div className="bg-red-100 text-red-800 p-4 rounded-lg text-center mb-2">
-          계좌번호: 신한 123-4567-8910-11 (한원보)
+          계좌번호: 카카오뱅크 3333-27-0930198 (한원보)
         </div>
         <p className="text-center text-sm text-gray-600 font-bold">
           🚨 주문 전 입금 잊지 말아 주세요!
