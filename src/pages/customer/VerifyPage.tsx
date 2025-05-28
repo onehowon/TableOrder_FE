@@ -26,7 +26,7 @@ export default function VerifyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const inputsRef = useRef<HTMLInputElement[]>([])
 
-  const ADMIN_CODE = '5132'
+  const ADMIN_CODE = '4132'
 
   // 메뉴 불러와서 subtotal 계산용
   useEffect(() => {
