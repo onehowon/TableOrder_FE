@@ -1,54 +1,69 @@
-# React + TypeScript + Vite
+<h1 align="middle">TableOrder_FE (테이블 오더)</h1>
+<h3 align="middle">학과 축제 주점용 테이블 주문·운영 관리 웹 서비스 — 프론트엔드</h3>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<br/>
 
-Currently, two official plugins are available:
+## 개요
+- 아주대학교 학과 축제 주점(22개 테이블, 2025년 5월) 운영에 실제로 사용한 테이블 주문 서비스의 화면
+- 7인 팀 프로젝트(주점 운영) — 서비스 개발·배포는 성원호 단독
+- 한 저장소에 **고객 주문 화면**과 **관리자 페이지**가 함께 있음 (둘 다 React)
+- 백엔드: [TableOrder](https://github.com/onehowon/TableOrder) (Spring Boot)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<br/>
 
-## Expanding the ESLint configuration
+## 주요 기능 (코드 기준)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**고객 화면 (`/customer/:tableNumber/...`)**
+- 테이블 번호가 들어간 링크로 접속 → 메뉴 목록·상세 → 장바구니 → 주문 확인
+- 품절 메뉴는 목록에서 제외
+- 계좌이체 금액 안내 후, 운영진이 이체를 확인하고 확인 코드를 입력하면 주문 전송
+- 테이블별 주문 현황·합계 조회
+- 직원 호출
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+**관리자 페이지 (`/admin/...`, 로그인 필요)**
+- 주문 보드·주문 목록: 주문 상태 변경(대기 → 서빙 완료 / 삭제)
+- 새 주문·직원 호출 알림: 5초마다 조회, 새 건이 오면 알림음 재생
+- 메뉴 관리: 등록·수정·삭제, 이미지 업로드, 품절 전환
+- 매출: 총 주문 수·총 매출·총 이윤, 시간대별 매출(선 그래프), 메뉴별 이윤(막대 그래프), 엑셀 내려받기(메뉴별 이윤·주문 상세)
+
+<br/>
+
+## 기술 스택 (package.json 기준)
+- React 19, TypeScript 5.8, Vite 6
+- React Router 7, Axios
+- Tailwind CSS 4
+- Recharts (매출 차트), xlsx + file-saver (엑셀 내려받기), dayjs
+
+<br/>
+
+## 배포
+- Vercel
+- `vercel.json`: `/api/*` 요청을 백엔드 서버로 넘기고, 나머지 경로는 `index.html`로 연결(SPA 라우팅)
+
+<br/>
+
+## 프로젝트 구조
+```
+src
+├── pages
+│   ├── customer   # 시작·메뉴·장바구니 확인·결제 확인·주문 현황·직원 호출
+│   └── admin      # 로그인·주문 보드·주문 목록·알림·매출·메뉴 관리
+├── components     # 알림(GlobalNotifier), 관리자 레이아웃, 사이드 메뉴, 장바구니 위젯
+├── contexts       # 장바구니·테이블 상태
+└── api.ts         # 고객/관리자 API 클라이언트
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+<br/>
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## 실행
+```bash
+npm install
+npm run dev     # 개발 서버
+npm run build   # 타입 검사 + 빌드
 ```
+
+<br/>
+
+## 한계
+- 실시간 갱신은 5초 간격 폴링 방식
+- 결제 연동 없음. 이체 확인 코드는 프론트엔드에서만 검사함
